@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb5168879139818776</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.973725628875-qi4sur8d7055jqukjkeculeitcej9s1q</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>FacebookAppID</key>
+	<string>5168879139818776</string>
+	<key>FacebookDisplayName</key>
+	<string>Flazhed</string>
+	<key>GADIsAdManagerApp</key>
+	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbapi</string>
+		<string>fbapi5168879139818776</string>
+		<string>fbapi5168879139818776</string>
+		<string>fbapi5168879139818776</string>
+		<string>fbapi5168879139818776</string>
+		<string>fbapi5168879139818776</string>
+		<string>fbapi5168879139818776</string>
+		<string>fbapi5168879139818776</string>
+		<string>fbapi5168879139818776</string>
+		<string>fbapi5168879139818776</string>
+		<string>fbapi5168879139818776</string>
+		<string>fbauth</string>
+		<string>fb-messenger-share-api</string>
+		<string>fbauth2</string>
+		<string>fbshareextension</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsForMedia</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+	</dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Media usage</string>
+	<key>NSCameraUsageDescription</key>
+	<string>To Take Photos and Video</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Location</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Location usase</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Location</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>To record audio</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo Usage</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Averta-ExtraboldItalic.otf</string>
+		<string>Averta-Regular.otf</string>
+		<string>Averta Black Italic.otf</string>
+		<string>Averta Black.otf</string>
+		<string>Averta Bold Italic.otf</string>
+		<string>Averta Bold.otf</string>
+		<string>Averta Extra Bold Italic.otf</string>
+		<string>Averta Extra Bold.otf</string>
+		<string>Averta Extrathin Italic.otf</string>
+		<string>Averta Extrathin.otf</string>
+		<string>Averta Light Italic.otf</string>
+		<string>Averta Light.otf</string>
+		<string>Averta Regular Italic.otf</string>
+		<string>Averta Semibold Italic.otf</string>
+		<string>Averta Semibold.otf</string>
+		<string>Averta Thin Italic.otf</string>
+		<string>Averta Thin.otf</string>
+		<string>Averta.otf</string>
+		<string>Averta-ExtraboldItalic.otf</string>
+		<string>Averta-Regular.otf</string>
+	</array>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneConfigurationName</key>
+					<string>Default Configuration</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+					<key>UISceneStoryboardFile</key>
+					<string>Main</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>remote-notification</string>
+		<string>voip</string>
+	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleLightContent</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+</dict>
+</plist>

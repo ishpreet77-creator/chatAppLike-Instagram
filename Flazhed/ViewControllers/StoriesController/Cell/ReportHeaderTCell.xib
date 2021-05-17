@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="Averta Bold.otf">
+            <string>Averta-Bold</string>
+        </array>
+        <array key="Averta.otf">
+            <string>Averta-Regular</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="ReportHeaderTCell" rowHeight="209" id="KGk-i7-Jjw" customClass="ReportHeaderTCell" customModule="Flazhed" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="395" height="209"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="395" height="209"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oMj-vC-tFP">
+                        <rect key="frame" x="0.0" y="0.0" width="395" height="209"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2GB-Rt-jcN">
+                                <rect key="frame" x="32" y="28" width="25" height="25"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="25" id="ou0-dk-S9x"/>
+                                    <constraint firstAttribute="width" constant="25" id="vt3-l0-7fZ"/>
+                                </constraints>
+                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <state key="normal" image="BackArrow">
+                                    <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Block And Report" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Z6v-tJ-hMJ">
+                                <rect key="frame" x="97.5" y="31.5" width="200" height="18"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="200" id="a3q-8B-mRs"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Averta-Bold" family="Averta-Bold" pointSize="18"/>
+                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tell us what this person did. Don't worry it will be totally anonymous." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Sro-A1-Kuu">
+                                <rect key="frame" x="32" y="97.5" width="331" height="28"/>
+                                <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="14"/>
+                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="Sro-A1-Kuu" secondAttribute="trailing" constant="32" id="5aE-yy-Dcg"/>
+                            <constraint firstItem="Sro-A1-Kuu" firstAttribute="top" secondItem="Z6v-tJ-hMJ" secondAttribute="bottom" constant="48" id="BSU-mH-z2i"/>
+                            <constraint firstItem="Z6v-tJ-hMJ" firstAttribute="centerY" secondItem="2GB-Rt-jcN" secondAttribute="centerY" id="DuL-0Y-sn2"/>
+                            <constraint firstItem="Sro-A1-Kuu" firstAttribute="leading" secondItem="oMj-vC-tFP" secondAttribute="leading" constant="32" id="Ggs-wC-ZPK"/>
+                            <constraint firstItem="2GB-Rt-jcN" firstAttribute="top" secondItem="oMj-vC-tFP" secondAttribute="top" constant="28" id="iYj-po-J7n"/>
+                            <constraint firstItem="Z6v-tJ-hMJ" firstAttribute="centerX" secondItem="oMj-vC-tFP" secondAttribute="centerX" id="nUI-vp-xGp"/>
+                            <constraint firstItem="2GB-Rt-jcN" firstAttribute="leading" secondItem="oMj-vC-tFP" secondAttribute="leading" constant="32" id="wg1-65-lEP"/>
+                        </constraints>
+                    </view>
+                </subviews>
+                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                <constraints>
+                    <constraint firstItem="oMj-vC-tFP" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="667-CU-Cai"/>
+                    <constraint firstItem="oMj-vC-tFP" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="VR6-kM-cQP"/>
+                    <constraint firstAttribute="bottom" secondItem="oMj-vC-tFP" secondAttribute="bottom" id="eb2-f1-90E"/>
+                    <constraint firstAttribute="trailing" secondItem="oMj-vC-tFP" secondAttribute="trailing" id="pSS-Wp-ego"/>
+                </constraints>
+            </tableViewCellContentView>
+            <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <connections>
+                <outlet property="btnBack" destination="2GB-Rt-jcN" id="WTd-k8-JMH"/>
+                <outlet property="lblTitle" destination="Z6v-tJ-hMJ" id="i2h-lU-Kve"/>
+                <outlet property="lblabout" destination="Sro-A1-Kuu" id="FGg-e3-iYq"/>
+            </connections>
+            <point key="canvasLocation" x="92.028985507246389" y="106.80803571428571"/>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="BackArrow" width="9" height="15.5"/>
+    </resources>
+</document>

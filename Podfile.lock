@@ -1,0 +1,175 @@
+PODS:
+  - Alamofire (5.4.1)
+  - AppAuth (1.4.0):
+    - AppAuth/Core (= 1.4.0)
+    - AppAuth/ExternalUserAgent (= 1.4.0)
+  - AppAuth/Core (1.4.0)
+  - AppAuth/ExternalUserAgent (1.4.0)
+  - CountryPickerView (3.1.3)
+  - CryptoSwift (1.3.8)
+  - FBSDKCoreKit (8.2.0):
+    - FBSDKCoreKit/Basics (= 8.2.0)
+    - FBSDKCoreKit/Core (= 8.2.0)
+  - FBSDKCoreKit/Basics (8.2.0)
+  - FBSDKCoreKit/Core (8.2.0):
+    - FBSDKCoreKit/Basics
+  - FBSDKLoginKit (8.2.0):
+    - FBSDKLoginKit/Login (= 8.2.0)
+  - FBSDKLoginKit/Login (8.2.0):
+    - FBSDKCoreKit (~> 8.2.0)
+  - FBSDKShareKit (8.2.0):
+    - FBSDKShareKit/Share (= 8.2.0)
+  - FBSDKShareKit/Share (8.2.0):
+    - FBSDKCoreKit (~> 8.2.0)
+  - Google-Mobile-Ads-SDK (7.69.0):
+    - GoogleAppMeasurement (~> 7.0)
+    - GoogleUserMessagingPlatform (~> 1.1)
+  - GoogleAppMeasurement (7.4.0):
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.0)
+    - GoogleUtilities/MethodSwizzler (~> 7.0)
+    - GoogleUtilities/Network (~> 7.0)
+    - "GoogleUtilities/NSData+zlib (~> 7.0)"
+    - nanopb (~> 2.30907.0)
+  - GoogleMaps (4.1.0):
+    - GoogleMaps/Maps (= 4.1.0)
+  - GoogleMaps/Base (4.1.0)
+  - GoogleMaps/Maps (4.1.0):
+    - GoogleMaps/Base
+  - GooglePlaces (4.1.0):
+    - GoogleMaps/Base (= 4.1.0)
+  - GoogleSignIn (5.0.2):
+    - AppAuth (~> 1.2)
+    - GTMAppAuth (~> 1.0)
+    - GTMSessionFetcher/Core (~> 1.1)
+  - GoogleUserMessagingPlatform (1.4.0)
+  - GoogleUtilities/AppDelegateSwizzler (7.1.1):
+    - GoogleUtilities/Environment
+    - GoogleUtilities/Logger
+    - GoogleUtilities/Network
+  - GoogleUtilities/Environment (7.1.1):
+    - PromisesObjC (~> 1.2)
+  - GoogleUtilities/Logger (7.1.1):
+    - GoogleUtilities/Environment
+  - GoogleUtilities/MethodSwizzler (7.1.1):
+    - GoogleUtilities/Logger
+  - GoogleUtilities/Network (7.1.1):
+    - GoogleUtilities/Logger
+    - "GoogleUtilities/NSData+zlib"
+    - GoogleUtilities/Reachability
+  - "GoogleUtilities/NSData+zlib (7.1.1)"
+  - GoogleUtilities/Reachability (7.1.1):
+    - GoogleUtilities/Logger
+  - GTMAppAuth (1.1.0):
+    - AppAuth/Core (~> 1.4)
+    - GTMSessionFetcher (~> 1.4)
+  - GTMSessionFetcher (1.5.0):
+    - GTMSessionFetcher/Full (= 1.5.0)
+  - GTMSessionFetcher/Core (1.5.0)
+  - GTMSessionFetcher/Full (1.5.0):
+    - GTMSessionFetcher/Core (= 1.5.0)
+  - IQKeyboardManagerSwift (6.5.6)
+  - KeychainSwift (19.0.0)
+  - nanopb (2.30907.0):
+    - nanopb/decode (= 2.30907.0)
+    - nanopb/encode (= 2.30907.0)
+  - nanopb/decode (2.30907.0)
+  - nanopb/encode (2.30907.0)
+  - PromisesObjC (1.2.11)
+  - QuickBlox (2.17.4)
+  - Quickblox-WebRTC (2.7.5):
+    - QuickBlox (>= 2.7.5)
+  - SDWebImage (5.10.2):
+    - SDWebImage/Core (= 5.10.2)
+  - SDWebImage/Core (5.10.2)
+  - Socket.IO-Client-Swift (15.2.0):
+    - Starscream (~> 3.1)
+  - Starscream (3.1.1)
+  - SwiftRangeControl (0.3)
+  - SwiftyCam (4.0.0)
+  - SwiftyInsta (2.4.2):
+    - CryptoSwift (~> 1.3)
+    - KeychainSwift (~> 19.0)
+
+DEPENDENCIES:
+  - Alamofire
+  - CountryPickerView
+  - FBSDKCoreKit
+  - FBSDKLoginKit
+  - FBSDKShareKit
+  - Google-Mobile-Ads-SDK
+  - GoogleMaps
+  - GooglePlaces
+  - GoogleSignIn
+  - IQKeyboardManagerSwift
+  - QuickBlox (~> 2.17.4)
+  - Quickblox-WebRTC (~> 2.7.4)
+  - SDWebImage
+  - Socket.IO-Client-Swift (~> 15.2.0)
+  - SwiftRangeControl
+  - SwiftyCam
+  - SwiftyInsta (~> 2.0)
+
+SPEC REPOS:
+  trunk:
+    - Alamofire
+    - AppAuth
+    - CountryPickerView
+    - CryptoSwift
+    - FBSDKCoreKit
+    - FBSDKLoginKit
+    - FBSDKShareKit
+    - Google-Mobile-Ads-SDK
+    - GoogleAppMeasurement
+    - GoogleMaps
+    - GooglePlaces
+    - GoogleSignIn
+    - GoogleUserMessagingPlatform
+    - GoogleUtilities
+    - GTMAppAuth
+    - GTMSessionFetcher
+    - IQKeyboardManagerSwift
+    - KeychainSwift
+    - nanopb
+    - PromisesObjC
+    - QuickBlox
+    - Quickblox-WebRTC
+    - SDWebImage
+    - Socket.IO-Client-Swift
+    - Starscream
+    - SwiftRangeControl
+    - SwiftyCam
+    - SwiftyInsta
+
+SPEC CHECKSUMS:
+  Alamofire: 2291f7d21ca607c491dd17642e5d40fdcda0e65c
+  AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
+  CountryPickerView: 383c09949f7455de9892db7ce3400b10da090150
+  CryptoSwift: 01b0f0cba1d5c212e5a335ff6c054fb75a204f00
+  FBSDKCoreKit: 4afd6ff53d8133a433dbcda44451c9498f8c6ce4
+  FBSDKLoginKit: 7181765f2524d7ebf82d9629066c8e6caafc99d0
+  FBSDKShareKit: 0c0d51b3af47075a85ed9bea0e28b2fc70e3594b
+  Google-Mobile-Ads-SDK: 2f288748a42920d1c744946a460896a95b0e9110
+  GoogleAppMeasurement: 688d7f00e2894d9e13823ed9a028b13b993bc277
+  GoogleMaps: 008e2c80e38605b56b560e8deb73d4194ff30bef
+  GooglePlaces: a058b776259c13e1323c9ff135549cb1b13ad8e7
+  GoogleSignIn: 7137d297ddc022a7e0aa4619c86d72c909fa7213
+  GoogleUserMessagingPlatform: b168e8c46cd8f92aa3e34b584c4ca78a411ce367
+  GoogleUtilities: 3dc4ff0d5e4840e2fa8eef0889620e8c33d4218c
+  GTMAppAuth: 197a8dabfea5d665224aa00d17f164fc2248dab9
+  GTMSessionFetcher: b3503b20a988c4e20cc189aa798fd18220133f52
+  IQKeyboardManagerSwift: c7df9d2deb356c04522f5c4b7b6e4ce4d8ed94fe
+  KeychainSwift: a06190cf933ad46b1e0abc3d77d29c06331715c7
+  nanopb: 59221d7f958fb711001e6a449489542d92ae113e
+  PromisesObjC: 8c196f5a328c2cba3e74624585467a557dcb482f
+  QuickBlox: 992be26bc127313991a1337dfd98c9359832c147
+  Quickblox-WebRTC: 6be5253719fc8b747408fdac53985d04d40f3172
+  SDWebImage: b969dcfc02c40a5da71eac0b03b8f1a0c794a86f
+  Socket.IO-Client-Swift: 1e3e3a1f09f3312a167f0d781eb2f383d477357c
+  Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
+  SwiftRangeControl: 3a0880968eaa5089fded2751924c1112dcfc6325
+  SwiftyCam: 6e57914771d972fbe508e759dc9d0150a44a93fd
+  SwiftyInsta: 39eeebf62d6fa58e1b0f57ab76552bf82ceaa947
+
+PODFILE CHECKSUM: a5304d75014bb5e25d6da15a9a4d8736eac3062a
+
+COCOAPODS: 1.10.1
