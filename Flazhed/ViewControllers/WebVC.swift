@@ -7,38 +7,53 @@
 
 
 import UIKit
+import WebKit
 
 class WebVC: BaseVC {
     
     //MARK:- Variables
-    @IBOutlet weak var txtFieldOtp: UITextField!
-    @IBOutlet weak var verifyBottonConstraint: NSLayoutConstraint!
+ 
+    
+    @IBOutlet weak var webViewUrl: WKWebView!
+    @IBOutlet weak var lblTitle: UILabel!
+    var pageTitle = ""
+    var pageUrl = ""
+    
     
     //MARK:- Class Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // Do any additional setup after loading the view.
+        self.webViewUrl.uiDelegate=self
+        self.webViewUrl.navigationDelegate = self
+        self.lblTitle.text = pageTitle
+        
+        if pageUrl != ""
+        {
+            Indicator.sharedInstance.showIndicator()
+        let request = URLRequest(url: URL(string: pageUrl)!)
+        
+        self.webViewUrl.load(request)
+        }
+        else
+        {
+            
+        }
+        
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        
-        self.view.endEditing(true)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-        
+      
         
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification , object: nil)
-        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification , object: nil)
+  
         
     }
-    
     
     //MARK:-IBActions
     @IBAction func backBtnAction(_ sender: UIButton) {
@@ -46,39 +61,19 @@ class WebVC: BaseVC {
         self.navigationController?.popViewController(animated: true)
     }
     
-    @IBAction func verifyBtnAction(_ sender: UIButton) {
-        
-    }
+}
+
+extension WebVC:UIWebViewDelegate,WKUIDelegate,WKNavigationDelegate
+{
+   
     
-    //MARK:- Functions
-    @objc
-    func keyboardWillAppear(notification: NSNotification?) {
-        
-        guard let keyboardFrame = notification?.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else {
-            return
-        }
-        
-        let keyboardHeight: CGFloat
-        if #available(iOS 11.0, *) {
-            keyboardHeight = keyboardFrame.cgRectValue.height - self.view.safeAreaInsets.bottom
-        } else {
-            keyboardHeight = keyboardFrame.cgRectValue.height
-        }
-        if self.getDeviceModel() == "iPhone 6"
-        {
-            verifyBottonConstraint.constant = keyboardHeight+44
-        }
-        else
-        {
-            self.verifyBottonConstraint.constant = keyboardHeight+44+20
-        }
-        
-    }
     
-    @objc
-    func keyboardWillDisappear(notification: NSNotification?) {
-        verifyBottonConstraint.constant = 44
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        Indicator.sharedInstance.hideIndicator()
     }
-    
+
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        Indicator.sharedInstance.hideIndicator()
+    }
     
 }

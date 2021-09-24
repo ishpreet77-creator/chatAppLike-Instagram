@@ -9,7 +9,7 @@ import UIKit
 import IQKeyboardManagerSwift
 
 class VerificationVC: BaseVC {
-    //MARK:- All outlets  🍎
+    //MARK:- All outlets  
     
     @IBOutlet weak var lblOtpSent: UILabel!
     @IBOutlet weak var topConst: NSLayoutConstraint!
@@ -23,15 +23,16 @@ class VerificationVC: BaseVC {
     @IBOutlet weak var viewResend: UIView!
     @IBOutlet weak var scrollHeightConst: NSLayoutConstraint!
     @IBOutlet weak var topScrollConst: NSLayoutConstraint!
-    
-    //MARK:- All Variable  🍎
+    @IBOutlet weak var txtDPOTPView: DPOTPView!
+
+    //MARK:- All Variable  
     
     var countryCode = ""
     var mobileNumber = ""
     var SentOTP = ""
     var forTesting = ""
-    
-    //MARK:- View Lifecycle   🍎
+   
+    //MARK:- View Lifecycle   
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,7 +48,7 @@ class VerificationVC: BaseVC {
         
         let characters = Array(SentOTP)
         print(characters)
-        if self.forTesting=="yes"
+        if self.forTesting.equalsIgnoreCase(string: "yes")
         {
             if characters.count>0
             {
@@ -96,7 +97,7 @@ class VerificationVC: BaseVC {
         
     }
     
-    //MARK:- Resend OTP button action 🍎
+    //MARK:- Resend OTP button action 
     
     @IBAction func ResendAct(_ sender: UIButton)
     {
@@ -113,7 +114,7 @@ class VerificationVC: BaseVC {
         }
         
     }
-    //MARK:- Send OTP button action 🍎
+    //MARK:- Send OTP button action 
     
     @IBAction func sendAct(_ sender: UIButton)
     {
@@ -126,10 +127,10 @@ class VerificationVC: BaseVC {
             var data = JSONDictionary()
             data[ApiKey.kPhoneNumber] = mobileNumber
             data[ApiKey.kCountryCode] = countryCode
-            data[ApiKey.kOtp] = txt1.text! + txt2.text! + txt3.text! + txt4.text!
+            data[ApiKey.kOtp] = self.SentOTP//txt1.text! + txt2.text! + txt3.text! + txt4.text!
             data[ApiKey.kDevicetype] = kDeviceType
             data[ApiKey.KDeviceToken] =  AppDelegate.DeviceToken
-            
+            data[ApiKey.KVoip_device_token] = AppDelegate.VOIPDeviceToken
             if Connectivity.isConnectedToInternet {
                 
                 self.OtpVerifyApi(data: data)
@@ -142,7 +143,7 @@ class VerificationVC: BaseVC {
         }
     }
     
-    //MARK:- Keyboard method 🍎
+    //MARK:- Keyboard method 
     
     @objc
     func keyboardWillAppear(notification: NSNotification?) {
@@ -180,10 +181,12 @@ class VerificationVC: BaseVC {
     // MARK:- Private Functions
     private func validateData () -> String?
     {
-        if txt1.isEmpty && txt2.isEmpty && txt3.isEmpty && txt4.isEmpty {
+        if self.SentOTP.count==0//txt1.isEmpty && txt2.isEmpty && txt3.isEmpty && txt4.isEmpty
+        {
             return kEmptyOTPAlert
         }
-        else if txt1.isEmpty || txt2.isEmpty || txt3.isEmpty || txt4.isEmpty {
+        else if self.SentOTP.count<4//txt1.isEmpty || txt2.isEmpty || txt3.isEmpty || txt4.isEmpty
+        {
             return kOTPValidAlert
         }
         
@@ -191,17 +194,17 @@ class VerificationVC: BaseVC {
         return nil
     }
     
-    //MARK:- Setup UI method 🍎
+    //MARK:- Setup UI method 
     
     func setUpUI()
     {
         let number = "\(countryCode)" + " " + "\(mobileNumber)"
         
-        let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: "Enter the OTP sent to  \(number)")
-        attributedString.setColorForText(textForAttribute: "Enter the OTP sent to ", withColor: UIColor.black)
+        let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: "\(kOTPsent)  \(number)")
+        attributedString.setColorForText(textForAttribute: kOTPsent, withColor: UIColor.black)
         attributedString.setColorForText(textForAttribute: "\(number)", withColor:UIColor(named: "AppTextColor")!)
         lblOtpSent.attributedText = attributedString
-        self.setCustomHeader(title: "Verification", showBack: true, showMenuButton: false)
+        self.setCustomHeader(title: kVerification, showBack: true, showMenuButton: false)
         
         if self.getDeviceModel() == "iPhone 6"
         {
@@ -232,14 +235,26 @@ class VerificationVC: BaseVC {
         txt2.attributedPlaceholder = NSAttributedString(string:"0", attributes:[NSAttributedString.Key.foregroundColor: OTPCOLOR,NSAttributedString.Key.font :UIFont(name: AppFontName.regular, size: 35)!])
         txt3.attributedPlaceholder = NSAttributedString(string:"0", attributes:[NSAttributedString.Key.foregroundColor: OTPCOLOR,NSAttributedString.Key.font :UIFont(name: AppFontName.regular, size: 35)!])
         txt4.attributedPlaceholder = NSAttributedString(string:"0", attributes:[NSAttributedString.Key.foregroundColor: OTPCOLOR,NSAttributedString.Key.font :UIFont(name: AppFontName.regular, size: 35)!])
+       // let attributedStringX = NSMutableAttributedString(string: "0000")
+      //  attributedStringX.addAttribute(NSAttributedString.Key.kern, value: CGFloat(50.0), range: NSRange(location: 0, length: attributedString.length))
+          // txt1.attributedText = attributedStringX
         
+            // let att = NSAttributedString(attributedString: attributedStringX)
+        
+     
         self.btnResed.underline()
         
+        txtDPOTPView.becomeFirstResponder()
+        txtDPOTPView.dpOTPViewDelegate = self
+        txtDPOTPView.fontTextField = UIFont(name: AppFontName.regular, size: 35)!
+        txtDPOTPView.placeholderTextColor=OTPCOLOR
+        txtDPOTPView.textEdgeInsets = UIEdgeInsets(top: 0, left: -1, bottom: 0, right: 0)
+        txtDPOTPView.editingTextEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         
     }
     
 }
-//MARK:- textfield delegate method 🍎
+//MARK:- textfield delegate method 
 
 extension VerificationVC:UITextFieldDelegate
 {
@@ -261,6 +276,10 @@ extension VerificationVC:UITextFieldDelegate
         
         let text = textField.text ?? ""
         let count = text.utf16.count
+        
+//        let attributedString = NSMutableAttributedString(string: textField.text!)
+//        attributedString.addAttribute(NSAttributedString.Key.kern, value: CGFloat(50.0), range: NSRange(location: 0, length: attributedString.length))
+//           txt1.attributedText = attributedString
         
         if count >= 1{
             switch textField
@@ -293,6 +312,7 @@ extension VerificationVC:UITextFieldDelegate
                 break
             }
         }
+        
     }
     func textFieldDidEndEditing(_ textField: UITextField) {
         print(textField)
@@ -312,14 +332,19 @@ extension VerificationVC
             }
             else{
                 
-                let characters = Array((OnBoardingVM.shared.sendOTPData[ApiKey.kOtp] as? String ?? ""))
+                //let characters = Array((OnBoardingVM.shared.sendOTPData[ApiKey.kOtp] as? String ?? ""))
+                let characters = (OnBoardingVM.shared.sendOTPData[ApiKey.kOtp] as? String ?? "")
+
                 print(characters)
                 self.viewResend.isHidden = true
                 self.viewOTPSuccess.isHidden = false
-                
+              //  self.txtDPOTPView.text=characters
+              //  self.SentOTP=characters
+                /*
                 if self.forTesting=="yes"
                 {
-                    
+                   self.txtDPOTPView.text=characters
+                   self.SentOTP=characters
                     if characters.count>0
                     {
                         self.txt1.text = "\(characters[0])"
@@ -344,6 +369,7 @@ extension VerificationVC
                     self.txt3.text=""
                     self.txt4.text=""
                 }
+                */
             }
         })
     }
@@ -358,22 +384,66 @@ extension VerificationVC
             }
             else{
                 
+                
+               
+                
+                
+                
                 if (OnBoardingVM.shared.loginUserDetail?.profile_data?.username != nil)
                 {
-                    let vc = self.storyboard?.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
-                    DataManager.comeFromTag=5
-                    DataManager.accessToken=OnBoardingVM.shared.loginUserDetail?.authToken ?? ""
-                    DataManager.userName=OnBoardingVM.shared.loginUserDetail?.name ?? ""
-                    DataManager.isProfileCompelete=true
-                    DataManager.Id=OnBoardingVM.shared.loginUserDetail?.id ?? ""
                     
-                    if OnBoardingVM.shared.loginUserDetail?.profile_data?.images?.count ?? 0>0
-                    {
-                        let img=OnBoardingVM.shared.loginUserDetail?.profile_data?.images?[0].image
+                    if (OnBoardingVM.shared.loginUserDetail?.more_profile_details?.bio == nil)
+                     {
+                        DataManager.comeFromTag=5
+                        DataManager.accessToken=OnBoardingVM.shared.loginUserDetail?.authToken ?? ""
+                        DataManager.userName=OnBoardingVM.shared.loginUserDetail?.name ?? ""
+                        DataManager.isProfileCompelete=true
+                        DataManager.Id=OnBoardingVM.shared.loginUserDetail?.id ?? ""
                         
-                        DataManager.userImage=img ?? ""
+                        if OnBoardingVM.shared.loginUserDetail?.profile_data?.images?.count ?? 0>0
+                        {
+                            let img=OnBoardingVM.shared.loginUserDetail?.profile_data?.images?[0].image
+                            
+                            DataManager.userImage=img ?? ""
+                        }
+                        DataManager.isEditProfile=false
+                                 if #available(iOS 13.0, *) {
+                                     SCENEDEL?.navigateToEditProfile()
+                                 } else {
+                                     // Fallback on earlier versions
+                                     APPDEL.navigateToEditProfile()
+                                 }
+                     }
+                else
+                    {
+                        let vc = self.storyboard?.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+                        DataManager.isEditProfile=true
+                        DataManager.comeFromTag=5
+                        DataManager.accessToken=OnBoardingVM.shared.loginUserDetail?.authToken ?? ""
+                        DataManager.userName=OnBoardingVM.shared.loginUserDetail?.name ?? ""
+                        DataManager.isProfileCompelete=true
+                        DataManager.Id=OnBoardingVM.shared.loginUserDetail?.id ?? ""
+                        let active = OnBoardingVM.shared.Swiping_Subsription_Data?.subscription_is_active ?? 0
+                        
+                        if active == 1
+                        {
+                           DataManager.purchasePlan=true
+                        }
+                        else
+                        {
+                            DataManager.purchasePlan=false
+                        }
+                        
+                        if OnBoardingVM.shared.loginUserDetail?.profile_data?.images?.count ?? 0>0
+                        {
+                            let img=OnBoardingVM.shared.loginUserDetail?.profile_data?.images?[0].image
+                            
+                            DataManager.userImage=img ?? ""
+                        }
+                        self.navigationController?.pushViewController(vc, animated: true)
                     }
-                    self.navigationController?.pushViewController(vc, animated: true)
+                    
+                  
                 }
                 else
                 {
@@ -385,5 +455,31 @@ extension VerificationVC
                 
             }
         })
+    }
+}
+
+extension VerificationVC : DPOTPViewDelegate {
+    func dpOTPViewAddText(_ text: String, at position: Int) {
+        print("addText:- " + text + " at:- \(position)" )
+        
+        self.SentOTP=text
+        
+    }
+    
+    func dpOTPViewRemoveText(_ text: String, at position: Int) {
+        print("removeText:- " + text + " at:- \(position)" )
+        self.SentOTP=text
+    }
+    
+    func dpOTPViewChangePositionAt(_ position: Int) {
+        print("at:-\(position)")
+    }
+    func dpOTPViewBecomeFirstResponder()
+    {
+        
+    }
+    func dpOTPViewResignFirstResponder()
+    {
+        
     }
 }

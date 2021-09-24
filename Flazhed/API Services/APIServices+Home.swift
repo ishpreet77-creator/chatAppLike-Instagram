@@ -13,8 +13,12 @@ enum APIServicesHome:APIService {
     case ShakeSentUser(data: JSONDictionary)
     case likeUnlikeUser(data: JSONDictionary)
     case AnonymousUser(data: JSONDictionary)
-    case getUserDetails(userId: String)
+    case UpdateLatLong(data: JSONDictionary)
+    case getUserDetails(data: JSONDictionary)
+    case RegretShake(data: JSONDictionary)
     
+    case RemoveStoryHangout(data: JSONDictionary)
+
     var path: String {
         var path = ""
         switch self {
@@ -26,8 +30,14 @@ enum APIServicesHome:APIService {
             path = BASE_URL.appending("like-dislike")
         case .AnonymousUser:
             path = BASE_URL.appending("get-user-by-anonymous")
-        case let .getUserDetails(userId):
-            path = BASE_URL.appending("get-user-anonymous-by-id/\(userId)")
+        case .UpdateLatLong:
+            path = BASE_URL.appending("cronjob-update-user-location-after-five-minutes")
+        case .getUserDetails:
+            path = BASE_URL.appending("get-user-anonymous-by-id")
+        case .RegretShake:
+            path = BASE_URL.appending("regret-shake")
+        case .RemoveStoryHangout:
+            path = BASE_URL.appending("delete-second-table-like-dislike")
             }
         return path
      }
@@ -48,8 +58,14 @@ enum APIServicesHome:APIService {
             
         case let .AnonymousUser(data):
             resource = Resource(method: .post, parameters: data, headers:headerDict)
-        case .getUserDetails(_):
-            resource = Resource(method: .get, parameters: nil, headers: headerDict)
+        case let .UpdateLatLong(data):
+            resource = Resource(method: .post, parameters: data, headers:headerDict)
+        case let .getUserDetails(data):
+            resource = Resource(method: .post, parameters: data, headers: headerDict)
+        case let .RegretShake(data):
+            resource = Resource(method: .post, parameters: data, headers:headerDict)
+        case let .RemoveStoryHangout(data):
+            resource = Resource(method: .post, parameters: data, headers:headerDict)
 
         }
         return resource

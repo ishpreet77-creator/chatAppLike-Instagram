@@ -14,6 +14,7 @@ enum APIServicesHangout:APIService {
     case otherHangouts(data: JSONDictionary)
     case deleteHangout(data: JSONDictionary)
     case detailHangout(data: JSONDictionary)
+    case likeDislikeHangout(data: JSONDictionary)
     var path: String {
         var path = ""
         switch self {
@@ -27,6 +28,8 @@ enum APIServicesHangout:APIService {
             path = BASE_URL.appending("delete-hangout-api")
         case .detailHangout:
             path = BASE_URL.appending("hangout-detail-by-id")
+        case .likeDislikeHangout:
+            path = BASE_URL.appending("hangout-like")
             
         }
         return path
@@ -47,6 +50,8 @@ enum APIServicesHangout:APIService {
         case let .deleteHangout(data):
             resource = Resource(method: .post, parameters: data, headers:headerDict)
         case let .detailHangout(data):
+            resource = Resource(method: .post, parameters: data, headers:headerDict)
+        case let .likeDislikeHangout(data):
             resource = Resource(method: .post, parameters: data, headers:headerDict)
         }
         return resource

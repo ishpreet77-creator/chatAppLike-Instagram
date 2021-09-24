@@ -15,19 +15,20 @@ class StoriesVM {
     
     var notificationSetupData:NotificationSetupModel?
     var Pagination_Details:Pagination_Details_Model?
-    
+    var singleStory:SinglePostDataModel?
     
     var page = 0
     
     private init(){}
 
-    func callApiGetStories(data: JSONDictionary,response: @escaping responseCallBack)
+    func callApiGetStories(showIndiacter:Bool, data: JSONDictionary,response: @escaping responseCallBack)
     {
-        APIManager.callApiGetStories(data:data,successCallback: { (responseDict) in
+        APIManager.callApiGetStories(showIndiacter:showIndiacter, data:data,successCallback: { (responseDict) in
          
             let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
          
             self.StoriesPostData.removeAll()
+            
          
            self.parseGetStoriesData(response:responseDict)
             response(message, nil)
@@ -64,15 +65,44 @@ class StoriesVM {
         }
     }
     
+    func callApiLikeStory(showIndiacter:Bool, data: JSONDictionary,response: @escaping responseCallBack)
+    {
+        APIManager.callApiLikeStory(showIndiacter:showIndiacter, data:data,successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+         
+            self.StoriesPostData.removeAll()
+            
+         
+           self.parseGetStoriesData(response:responseDict)
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
     
+    
+    func callApiGetStoryDetail(showIndiacter:Bool, data: JSONDictionary,response: @escaping responseCallBack)
+    {
+        APIManager.callApiSingleStory(showIndiacter:showIndiacter, data:data,successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+         
+        
+           self.parseGetSingleStory(response:responseDict)
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
     
 }
 extension APIManager {
 
     //MARK:- call Api get stories
 
-    class func callApiGetStories(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
-        APIServicesStories.getStories(data: data).request(isJsonRequest: true,success:{ (response) in
+    class func callApiGetStories(showIndiacter:Bool=true,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
+        APIServicesStories.getStories(data: data).request(showIndiacter: showIndiacter,isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
                 print(responseDict)
 
@@ -107,6 +137,33 @@ extension APIManager {
             }
         }, failure: failureCallback)
     }
+    
+    
+    class func callApiLikeStory(showIndiacter:Bool=true,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
+        APIServicesStories.likeStory(data: data).request(showIndiacter: showIndiacter,isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                print(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
+    
+    class func callApiSingleStory(showIndiacter:Bool=true,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
+        APIServicesStories.storyDetails(data: data).request(showIndiacter: showIndiacter,isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                print(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
 }
 
 //MARK:- Parsing the data
@@ -137,6 +194,15 @@ extension StoriesVM {
      
                 }
             }
+        }
+    }
+    
+    func parseGetSingleStory(response: JSONDictionary){
+        if let data = response[ApiKey.kData] as? JSONDictionary
+        {
+       let detail = SinglePostDataModel(detail: data)
+            self.singleStory=detail
+    
         }
     }
 

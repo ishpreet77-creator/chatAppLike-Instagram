@@ -19,7 +19,7 @@ class AccountsVC: BaseVC {
     var comeFromVerify = false
     var mobileNumber = ""
     var countryCode = kCurrentCountryCode
-    var countryName = "India"
+    var countryName = "Denmark"
     
     let manager = CLLocationManager()
     
@@ -36,7 +36,7 @@ class AccountsVC: BaseVC {
         manager.requestAlwaysAuthorization()
         manager.delegate = self
         manager.requestLocation()
-        
+       // manager.startMonitoringSignificantLocationChanges()        
         super.viewWillAppear(true)
         self.topConst.constant = 0
        if DataManager.comeFrom != kViewProfile
@@ -51,16 +51,31 @@ class AccountsVC: BaseVC {
     @IBAction func backBtnAction(_ sender: UIButton) {
         if comeFromVerify
         {
-            if #available(iOS 13.0, *) {
-                SCENEDEL?.navigateToProfile()
-            } else {
-                // Fallback on earlier versions
-                APPDEL.navigateToProfile()
-            }
+//            if #available(iOS 13.0, *) {
+//                SCENEDEL?.navigateToProfile()
+//            } else {
+//                // Fallback on earlier versions
+//                APPDEL.navigateToProfile()
+//            }
+            let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
+            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+            vc.selectedIndex=4
+            self.navigationController?.pushViewController(vc, animated: true)
+            
         }
         else
         {
-            DataManager.comeFrom = kViewProfile
+            if DataManager.comeFrom == kOTPValidAlert
+            {
+                DataManager.comeFrom = kEmptyString
+            }
+            else
+            {
+                DataManager.comeFrom = kViewProfile
+            }
+            
+            
+            //
             self.navigationController?.popViewController(animated: true)
         }
         
@@ -88,6 +103,8 @@ class AccountsVC: BaseVC {
         {
             let storyBoard = UIStoryboard.init(name: "Account", bundle: nil)
             let vc = storyBoard.instantiateViewController(withIdentifier: "WebVC") as! WebVC
+            vc.pageTitle=kTermOfService
+            vc.pageUrl=TERM_URL
             self.navigationController?.pushViewController(vc, animated: true)
         }
         else if sender.tag == 6
@@ -118,7 +135,7 @@ class AccountsVC: BaseVC {
     
     
     @IBAction func getTheMostBtnAction(_ sender: UIButton) {
-        let vc = self.storyboard?.instantiateViewController(withIdentifier: "RegretPopUpVC") as! RegretPopUpVC
+        let vc = self.storyboard?.instantiateViewController(withIdentifier: "PremiumVC") as! PremiumVC //RegretPopUpVC
         vc.type = .kExtraShakes
         vc.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
         vc.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
@@ -133,7 +150,7 @@ extension AccountsVC:deleteAccountDelegate
 {
     func deleteAccountFunc(name: String)
     {
-        if name==kAccount
+        if name.equalsIgnoreCase(string: kAccount)
         {
             if Connectivity.isConnectedToInternet
             {
@@ -145,7 +162,7 @@ extension AccountsVC:deleteAccountDelegate
             }
            
         }
-       else if name==kDelete
+        else if name.equalsIgnoreCase(string: kDelete)
         {
         if Connectivity.isConnectedToInternet
         {
@@ -171,12 +188,20 @@ extension AccountsVC
                 self.showErrorMessage(error: error)
             }
             else{
-     
+                APPDEL.timerBudgeCount?.invalidate()
                     DataManager.comeFrom = ""
                     DataManager.isProfileCompelete = false
                      DataManager.accessToken = ""
-                    DataManager.Id = ""
+                    DataManager.Id = kEmptyString
+                DataManager.userName = ""
                  DataManager.currentUnit = ""
+                DataManager.ShakeId=""
+                DataManager.purchasePlan=false
+                DataManager.purchaseProlong=false
+                APPDEL.timerBudgeCount?.invalidate()
+                self.ClearMemory()
+                UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+
                 if #available(iOS 13.0, *) {
                     SCENEDEL?.navigateToLogin()
                 } else {
@@ -198,11 +223,24 @@ extension AccountsVC
                 self.showErrorMessage(error: error)
             }
             else{
-              
+                APPDEL.timerBudgeCount?.invalidate()
                     DataManager.comeFrom = ""
                     DataManager.isProfileCompelete = false
                      DataManager.accessToken = ""
-                    DataManager.Id = ""
+                    DataManager.Id = kEmptyString
+                DataManager.ShakeId=""
+                DataManager.userName = ""
+                DataManager.isPrefrenceSet = false
+                DataManager.isEditProfile=false
+                DataManager.purchasePlan=false
+                DataManager.purchaseProlong=false
+                APPDEL.timerBudgeCount?.invalidate()
+                self.ClearMemory()
+                UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+                
+                
+                
+                
                 if #available(iOS 13.0, *) {
                     SCENEDEL?.navigateToLogin()
                 } else {
@@ -265,7 +303,9 @@ extension AccountsVC
                     }
                     else
                     {
-                        self.lblUnit.text = ""
+                        self.lblUnit.text = kCentimeters
+                        CURRENTUNIT=self.lblUnit.text ?? kCentimeters
+                        DataManager.currentUnit=kCentimeters
                     }
                 }
  
@@ -295,7 +335,7 @@ extension AccountsVC: CLLocationManagerDelegate
                 print("country = \(coutry)")
                 print("error = \(error)")
                 let code = coutry ?? ""
-                let countryName = city ?? "India"
+                let countryName = city ?? "Denmark"
                 self.countryName = countryName
                 let phoneCode = self.getCountryCallingCode(countryRegionCode: code)
                 

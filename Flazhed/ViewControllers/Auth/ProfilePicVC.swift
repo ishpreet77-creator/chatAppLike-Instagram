@@ -9,7 +9,7 @@ import CountryPickerView
 import SDWebImage
 
 class ProfilePicVC: BaseVC {
-    //MARK:- All outlets  🍎
+    //MARK:- All outlets  
     
     @IBOutlet weak var lblOtpSent: UILabel!
     @IBOutlet weak var topConst: NSLayoutConstraint!
@@ -40,13 +40,13 @@ class ProfilePicVC: BaseVC {
     func setUpUI()
     {
         let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: lblOtpSent.text ?? "")
-        attributedString.setColorForText(textForAttribute: "Adding at least 3 pictures increases your chance by ", withColor: UIColor.black)
-        attributedString.setColorForText(textForAttribute: "20x.", withColor: TEXTCOLOR)
+        attributedString.setColorForText(textForAttribute: kAddingAtLeast, withColor: UIColor.black)
+        attributedString.setColorForText(textForAttribute: k20x, withColor: TEXTCOLOR)
      
 
         lblOtpSent.attributedText = attributedString
         
-        self.setCustomHeader(title: "Profile Picture", showBack: false, showMenuButton: false)
+        self.setCustomHeader(title: kProfilePicture, showBack: false, showMenuButton: false)
         
         if self.getDeviceModel() == "iPhone 6"
         {
@@ -130,8 +130,8 @@ class ProfilePicVC: BaseVC {
         else
         {
                     let vc = self.storyboard?.instantiateViewController(withIdentifier: "UserNameVC") as! UserNameVC
-            vc.imageArray1=self.SelectedImages
-                vc.userName=self.userName
+                    vc.imageArray1=self.SelectedImages
+                    vc.userName=self.userName
             
                     self.navigationController?.pushViewController(vc, animated: true)
         }
@@ -197,8 +197,42 @@ extension ProfilePicVC:CountryPickerViewDataSource,CustomImagePickerDelegate
     //BackImage.image = image
       
         
+        if Connectivity.isConnectedToInternet {
+            self.showImageCheckLoader(vc: self)
         
-        let dataImage =  image.jpegData(compressionQuality: 0.7) ?? Data()
+       // let dataImage =  image.jpegData(compressionQuality: 0.7) ?? Data()
+        
+        let dataImage1 =  image.jpegData(compressionQuality: 1) ?? Data()
+        var imageSize1: Int = dataImage1.count
+        let size = Double(imageSize1) / 1000.0
+        var  dataImage = Data()
+        if size>1500
+        {
+            dataImage =  image.jpegData(compressionQuality: 0.03) ?? Data()
+        }
+        else if size>1000
+        {
+            dataImage =  image.jpegData(compressionQuality: 0.04) ?? Data()
+        }
+        
+        else if size>500
+        {
+         dataImage =  image.jpegData(compressionQuality: 0.05) ?? Data()
+        }
+      else if size>100
+       {
+        dataImage =  image.jpegData(compressionQuality: 0.2) ?? Data()
+       }
+      else if size>50
+       {
+        dataImage =  image.jpegData(compressionQuality: 0.5) ?? Data()
+       }
+        else
+       {
+        dataImage =  image.jpegData(compressionQuality: 0.7) ?? Data()
+       }
+        
+      
         
          APIManager.callApiForImageCheck(image1: dataImage,imageParaName1: kMedia, api: "",successCallback: {
              
@@ -206,12 +240,15 @@ extension ProfilePicVC:CountryPickerViewDataSource,CustomImagePickerDelegate
              print(responseDict)
             let data =   self.parseImageCheckData(response: responseDict)
             
-             if responseDict[ApiKey.kStatus] as? String == kSucess
+            if kSucess.equalsIgnoreCase(string: responseDict[ApiKey.kStatus] as? String ?? "")//responseDict[ApiKey.kStatus] as? String == kSucess
              {
+
                  print(data)
                  if data?.weapon ?? 0.0 > kNudityCheck
                  {
+                    self.dismiss(animated: true) {
                      self.openSimpleAlert(message: kImageCkeckAlert)
+                    }
                  }
 //                 else if  data?.alcohol ?? 0.0 > kNudityCheck
 //                 {
@@ -219,14 +256,19 @@ extension ProfilePicVC:CountryPickerViewDataSource,CustomImagePickerDelegate
 //                 }
                  else if  data?.drugs ?? 0.0 > kNudityCheck
                  {
+                    self.dismiss(animated: true) {
                      self.openSimpleAlert(message: kImageCkeckAlert)
+                    }
                  }
                  else if  data?.nudity?.partial ?? 0.0 > kNudityCheck
                  {
+                    self.dismiss(animated: true) {
                      self.openSimpleAlert(message: kImageCkeckAlert)
+                    }
                  }
                  else
                  {
+                    self.dismiss(animated: true, completion: nil)
                     self.SelectedImages.append(image)
                     self.imageCollectionView.reloadData()
                     
@@ -247,14 +289,18 @@ extension ProfilePicVC:CountryPickerViewDataSource,CustomImagePickerDelegate
              else
              {
                  let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+
                 if  data?.error?.message != ""
                 {
-                   
+                    self.dismiss(animated: true) {
                     self.openSimpleAlert(message:  data?.error?.message)
+                    }
                 }
                 else
                 {
+                    self.dismiss(animated: true) {
                     self.openSimpleAlert(message: message)
+                    }
                 }
                  
              }
@@ -262,10 +308,17 @@ extension ProfilePicVC:CountryPickerViewDataSource,CustomImagePickerDelegate
              
              
          },  failureCallback: { (errorReason, error) in
+            self.dismiss(animated: true, completion: nil)
+
              print(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
              
          })
-                
+           
+        } else {
+            
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
+        
     }
     
    

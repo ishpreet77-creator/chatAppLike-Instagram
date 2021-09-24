@@ -22,3 +22,13 @@ extension UITextView
         self.attributedText = attributedText
     }
 }
+extension UITextView{
+
+    func numberOfLines() -> Int{
+        if let fontUnwrapped = self.font{
+            return Int(self.contentSize.height / fontUnwrapped.lineHeight)
+        }
+        return 0
+    }
+
+}

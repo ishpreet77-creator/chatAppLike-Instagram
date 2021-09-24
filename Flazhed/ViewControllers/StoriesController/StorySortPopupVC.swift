@@ -38,7 +38,7 @@ class StorySortPopupVC: UIViewController {
     var match = ""
     var myPost = ""
     var allPost = ""
-    
+    var didUpdate=false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -136,27 +136,58 @@ class StorySortPopupVC: UIViewController {
     
     @IBAction func hidePopupAct(_ sender: UIButton)
     {
-        self.dismiss(animated: true)
+        if didUpdate
+        {
+            DataManager.storyImageSelected=self.img
+            DataManager.storyVideoSelected=self.video
+            DataManager.storyMatchSelected=self.match
+            DataManager.storyMyPostSelected=self.myPost
+            DataManager.storyAllPostSelected=self.allPost
+            
+            delegate?.selectedOption()
+            self.dismiss(animated: true, completion: nil)
+            
+        }
+        else
+        {
+            self.dismiss(animated: true, completion: nil)
+        }
     }
     
     
     @IBAction func BackAct(_ sender: UIButton)
     {
-        self.dismiss(animated: true, completion: nil)
+        if didUpdate
+        {
+            DataManager.storyImageSelected=self.img
+            DataManager.storyVideoSelected=self.video
+            DataManager.storyMatchSelected=self.match
+            DataManager.storyMyPostSelected=self.myPost
+            DataManager.storyAllPostSelected=self.allPost
+            
+            delegate?.selectedOption()
+            self.dismiss(animated: true, completion: nil)
+            
+        }
+        else
+        {
+            self.dismiss(animated: true, completion: nil)
+        }
+       
     }
     
 
     @IBAction func ApplyAct(_ sender: UIButton)
     {
-        DataManager.storyImageSelected=self.img
-        DataManager.storyVideoSelected=self.video
-        DataManager.storyMatchSelected=self.match
-        DataManager.storyMyPostSelected=self.myPost
-        DataManager.storyAllPostSelected=self.allPost
-        
-        delegate?.selectedOption()
-        self.dismiss(animated: true, completion: nil)
-        
+//        DataManager.storyImageSelected=self.img
+//        DataManager.storyVideoSelected=self.video
+//        DataManager.storyMatchSelected=self.match
+//        DataManager.storyMyPostSelected=self.myPost
+//        DataManager.storyAllPostSelected=self.allPost
+//
+//        delegate?.selectedOption()
+//        self.dismiss(animated: true, completion: nil)
+//
         
     }
     
@@ -164,6 +195,7 @@ class StorySortPopupVC: UIViewController {
     
     @IBAction func categoryAct(_ sender: UIButton)
     {
+        self.didUpdate=true
         if sender.tag == 0
         {
             if imgImage.image == UIImage(named: "SelectedCheck")

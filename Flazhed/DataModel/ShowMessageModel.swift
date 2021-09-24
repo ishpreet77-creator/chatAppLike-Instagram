@@ -6,15 +6,22 @@
 //
 
 import Foundation
+import GiphyUISDK
 
 
 struct AllMessageModel
 {
     //var type:MessageType?
+    var _id:String?
     var messageText:String?
     var messageTime:String?
     var to_user_id:String?
-
+    var media:GPHMedia?
+    var messageType:String = kMessageType
+    
+    var item_title:String?
+    var item_image:String?
+    var item_id:String?
 }
 
 

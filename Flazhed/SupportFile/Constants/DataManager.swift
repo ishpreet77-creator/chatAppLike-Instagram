@@ -27,6 +27,15 @@ class DataManager {
             return UserDefaults.standard.string(forKey: kId) ?? kEmptyString
         }
     }
+    static var ShakeId:String {
+        set {
+            UserDefaults.standard.set(newValue, forKey: ApiKey.kShakeUser)
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.string(forKey: ApiKey.kShakeUser) ?? kEmptyString
+        }
+    }
     
     static var comeFrom:String {
         set {
@@ -37,13 +46,13 @@ class DataManager {
             return UserDefaults.standard.string(forKey: kComeFrom) ?? kEmptyString
         }
     }
-    static var HomeRefresh:String {
+    static var HomeRefresh:Bool {
         set {
             UserDefaults.standard.set(newValue, forKey: "Home")
             UserDefaults.standard.synchronize()
         }
         get {
-            return UserDefaults.standard.string(forKey: "Home") ?? kEmptyString
+            return UserDefaults.standard.bool(forKey: "Home") ?? false
         }
     }
     static var comeFromTag:Int {
@@ -93,6 +102,16 @@ class DataManager {
             return UserDefaults.standard.string(forKey: kUserName) ?? kEmptyString
         }
     }
+    static var OtherUserId:String {
+        set {
+            UserDefaults.standard.set(newValue, forKey: kOtherUserId)
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.string(forKey: kOtherUserId) ?? kEmptyString
+        }
+    }
+    
     
     static var isProfileCompelete:Bool {
         set {
@@ -103,6 +122,25 @@ class DataManager {
             return UserDefaults.standard.bool(forKey: kProfileComplete)
         }
     }
+    static var isVideoMute:Bool {
+        set {
+            UserDefaults.standard.set(newValue, forKey: "Mute")
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.bool(forKey: "Mute")
+        }
+    }
+    static var isMessagePageOpen:Bool {
+        set {
+            UserDefaults.standard.set(newValue, forKey: "MessagePageOpen")
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.bool(forKey: "MessagePageOpen")
+        }
+    }
+    
     static var imageCount:Int {
         set {
             UserDefaults.standard.set(newValue, forKey: kImageCount)
@@ -179,6 +217,15 @@ class DataManager {
             return UserDefaults.standard.bool(forKey: ApiKey.kPurchasePlan) 
         }
     }
+    static var purchaseProlong:Bool {
+        set {
+            UserDefaults.standard.set(newValue, forKey: ApiKey.kChat_room)
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.bool(forKey: ApiKey.kChat_room)
+        }
+    }
     
     static var countryPhoneCode:String {
         set {
@@ -196,6 +243,26 @@ class DataManager {
         }
         get {
             return UserDefaults.standard.string(forKey: kCountryName) ?? kEmptyString
+        }
+    }
+    
+    static var isPrefrenceSet:Bool {
+        set {
+            UserDefaults.standard.set(newValue, forKey: kPreference)
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.bool(forKey: kPreference)
+        }
+    }
+    
+    static var isEditProfile:Bool {
+        set {
+            UserDefaults.standard.set(newValue, forKey: kEdit)
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.bool(forKey: kEdit)
         }
     }
     
@@ -339,6 +406,64 @@ class DataManager {
             return UserDefaults.standard.string(forKey: kClatest) ?? kEmptyString
         }
     }
+    
+    static var currentScreen:String {
+        set {
+            UserDefaults.standard.set(newValue, forKey: kMessage)
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.string(forKey: kMessage) ?? kEmptyString
+        }
+    }
+    static var isViewProfile:Bool {
+        set {
+            UserDefaults.standard.set(newValue, forKey: kViewProfile)
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.bool(forKey: kViewProfile)
+        }
+    }
+    
+    static var userNameType:String {
+        set {
+            UserDefaults.standard.set(newValue, forKey: kCalling)
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.string(forKey: kCalling) ?? kEmptyString
+        }
+    }
+    static var Selected_DateOfBirth:String {
+        set {
+            UserDefaults.standard.set(newValue, forKey: kCallTry)
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.string(forKey: kCallTry) ?? kEmptyString
+        }
+    }
+    static var Selected_Gender:String {
+        set {
+            UserDefaults.standard.set(newValue, forKey: kText)
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.string(forKey: kText) ?? kEmptyString
+        }
+    }
+    static var Selected_Audio:String {
+        set {
+            UserDefaults.standard.set(newValue, forKey: kAudio)
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.string(forKey: kAudio) ?? kEmptyString
+        }
+    }
 }
+
+
 
 

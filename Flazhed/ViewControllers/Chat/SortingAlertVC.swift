@@ -33,18 +33,21 @@ class SortingAlertVC: UIViewController {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
+        unreadButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+        latestButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+        closetToMeButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
         
         let currentFilter = DataManager.chatFilter
         
-        if currentFilter == kCunread
+        if currentFilter.equalsIgnoreCase(string: kCunread)
         {
             self.ShowSelectedOption(tag: 0)
         }
-       else if currentFilter == kClatest
+        else if currentFilter.equalsIgnoreCase(string: kClatest)
         {
             self.ShowSelectedOption(tag:1)
         }
-       else if currentFilter == kCclosest
+        else if currentFilter.equalsIgnoreCase(string: kCclosest)
         {
             self.ShowSelectedOption(tag:2)
         }
@@ -76,7 +79,8 @@ class SortingAlertVC: UIViewController {
     
     @IBAction func ApplyButtonAction(_ sender: UIButton)
     {
-        self.dismiss(animated: true) {
+        self.dismiss(animated: true)
+        {
             DataManager.chatFilter=self.selectedOption
             self.delegate?.SortOptionName(name: self.selectedOption)
         }
@@ -87,24 +91,63 @@ class SortingAlertVC: UIViewController {
     {
         if  tag == 0
         {
+            if  self.unreadButton.titleColor(for: .normal) == #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1) //self.unreadButton.isSelected==false
+            {
+
             unreadButton.setTitleColor(#colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1), for: .normal)
             latestButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
             closetToMeButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+                              
             unreadCheckUncheckImage.image = #imageLiteral(resourceName: "SelectedCheck")
             closetToMeCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
             latestCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
             self.selectedOption = kCunread
+            }
+            else
+            {
+                unreadButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+                latestButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+                closetToMeButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+                
+                unreadCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                closetToMeCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                latestCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                self.selectedOption = kEmptyString
+            }
             
         }else if tag == 1{
+            if  self.latestButton.titleColor(for: .normal) == #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+            {
+            
             unreadButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+
             latestButton.setTitleColor(#colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1), for: .normal)
+                
             closetToMeButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+                
             unreadCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
             latestCheckUncheckImage.image = #imageLiteral(resourceName: "SelectedCheck")
             closetToMeCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
             
             self.selectedOption = kClatest
+            }
+            
+            else
+            {
+                unreadButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+                latestButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+                closetToMeButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+                
+                unreadCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                closetToMeCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                latestCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                self.selectedOption = kEmptyString
+            }
+            
+            
         }else{
+            if  self.closetToMeButton.titleColor(for: .normal) == #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+            {
             unreadButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
             latestButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
             closetToMeButton.setTitleColor(#colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1), for: .normal)
@@ -112,6 +155,21 @@ class SortingAlertVC: UIViewController {
             latestCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
             closetToMeCheckUncheckImage.image = #imageLiteral(resourceName: "SelectedCheck")
             self.selectedOption = kCclosest
+                
+            }
+            else
+            {
+                unreadButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+                latestButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+                closetToMeButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
+                
+                unreadCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                closetToMeCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                latestCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                self.selectedOption = kEmptyString
+                self.selectedOption = kEmptyString
+
+            }
         }
 
        

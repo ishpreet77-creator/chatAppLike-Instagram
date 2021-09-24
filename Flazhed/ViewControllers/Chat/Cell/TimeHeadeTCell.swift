@@ -9,6 +9,9 @@ import UIKit
 
 class TimeHeadeTCell: UITableViewCell {
 
+    @IBOutlet weak var buttomConst: NSLayoutConstraint!
+    @IBOutlet weak var topconst: NSLayoutConstraint!
+    @IBOutlet weak var topConstHeader: NSLayoutConstraint!
     @IBOutlet weak var lblTime: UILabel!
     override func awakeFromNib() {
         super.awakeFromNib()

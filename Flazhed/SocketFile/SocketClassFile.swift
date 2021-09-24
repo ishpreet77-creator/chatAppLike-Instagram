@@ -47,6 +47,41 @@ class SocketIOManager {
         self.socket.connect()
     }
     
+    //MARK:- send Chat Message the room
+    func selfJoinSocket(MessageChatDict:[String:Any])
+    {
+        if(self.socket.status == .connected)
+        {
+              
+                self.socket.emit("selfJoinSocket",  MessageChatDict, completion: {
+
+        print("selfJoinSocket \(MessageChatDict)")
+                })
+        }
+        else{
+            print("Socket is not connected")
+            self.socket.connect()
+        }
+    }
+    
+    //MARK:- send Chat Message the room
+    func checkRoomExist(MessageChatDict:[String:Any])
+    {
+        if(self.socket.status == .connected)
+        {
+              
+                self.socket.emit("checkRoomExist",  MessageChatDict, completion: {
+
+        print("checkRoomExist \(MessageChatDict)")
+                })
+        }
+        else{
+            print("Socket is not connected")
+            self.socket.connect()
+        }
+    }
+    
+    
     
     //MARK:- Join the room
     
@@ -69,8 +104,6 @@ class SocketIOManager {
         }
     }
     //MARK:- send Chat Message the room
-   // ,joinRoomDict:[String:String
-    
     func sendChatMessage(MessageChatDict:[String:Any])
     {
         if(self.socket.status == .connected)
@@ -78,12 +111,150 @@ class SocketIOManager {
               
                 self.socket.emit("sendMessage",  MessageChatDict, completion: {
 
-                    print("sendMessage \(MessageChatDict)")
+        print("sendMessage \(MessageChatDict)")
+                })
+        }
+        else{
+            print("Socket is not connected")
+            self.socket.connect()
+        }
+    }
+    
+    
+    
+    
+    
+    
+    func sendSmsAlert(MessageChatDict:[String:Any])
+    {
+        if(self.socket.status == .connected)
+        {
+              
+                self.socket.emit("sendSmsAlert",  MessageChatDict, completion: {
+
+                    print("sendSmsAlert \(MessageChatDict)")
                     //self.getAllMessageInOnMethod()
                 })
         }
         else{
             print("Socket is not connected")
+            self.socket.connect()
+        }
+    }
+    
+    func userOnChatMessageScreen(MessageChatDict:[String:Any])
+    {
+        if(self.socket.status == .connected)
+        {
+              
+                self.socket.emit("userOnChatMessageScreen",  MessageChatDict, completion: {
+
+                    print("userOnChatMessageScreen \(MessageChatDict)")
+
+                })
+        }
+        else{
+            print("Socket is not connected")
+            self.socket.connect()
+        }
+    }
+    
+    
+    
+    func onActiveInactiveChatScreenJoin(MessageChatDict:[String:Any])
+    {
+        if(self.socket.status == .connected)
+        {
+              
+                self.socket.emit("onActiveInactiveChatScreenJoin",  MessageChatDict, completion: {
+
+                    print("onActiveInactiveChatScreenJoin \(MessageChatDict)")
+                 
+                })
+        }
+        else{
+            print("Socket is not connected")
+            self.socket.connect()
+        }
+    }
+
+    
+    
+    
+    //MARK:- Delete messge emirt method
+    
+    func deleteChatBySingleIdEmit(MessageChatDict:[String:Any])
+    {
+        if(self.socket.status == .connected)
+        {
+              
+                self.socket.emit("deleteChatBySingleId",  MessageChatDict, completion: {
+
+                    print("deleteChatBySingleId \(MessageChatDict)")
+                    //self.getAllMessageInOnMethod()
+                })
+        }
+        else{
+            print("Socket is not connected")
+            self.socket.connect()
+        }
+    }
+    
+    //MARK:- Delete messge emirt method
+    
+    func disconnectRoomEmit(MessageChatDict:[String:Any])
+    {
+        if(self.socket.status == .connected)
+        {
+              
+                self.socket.emit("disconnect",  MessageChatDict, completion: {
+
+                    print("disconnect \(MessageChatDict)")
+                    //self.getAllMessageInOnMethod()
+                })
+        }
+        else{
+            print("Socket is not connected")
+            self.socket.connect()
+        }
+    }
+    
+    
+    //MARK:- send updateOnlineStatusAfter2Minutes
+    
+    func updateOnlineStatusAfter2Minutes(MessageChatDict:[String:Any])
+    {
+        if(self.socket.status == .connected)
+        {
+              
+        self.socket.emit("updateOnlineStatusAfter2Minutes",  MessageChatDict, completion: {
+
+        print("updateOnlineStatusAfter2Minutes \(MessageChatDict)")
+                })
+        }
+        else{
+            print("Socket is not connected")
+            self.socket.connect()
+        }
+    }
+    
+    
+    
+    
+    //MARK:- badgeCountIntervalCheckEmitmethod
+    func badgeCountIntervalCheckEmit(MessageChatDict:[String:Any])
+    {
+        if(self.socket.status == .connected)
+        {
+              
+                self.socket.emit("badgeCountIntervalCheck",  MessageChatDict, completion: {
+
+                  //  print("badgeCountIntervalCheck \(MessageChatDict)")
+                    //self.getAllMessageInOnMethod()
+                })
+        }
+        else{
+         //   print("Socket is not connected")
             self.socket.connect()
         }
     }
@@ -187,6 +358,22 @@ class SocketIOManager {
     
     
     
+    //MARK:- send Chat Message the room
+    func sendMatchBlockNoti(MessageChatDict:[String:Any])
+    {
+        if(self.socket.status == .connected)
+        {
+              
+        self.socket.emit("sendRemoveBlockAlert",  MessageChatDict, completion: {
+
+        print("sendRemoveBlockAlert \(MessageChatDict)")
+                })
+        }
+        else{
+            print("Socket is not connected")
+            self.socket.connect()
+        }
+    }
     
     
 }

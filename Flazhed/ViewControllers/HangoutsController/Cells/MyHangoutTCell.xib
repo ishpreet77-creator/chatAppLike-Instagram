@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -58,7 +58,7 @@
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Saturdays @ 9:00 PM" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bwh-5T-98m">
                                 <rect key="frame" x="42" y="74" width="551" height="15"/>
                                 <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="15"/>
-                                <color key="textColor" red="0.69019607839999997" green="0.72549019609999998" blue="0.7843137255" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="textColor" red="0.2627450980392157" green="0.2627450980392157" blue="0.2627450980392157" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" image="Location-1" translatesAutoresizingMaskIntoConstraints="NO" id="txp-Ab-Ohv">
@@ -227,7 +227,7 @@
                             <view contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cd5-sb-tLY">
                                 <rect key="frame" x="0.0" y="282" width="601" height="375"/>
                                 <subviews>
-                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="placeholderImage" translatesAutoresizingMaskIntoConstraints="NO" id="DMx-TS-Yy2">
+                                    <imageView clipsSubviews="YES" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="placeholderImage" translatesAutoresizingMaskIntoConstraints="NO" id="DMx-TS-Yy2" customClass="EEZoomableImageView" customModule="Flazhed" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="601" height="375"/>
                                     </imageView>
                                 </subviews>
@@ -306,12 +306,15 @@
                 <outlet property="btnDelete" destination="qbe-vi-TPI" id="hdy-17-FPF"/>
                 <outlet property="btnEdit" destination="Cv5-SJ-M1T" id="VSm-wX-BFd"/>
                 <outlet property="btnLocation" destination="cOv-FX-Wje" id="Kby-gf-xzg"/>
+                <outlet property="imgCalender" destination="cFl-Kv-6Xu" id="lKC-Gv-4vJ"/>
                 <outlet property="imgHangout" destination="DMx-TS-Yy2" id="5sC-po-Idh"/>
                 <outlet property="imgHangoutTypeIcon" destination="ciM-Ye-dcw" id="Jif-XS-Omh"/>
+                <outlet property="imgHeightConst" destination="cKM-rd-XZn" id="aFh-IS-QAO"/>
                 <outlet property="lblDateTime" destination="bwh-5T-98m" id="ZgK-lw-53i"/>
                 <outlet property="lblEdit" destination="c4g-of-3Z9" id="9T0-3D-xhI"/>
                 <outlet property="lblHanoutType" destination="edj-wK-Cgh" id="td1-oB-vR8"/>
                 <outlet property="lblLocation" destination="1U9-5j-ihY" id="hsh-KR-CMf"/>
+                <outlet property="lmgLocation" destination="txp-Ab-Ohv" id="X68-9b-Dzl"/>
                 <outlet property="txtDesc" destination="1W3-Zr-YtN" id="V1k-1E-RTn"/>
                 <outlet property="txtTitle" destination="3PM-L0-C6b" id="7pd-sA-O8V"/>
                 <outlet property="viewHangoutType" destination="ziu-8i-fei" id="FO7-bM-Qks"/>
@@ -322,7 +325,7 @@
     <resources>
         <image name="Location-1" width="13" height="13"/>
         <image name="calender" width="13" height="13"/>
-        <image name="delete" width="13" height="13"/>
+        <image name="delete" width="18" height="18"/>
         <image name="edit" width="19" height="19"/>
         <image name="editBack" width="105" height="31"/>
         <image name="placeholderImage" width="235" height="215"/>

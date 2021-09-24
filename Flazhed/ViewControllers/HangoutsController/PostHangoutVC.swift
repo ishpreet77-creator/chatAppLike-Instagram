@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+//import CLImageEditor
 import IQKeyboardManagerSwift
 
 //MARRK:- First vc to create hangout
@@ -20,10 +20,12 @@ class PostHangoutVC: BaseVC, UITextViewDelegate {
     @IBOutlet weak var txtDesc: UITextView!
    
     @IBOutlet weak var imgView: UIImageView!
+    var hangoutImage = UIImage()
+    
     var HangoutDetail:HangoutDataModel?
     var fromEdit = false
     @IBOutlet weak var topConst: NSLayoutConstraint!
-    
+    var imageData = Data()
     override func viewDidLoad() {
         super.viewDidLoad()
         txtDesc.text = "Description"
@@ -75,7 +77,7 @@ class PostHangoutVC: BaseVC, UITextViewDelegate {
             {
               let url = URL(string: img)!
               DispatchQueue.main.async {
-                self.imgView.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: .refreshCached, completed: nil)
+                self.imgView.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: [], completed: nil)
               }
             }
             self.lblTitle.text = "Edit Hangout"
@@ -151,13 +153,18 @@ class PostHangoutVC: BaseVC, UITextViewDelegate {
             if self.fromEdit
             {
                 vc.HangoutDetail=self.HangoutDetail
+                vc.imageData = self.imgView.image?.jpegData(compressionQuality: 1) ?? Data()
+            }
+            else
+            {
+                vc.imageData = self.imageData
             }
             vc.fromEdit=self.fromEdit
             
             vc.hangoutType=self.txtType.text!
             vc.hangoutHeading=self.txtHeading.text!
             vc.hangoutDesc=self.txtDesc.text!
-            vc.imageData = self.imgView.image?.jpegData(compressionQuality: 1) ?? Data()
+            //self.imgView.image?.jpegData(compressionQuality: 1) ?? Data()
             
             self.navigationController?.pushViewController(vc, animated: true)
         }
@@ -198,10 +205,64 @@ extension PostHangoutVC:CustomImagePickerDelegate,UITextFieldDelegate
     
     func didImagePickerFinishPicking(_ image: UIImage)
     {
+        if Connectivity.isConnectedToInternet {
+                       
+            self.showImageCheckLoader(vc: self)
+
+    print("Image details: = \(image)")
+        let dataImage1 =  image.jpegData(compressionQuality: 1) ?? Data()
+        var imageSize1: Int = dataImage1.count
+        let size = Double(imageSize1) / 1000.0
+        var  dataImage = Data()
+        if size>1500
+        {
+            dataImage =  image.jpegData(compressionQuality: 0.03) ?? Data()
+        }
+        else if size>1000
+        {
+            dataImage =  image.jpegData(compressionQuality: 0.04) ?? Data()
+        }
         
-    
+        else if size>500
+        {
+         dataImage =  image.jpegData(compressionQuality: 0.05) ?? Data()
+        }
+      else if size>100
+       {
+        dataImage =  image.jpegData(compressionQuality: 0.2) ?? Data()
+       }
+      else if size>50
+       {
+        dataImage =  image.jpegData(compressionQuality: 0.5) ?? Data()
+       }
+        else
+       {
+        dataImage =  image.jpegData(compressionQuality: 0.7) ?? Data()
+       }
+        print("actual size of image in KB: %f ", Double(imageSize1) / 1000.0)
+        self.imageData = dataImage
+
+        var imageSize: Int = dataImage.count
+        print("actual size of image in KB: %f ", Double(imageSize) / 1000.0)
         
-        let dataImage =  image.jpegData(compressionQuality: 0.7) ?? Data()
+//        if image.size.height > SCREENHEIGHT
+//        {
+//            let image2 = (self.resizeImage(image: image, targetSize: CGSize(width: SCREENWIDTH, height: SCREENHEIGHT)))
+//            dataImage =  image2.jpegData(compressionQuality: 0.7) ?? Data()
+//        }
+//        else
+//        {
+//            dataImage =  image.jpegData(compressionQuality: 0.7) ?? Data()
+//        }
+        
+        
+   
+        
+       
+        
+        
+        //let dataImage =  image.jpegData(compressionQuality: 0.7) ?? Data()
+        
         
          APIManager.callApiForImageCheck(image1: dataImage,imageParaName1: kMedia, api: "",successCallback: {
              
@@ -209,14 +270,20 @@ extension PostHangoutVC:CustomImagePickerDelegate,UITextFieldDelegate
              print(responseDict)
             let data =   self.parseImageCheckData(response: responseDict)
 
-             if responseDict[ApiKey.kStatus] as? String == kSucess
+            if kSucess.equalsIgnoreCase(string: responseDict[ApiKey.kStatus] as? String ?? "")
              {
-               
+                //self.dismiss(animated: true, completion: nil)
+
                  
                  print(data)
                  if data?.weapon ?? 0.0 > kNudityCheck
                  {
-                     self.openSimpleAlert(message: kImageCkeckAlert)
+                    self.dismiss(animated: true) {
+ self.dismiss(animated: true) {
+                        self.openSimpleAlert(message: kImageCkeckAlert)
+
+                    }
+                    }
                  }
 //                 else if  data?.alcohol ?? 0.0 > kNudityCheck
 //                 {
@@ -224,20 +291,27 @@ extension PostHangoutVC:CustomImagePickerDelegate,UITextFieldDelegate
 //                 }
                  else if  data?.drugs ?? 0.0 > kNudityCheck
                  {
+                    self.dismiss(animated: true) {
                      self.openSimpleAlert(message: kImageCkeckAlert)
+                    }
                  }
                  else if  data?.nudity?.partial ?? 0.0 > kNudityCheck
                  {
+                    self.dismiss(animated: true) {
                      self.openSimpleAlert(message: kImageCkeckAlert)
+                    }
                  }
                  else
                  {
+                    self.dismiss(animated: true, completion: nil)
                     self.imgView.image = image
                  }
                  
              }
              else
              {
+                self.dismiss(animated: true, completion: nil)
+
 //                let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
 //               if  data?.error?.message != ""
 //               {
@@ -253,10 +327,17 @@ extension PostHangoutVC:CustomImagePickerDelegate,UITextFieldDelegate
              
              
          },  failureCallback: { (errorReason, error) in
+            self.dismiss(animated: true, completion: nil)
+
              print(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
              
          })
-                
+           
+        } else {
+            
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
+           
     }
     
    
@@ -331,7 +412,8 @@ extension PostHangoutVC:CustomImagePickerDelegate,UITextFieldDelegate
     }
 }
 
-extension PostHangoutVC {
+
+extension PostHangoutVC { //CLImageEditorDelegate
     
     func textFieldDidEndEditing(_ textField: UITextField)
     {
@@ -346,4 +428,106 @@ extension PostHangoutVC {
         textField.resignFirstResponder() // dismiss keyboard
         return true
     }
+//    func imageEditorDidCancel(_ editor: CLImageEditor!) {
+//        print(#function)
+//        self.imageCheck(image: self.hangoutImage)
+//        self.dismiss(animated: true, completion: nil)
+//    }
+//
+//    func imageEditor(_ editor: CLImageEditor!, didFinishEditingWith image: UIImage!)
+//    {
+//        print(#function)
+//
+//        print(image)
+//        self.hangoutImage =  image
+//
+//        self.dismiss(animated: true) {
+//            self.imageCheck(image: self.hangoutImage)
+//        }
+//    }
+    
+  //  func imageCheck(image:UIImage)
+//    {
+//        self.showImageCheckLoader(vc: self)
+//
+//        var dataImage  = Data()
+//
+//        if image.size.height > SCREENHEIGHT
+//        {
+//            let image2 = (self.resizeImage(image: image, targetSize: CGSize(width: SCREENWIDTH, height: SCREENHEIGHT)))
+//            dataImage =  image2.jpegData(compressionQuality: 1) ?? Data()
+//        }
+//        else
+//        {
+//            dataImage =  image.jpegData(compressionQuality: 1) ?? Data()
+//        }
+//
+//
+//
+//
+//        print("Image details 2: = \(image)")
+//
+//
+//        //let dataImage =  image.jpegData(compressionQuality: 0.7) ?? Data()
+//
+//         APIManager.callApiForImageCheck(image1: dataImage,imageParaName1: kMedia, api: "",successCallback: {
+//
+//             (responseDict) in
+//             print(responseDict)
+//            let data =   self.parseImageCheckData(response: responseDict)
+//
+//             if responseDict[ApiKey.kStatus] as? String == kSucess
+//             {
+//                self.dismiss(animated: true, completion: nil)
+//
+//
+//                 print(data)
+//                 if data?.weapon ?? 0.0 > kNudityCheck
+//                 {
+//                     self.openSimpleAlert(message: kImageCkeckAlert)
+//                 }
+////                 else if  data?.alcohol ?? 0.0 > kNudityCheck
+////                 {
+////                     self.openSimpleAlert(message: kImageCkeckAlert)
+////                 }
+//                 else if  data?.drugs ?? 0.0 > kNudityCheck
+//                 {
+//                     self.openSimpleAlert(message: kImageCkeckAlert)
+//                 }
+//                 else if  data?.nudity?.partial ?? 0.0 > kNudityCheck
+//                 {
+//                     self.openSimpleAlert(message: kImageCkeckAlert)
+//                 }
+//                 else
+//                 {
+//                    self.imgView.image = image
+//                 }
+//
+//             }
+//             else
+//             {
+//                self.dismiss(animated: true, completion: nil)
+//
+////                let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+////               if  data?.error?.message != ""
+////               {
+////
+////                   self.openSimpleAlert(message:  data?.error?.message)
+////               }
+////               else
+////               {
+////                   self.openSimpleAlert(message: message)
+////               }
+//             }
+//
+//
+//
+//         },  failureCallback: { (errorReason, error) in
+//            self.dismiss(animated: true, completion: nil)
+//
+//             print(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+//
+//         })
+//    }
 }
+

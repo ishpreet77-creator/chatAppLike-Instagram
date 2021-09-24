@@ -8,10 +8,18 @@
 import UIKit
 
 class HangoutUserTCell: UITableViewCell {
+    
+
+    @IBOutlet weak var lmgLocation: UIImageView!
+    @IBOutlet weak var imgCalender: UIImageView!
+    @IBOutlet weak var imgDelete: UIImageView!
+    
+    @IBOutlet weak var lblDelete: UILabel!
     @IBOutlet weak var lblDateTime: UILabel!
     @IBOutlet weak var viewHangoutType: UIView!
     @IBOutlet weak var viewDelete: UIView!
     
+    @IBOutlet weak var imgHeightConst: NSLayoutConstraint!
     @IBOutlet weak var btnDelete: UIButton!
     @IBOutlet weak var btnImageTap: UIButton!
     @IBOutlet weak var btnLocation: UIButton!
@@ -28,10 +36,25 @@ class HangoutUserTCell: UITableViewCell {
     @IBOutlet weak var lblUsername: UILabel!
     @IBOutlet weak var imgProfile: UIImageView!
     override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
+     // self.layoutIfNeeded()
+        
+        //super.awakeFromNib()
+          //  self.layoutIfNeeded()
     }
 
+    override func didMoveToSuperview() {
+       // super.didMoveToSuperview()
+       // layoutIfNeeded()
+        
+        self.lblLocation.textColor=UIColor.darkGray
+        self.lblDateTime.textColor=UIColor.darkGray
+        
+        self.imgCalender.image = self.imgCalender.image?.tinted(color: UIColor.darkGray)
+        self.lmgLocation.image = self.lmgLocation.image?.tinted(color: UIColor.darkGray)
+    
+    }
+    
+    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 

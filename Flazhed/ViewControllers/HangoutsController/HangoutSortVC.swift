@@ -36,7 +36,8 @@ class HangoutSortVC: UIViewController {
     var ase = "0"
      var desc = "0"
 
-
+var isUpdate=false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -52,7 +53,7 @@ class HangoutSortVC: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        
+        self.isUpdate=false
        
         self.selectedOption.removeAll()
         
@@ -114,7 +115,36 @@ class HangoutSortVC: UIViewController {
 
     @IBAction func hidePopupAct(_ sender: UIButton)
     {
-        self.dismiss(animated: true)
+        if isUpdate
+        {
+            self.dismiss(animated: true) {
+                
+                DataManager.social=self.Social
+                DataManager.travel=self.travel
+                DataManager.sport=self.sport
+                DataManager.business=self.business
+                
+                DataManager.men=self.men
+                DataManager.women=self.women
+                
+                DataManager.ase=self.ase
+                DataManager.desc=self.desc
+                
+                DataManager.latest=self.latest
+                DataManager.oldest=self.oldest
+                
+                
+                self.delegate?.SortHangoutOption()
+                //Social: self.Social, travel: self.travel, sport: self.sport, business: self.business, women: self.women, men: self.men, latest: self.latest, oldest: self.oldest, ase: self.ase, desc: self.desc
+            }
+        }
+        else
+        {
+            self.dismiss(animated: true) {
+                
+    
+            }
+        }
     }
     
 }
@@ -143,6 +173,7 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
     {
+        
         
         if indexPath.row == 0
         {
@@ -360,18 +391,18 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
         return 80
     }
     
-    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-   
-        
-        let cell = tableView.dequeueReusableCell(withIdentifier: "SortHangoutFooterTCell") as! SortHangoutFooterTCell
-      
-        cell.btnApply.addTarget(self, action: #selector(btnApplyAct), for: .touchUpInside)
-        return cell
-        
-    }
+//    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+//
+//
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "SortHangoutFooterTCell") as! SortHangoutFooterTCell
+//
+//        cell.btnApply.addTarget(self, action: #selector(btnApplyAct), for: .touchUpInside)
+//        return cell
+//
+//    }
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 149
+        return 0//149
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
@@ -394,7 +425,40 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
     @objc func goBack(_ sender: UIButton)
     {
 
-            self.dismiss(animated: true, completion: nil)
+            //self.dismiss(animated: true, completion: nil)
+        
+        if isUpdate
+        {
+            self.dismiss(animated: true) {
+                
+                DataManager.social=self.Social
+                DataManager.travel=self.travel
+                DataManager.sport=self.sport
+                DataManager.business=self.business
+                
+                DataManager.men=self.men
+                DataManager.women=self.women
+                
+                DataManager.ase=self.ase
+                DataManager.desc=self.desc
+                
+                DataManager.latest=self.latest
+                DataManager.oldest=self.oldest
+                
+                
+                self.delegate?.SortHangoutOption()
+                //Social: self.Social, travel: self.travel, sport: self.sport, business: self.business, women: self.women, men: self.men, latest: self.latest, oldest: self.oldest, ase: self.ase, desc: self.desc
+            }
+        }
+        else
+        {
+            self.dismiss(animated: true) {
+                
+    
+            }
+        }
+        
+       
 
     }
     
@@ -428,7 +492,7 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
     @objc func TypeAct(_ sender: UIButton)
     {
         print(sender.tag)
-        
+        self.isUpdate=true
         if sender.isSelected
         {
             sender.isSelected=false
@@ -455,7 +519,7 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
     @objc func btn1Act(_ sender: UIButton)
     {
         print(sender.tag)
-        
+        self.isUpdate=true
         let buttonPosition = sender.convert(CGPoint.zero, to: self.tableSort)
         let indexPath = self.tableSort.indexPathForRow(at:buttonPosition)
         let cell = self.tableSort.cellForRow(at: indexPath ?? IndexPath(item: 0, section: 0)) as! SortHangout2TCell
@@ -547,6 +611,7 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
     
     @objc func btn2Act(_ sender: UIButton)
     {
+        self.isUpdate=true
         let buttonPosition = sender.convert(CGPoint.zero, to: self.tableSort)
         let indexPath = self.tableSort.indexPathForRow(at:buttonPosition)
         let cell = self.tableSort.cellForRow(at: indexPath ?? IndexPath(item: 0, section: 0)) as! SortHangout2TCell

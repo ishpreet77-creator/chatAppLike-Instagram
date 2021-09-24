@@ -8,9 +8,10 @@
 import UIKit
 import CoreLocation
 import MapKit
+import SDWebImage
 
 class MyHangoutVC: BaseVC {
-    //MARK:- All outlets  🍎
+    //MARK:- All outlets  
     
     @IBOutlet weak var topIconConst: NSLayoutConstraint!
     @IBOutlet weak var viewHeader: UIView!
@@ -25,8 +26,9 @@ class MyHangoutVC: BaseVC {
     @IBOutlet weak var imgTravel: UIImageView!
     @IBOutlet weak var imgSport: UIImageView!
     @IBOutlet weak var imgBusiness: UIImageView!
-    
-    //MARK:- All Variable  🍎
+    @IBOutlet weak var btnCreateHangout: UIButton!
+
+    //MARK:- All Variable  
     
     var refreshControl = UIRefreshControl()
     var fromCreateHangout=false
@@ -36,7 +38,9 @@ class MyHangoutVC: BaseVC {
     let locationmanager = CLLocationManager()
     var hagoutTYpe=""
     
-    //MARK:- View Lifecycle   🍎
+    var fromDelete=false
+    
+    //MARK:- View Lifecycle   
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,6 +52,7 @@ class MyHangoutVC: BaseVC {
         locationmanager.requestAlwaysAuthorization()
         locationmanager.delegate = self
         locationmanager.requestLocation()
+        //locationmanager.startMonitoringSignificantLocationChanges()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -56,7 +61,7 @@ class MyHangoutVC: BaseVC {
         if DataManager.fromHangout==kCreate
         {
             
-            if self.hagoutTYpe==kTravel
+            if self.hagoutTYpe.equalsIgnoreCase(string: kTravel)
             {
                 self.viewSocial.backgroundColor=UIColor.white
                 self.viewSport.backgroundColor=UIColor.white
@@ -83,7 +88,7 @@ class MyHangoutVC: BaseVC {
                     DataManager.comeFrom = ""
                 }
             }
-           else if self.hagoutTYpe==kSports
+            else if self.hagoutTYpe.equalsIgnoreCase(string: kSports)
             {
             self.viewSocial.backgroundColor=UIColor.white
             self.viewSport.backgroundColor=SPORTBACK
@@ -110,7 +115,7 @@ class MyHangoutVC: BaseVC {
                 DataManager.comeFrom = ""
             }
            }
-           else if self.hagoutTYpe==kBusiness
+            else if self.hagoutTYpe.equalsIgnoreCase(string: kBusiness)
             {
             self.viewSocial.backgroundColor=UIColor.white
             self.viewSport.backgroundColor=UIColor.white
@@ -138,7 +143,7 @@ class MyHangoutVC: BaseVC {
                 DataManager.comeFrom = ""
             }
            }
-            else if self.hagoutTYpe==kSocial
+            else if self.hagoutTYpe.equalsIgnoreCase(string: kSocial)
            {
             self.viewSocial.backgroundColor=SOCAILBACK
             self.viewSport.backgroundColor=UIColor.white
@@ -169,16 +174,16 @@ class MyHangoutVC: BaseVC {
            }
             else
             {
-                self.viewSocial.backgroundColor=UIColor.white//SOCAILBACK
-                self.viewSport.backgroundColor=UIColor.white
-                self.viewTravel.backgroundColor=UIColor.white
-                self.viewBusiness.backgroundColor=UIColor.white
-                
-             
-                self.imgSport.image = self.imgSport.image?.tinted(color:  UIColor.lightGray)
-                self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  UIColor.lightGray)
-                self.imgTravel.image = self.imgTravel.image?.tinted(color:  UIColor.lightGray)
-                self.imgSocial.image = self.imgSocial.image?.tinted(color:  UIColor.lightGray)//SOCAILTEXRT)
+//                self.viewSocial.backgroundColor=UIColor.white//SOCAILBACK
+//                self.viewSport.backgroundColor=UIColor.white
+//                self.viewTravel.backgroundColor=UIColor.white
+//                self.viewBusiness.backgroundColor=UIColor.white
+//
+//
+//                self.imgSport.image = self.imgSport.image?.tinted(color:  UIColor.lightGray)
+//                self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  UIColor.lightGray)
+//                self.imgTravel.image = self.imgTravel.image?.tinted(color:  UIColor.lightGray)
+//                self.imgSocial.image = self.imgSocial.image?.tinted(color:  UIColor.lightGray)//SOCAILTEXRT)
                 
 
             if DataManager.comeFrom != kViewProfile
@@ -198,17 +203,17 @@ class MyHangoutVC: BaseVC {
         else
         {
         
-            self.viewSocial.backgroundColor=UIColor.white//SOCAILBACK
-            self.viewSport.backgroundColor=UIColor.white
-            self.viewTravel.backgroundColor=UIColor.white
-            self.viewBusiness.backgroundColor=UIColor.white
-            
-         
-            self.imgSport.image = self.imgSport.image?.tinted(color:  UIColor.lightGray)
-            self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  UIColor.lightGray)
-            self.imgTravel.image = self.imgTravel.image?.tinted(color:  UIColor.lightGray)
-            self.imgSocial.image = self.imgSocial.image?.tinted(color:  UIColor.lightGray)//SOCAILTEXRT)
-            
+//            self.viewSocial.backgroundColor=UIColor.white//SOCAILBACK
+//            self.viewSport.backgroundColor=UIColor.white
+//            self.viewTravel.backgroundColor=UIColor.white
+//            self.viewBusiness.backgroundColor=UIColor.white
+//
+//
+//            self.imgSport.image = self.imgSport.image?.tinted(color:  UIColor.lightGray)
+//            self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  UIColor.lightGray)
+//            self.imgTravel.image = self.imgTravel.image?.tinted(color:  UIColor.lightGray)
+//            self.imgSocial.image = self.imgSocial.image?.tinted(color:  UIColor.lightGray)//SOCAILTEXRT)
+//
 
         if DataManager.comeFrom != kViewProfile
         {
@@ -245,7 +250,7 @@ class MyHangoutVC: BaseVC {
  
         self.callGetHangoutApi(page: 0)
     }
-    //MARK:- back button action  🍎
+    //MARK:- back button action  
     
     @IBAction func BackAct(_ sender: UIButton)
     {
@@ -294,7 +299,7 @@ class MyHangoutVC: BaseVC {
         let vc = storyBoard.instantiateViewController(withIdentifier: "PostHangoutVC") as! PostHangoutVC
         self.navigationController?.pushViewController(vc, animated: true)
     }
-   //MARK:- Filter button action  🍎
+   //MARK:- Filter button action  
     
     @IBAction func SocialAct(_ sender: UIButton)
     {
@@ -302,7 +307,8 @@ class MyHangoutVC: BaseVC {
         self.viewSport.backgroundColor=UIColor.white
         self.viewTravel.backgroundColor=UIColor.white
         self.viewBusiness.backgroundColor=UIColor.white
-        
+        self.fromDelete=false
+
      
         self.imgSport.image = self.imgSport.image?.tinted(color:  UIColor.lightGray)
         self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  UIColor.lightGray)
@@ -319,7 +325,8 @@ class MyHangoutVC: BaseVC {
         self.viewSport.backgroundColor=UIColor.white
         self.viewTravel.backgroundColor=TRAVELBACK
         self.viewBusiness.backgroundColor=UIColor.white
-  
+        self.fromDelete=false
+
         self.imgTravel.image = self.imgTravel.image?.tinted(color:  TRAVELTEXRT)
         self.imgSport.image = self.imgSport.image?.tinted(color:  UIColor.lightGray)
         self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  UIColor.lightGray)
@@ -336,7 +343,8 @@ class MyHangoutVC: BaseVC {
         self.viewSport.backgroundColor=SPORTBACK
         self.viewTravel.backgroundColor=UIColor.white
         self.viewBusiness.backgroundColor=UIColor.white
-        
+        self.fromDelete=false
+
         self.imgSport.image = self.imgSport.image?.tinted(color:  SPORTTEXRT)
         self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  UIColor.lightGray)
         self.imgSocial.image = self.imgSocial.image?.tinted(color:   UIColor.lightGray)
@@ -353,7 +361,8 @@ class MyHangoutVC: BaseVC {
         self.viewSport.backgroundColor=UIColor.white
         self.viewTravel.backgroundColor=UIColor.white
         self.viewBusiness.backgroundColor=BUSSINESSBACK
-        
+        self.fromDelete=false
+
         self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  BUSSINESSTEXRT)
         self.imgSport.image = self.imgSport.image?.tinted(color:   UIColor.lightGray)
         self.imgSocial.image = self.imgSocial.image?.tinted(color:   UIColor.lightGray)
@@ -379,16 +388,37 @@ class MyHangoutVC: BaseVC {
    
     }
     
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        print(#function)
+        self.btnCreateHangout.isHidden=false
+        
+
+    }
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+
+        if self.MyHangoutData.count>0
+        {
+            self.btnCreateHangout.isHidden=false
+
+        }
+        else
+        {
+            self.btnCreateHangout.isHidden=false
+
+        }
+        
+        }
+    
 }
 
-//MARK:- delete hangout delegate  🍎
+//MARK:- delete hangout delegate  
 
 extension MyHangoutVC:DiscardDelegate
 {
     func ClickNameAction(name: String)
     {
         print(name)
-        if name == kDelete
+        if name.equalsIgnoreCase(string: kDelete)
         {
             self.callDeleteHangoutApi(hangout_id: self.hangout_id)
         }
@@ -396,7 +426,7 @@ extension MyHangoutVC:DiscardDelegate
     
     
 }
-//MARK:- Tableview  setup and show my hangout data 🍎
+//MARK:- Tableview  setup and show my hangout data 
 
 extension MyHangoutVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
 {
@@ -420,26 +450,31 @@ extension MyHangoutVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDele
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
     {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MyHangoutTCell") as! MyHangoutTCell
+        var cellData:HangoutDataModel?
         
-        let cellData = self.MyHangoutData[indexPath.row]
-        cell.txtDesc.text=cellData.aditional_description
-        
-        let heading = (cellData.heading ?? "")+" "
-        let desc = cellData.description ?? ""
+        if self.MyHangoutData.count>indexPath.row
+        {
+            cellData = self.MyHangoutData[indexPath.row]
+
+        }
+        cell.txtDesc.text=cellData?.aditional_description
+     
+        let heading = (cellData?.heading ?? "")+" "
+        let desc = cellData?.description ?? ""
         cell.txtTitle.customFontText(boldSting: heading, regularSting: desc)
-        cell.lblLocation.text=cellData.place
+        cell.lblLocation.text=cellData?.place
         
         
-        let hangoutType = cellData.hangout_type ?? ""
+        let hangoutType = cellData?.hangout_type ?? ""
         
-        if hangoutType == kBusiness
+        if hangoutType.equalsIgnoreCase(string: kBusiness)
         {
             cell.imgHangoutTypeIcon.image=UIImage(named: "business")
             cell.lblHanoutType.text = kBusiness.uppercased()
             cell.lblHanoutType.textColor=BUSSINESSTEXRT
             cell.viewHangoutType.backgroundColor = BUSSINESSBACK
         }
-       else if hangoutType == kTravel
+        else if hangoutType.equalsIgnoreCase(string: kTravel)
         {
             cell.imgHangoutTypeIcon.image=UIImage(named: "travler")
             cell.lblHanoutType.text = kTravel.uppercased()
@@ -447,7 +482,7 @@ extension MyHangoutVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDele
         cell.lblHanoutType.textColor=TRAVELTEXRT
         cell.viewHangoutType.backgroundColor = TRAVELBACK
         }
-       else if hangoutType == kSports
+        else if hangoutType.equalsIgnoreCase(string: kSports)
         {
             cell.imgHangoutTypeIcon.image=UIImage(named: "sport-1")
             cell.lblHanoutType.text = kSports.uppercased()
@@ -463,14 +498,14 @@ extension MyHangoutVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDele
        }
  
         
-        if let time = cellData.date
+        if let time = cellData?.date
         {
            // let time2 = time.dateFromString(format: .NewISO, type: .local)
    // let date = time2.string(format: .longdateTime2, type: .local)
             
             let date = time.utcToLocalDate(dateStr: time) ?? ""
             
-            if let time11 = cellData.time
+            if let time11 = cellData?.time
             {
               //let time12 = time11.dateFromString(format: .NewISO, type: .local)
              //   let date12 = time12.string(format: .localTime, type: .local)
@@ -480,14 +515,68 @@ extension MyHangoutVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDele
         }
 
         
-        
+       
 
-        if let img = cellData.image
+        if let img = cellData?.image
         {
-          let url = URL(string: img)!
+//            let size = cell.imgHangout.image?.getImageSizeWithURL(url: img)
+//
+//            let height = size?.height ?? 375
+         let url = URL(string: img)!
+//            if height > SCREENHEIGHT
+//            {
+//                let per = (height*kLongImagePercent)/100
+//
+//                cell.imgHeightConst.constant = SCREENHEIGHT-120//height-per
+//            }
+//       else if height > 700
+//        {
+//            let per = (height*kImagePercent)/100
+//
+//        cell.imgHeightConst.constant = height-per
+//        }
+//        else
+//        {
+//            cell.imgHeightConst.constant = size?.height ?? 375
+//        }
+            
+            
+//            let imageURL = URL(string: img)!
+//            let source = CGImageSourceCreateWithURL(imageURL as CFURL,nil)
+//            let imageHeader = CGImageSourceCopyPropertiesAtIndex(source!, 0, nil)! as NSDictionary;
+//
+//            print("Sizec = \(imageHeader)")
+            cell.imgHangout.sd_imageIndicator = SDWebImageActivityIndicator.gray
+            cell.imgHeightConst.constant =  390
+
           DispatchQueue.main.async {
-            cell.imgHangout.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: .refreshCached, completed: nil)
+            cell.imgHangout.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: [], completed: nil)
           }
+            
+            var cellFrame = cell.frame.size
+
+//            cell.imgHangout.sd_setImage(with: url, placeholderImage: nil, options: [], completed: { (theImage, error, cache, url) in
+//
+//                if theImage != nil
+//                {
+//                    let height = self.getAspectRatioAccordingToiPhones(cellImageFrame: cellFrame,downloadedImage: theImage!)
+//
+//                    if height>500
+//                    {
+//                        cell.imgHeightConst.constant  = 500
+//                    }
+//                else
+//                    {
+//                        cell.imgHeightConst.constant  = height
+//                    }
+//
+//                    print("Height = \(height)")
+//                }
+//                else
+//                {
+//                    cell.imgHeightConst.constant  = 375
+//                }
+//    })
         }
         cell.lblLocation.underline()
         
@@ -528,8 +617,8 @@ extension MyHangoutVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDele
         if self.MyHangoutData.count>sender.tag
         {
 
-            let lat = self.MyHangoutData[sender.tag].latitude ?? 30.123
-            let long = self.MyHangoutData[sender.tag].longitude ?? 76.123
+            let lat = self.MyHangoutData[sender.tag].latitude ?? CURRENTLAT
+            let long = self.MyHangoutData[sender.tag].longitude ?? CURRENTLONG
             let place = self.MyHangoutData[sender.tag].place ?? ""
 
             
@@ -546,7 +635,7 @@ extension MyHangoutVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDele
         
     }
 }
-//MARK:- Get current location 🍎
+//MARK:- Get current location 
 
 extension MyHangoutVC: CLLocationManagerDelegate
 {
@@ -566,7 +655,7 @@ extension MyHangoutVC: CLLocationManagerDelegate
        }
 }
 
-// MARK:- Extension get and delete my hangout api Calls   🍎
+// MARK:- Extension get and delete my hangout api Calls   
 
 extension MyHangoutVC
 {
@@ -594,11 +683,13 @@ extension MyHangoutVC
      
             if error != nil
             {
-            
+                self.btnCreateHangout.isHidden=false
+
                 self.showErrorMessage(error: error)
             }
             else{
  
+                self.btnCreateHangout.isHidden=false
                 for dict in HangoutVM.shared.HangoutDataArray
                 {
                     
@@ -644,6 +735,56 @@ extension MyHangoutVC
                     {
                         self.topIconConst.constant = 10
                     }
+                    if HangoutVM.shared.total_travel_count > 0
+                    {
+                        self.viewTravel.backgroundColor=UIColor.black
+                     self.imgTravel.image = self.imgTravel.image?.tinted(color:  UIColor.lightGray)
+                    }
+                    else
+                    {
+                        self.viewTravel.backgroundColor=UIColor.white
+                        self.imgTravel.image = self.imgTravel.image?.tinted(color:  UIColor.lightGray)
+                    }
+                     if HangoutVM.shared.total_social_count > 0
+                     {
+//                         self.viewSocial.backgroundColor=SOCAILBACK
+//                         self.imgSocial.image = self.imgSocial.image?.tinted(color:  SOCAILTEXRT)
+
+                        self.viewSocial.backgroundColor=UIColor.black
+                        self.imgSocial.image = self.imgSocial.image?.tinted(color:  UIColor.lightGray)
+                     }
+                    else
+                     {
+                        self.viewSocial.backgroundColor=UIColor.white
+                        
+                        self.imgSocial.image = self.imgSocial.image?.tinted(color:  UIColor.lightGray)
+                     }
+                     if HangoutVM.shared.total_business_count > 0
+                     {
+//                         self.viewBusiness.backgroundColor=BUSSINESSBACK
+//                         self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  BUSSINESSTEXRT)
+                        self.viewBusiness.backgroundColor=UIColor.black
+                        self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  UIColor.lightGray)
+                     }
+                    else
+                     {
+                        self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  UIColor.lightGray)
+                        self.viewBusiness.backgroundColor=UIColor.white
+
+                     }
+                      if HangoutVM.shared.total_sport_count > 0
+                      {
+//                         self.viewSport.backgroundColor=SPORTBACK
+//                         self.imgSport.image = self.imgSport.image?.tinted(color:  SPORTTEXRT)
+
+                        self.viewSport.backgroundColor=UIColor.black
+                        self.imgSport.image = self.imgSport.image?.tinted(color:  UIColor.lightGray)
+                      }
+                    else
+                      {
+                        self.viewSport.backgroundColor=UIColor.white
+                        self.imgSport.image = self.imgSport.image?.tinted(color:  UIColor.lightGray)
+                      }
                 }
                 else
                 {
@@ -658,8 +799,93 @@ extension MyHangoutVC
                         self.tableHangout.isHidden=true
                         self.viewEmptyList.isHidden=false
                         self.viewHeader.isHidden=false
+                        
+                       
                     }
                 }
+                
+                
+            var isavailble = false
+
+                if self.fromDelete
+                {
+                    if HangoutVM.shared.total_travel_count > 0
+                    {
+                        self.viewTravel.backgroundColor=UIColor.black
+                     self.imgTravel.image = self.imgTravel.image?.tinted(color:  UIColor.lightGray)
+                        isavailble=true
+                    }
+                    else
+                    {
+                        self.viewTravel.backgroundColor=UIColor.white
+                        self.imgTravel.image = self.imgTravel.image?.tinted(color:  UIColor.lightGray)
+                    }
+                     if HangoutVM.shared.total_social_count > 0
+                     {
+//                         self.viewSocial.backgroundColor=SOCAILBACK
+//                         self.imgSocial.image = self.imgSocial.image?.tinted(color:  SOCAILTEXRT)
+                        isavailble=true
+
+                        self.viewSocial.backgroundColor=UIColor.black
+                        self.imgSocial.image = self.imgSocial.image?.tinted(color:  UIColor.lightGray)
+                     }
+                    else
+                     {
+                        self.viewSocial.backgroundColor=UIColor.white
+                        
+                        self.imgSocial.image = self.imgSocial.image?.tinted(color:  UIColor.lightGray)
+                     }
+                     if HangoutVM.shared.total_business_count > 0
+                     {
+                        isavailble=true
+
+//                         self.viewBusiness.backgroundColor=BUSSINESSBACK
+//                         self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  BUSSINESSTEXRT)
+                        self.viewBusiness.backgroundColor=UIColor.black
+                        self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  UIColor.lightGray)
+                     }
+                    else
+                     {
+                        self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  UIColor.lightGray)
+                        self.viewBusiness.backgroundColor=UIColor.white
+
+                     }
+                      if HangoutVM.shared.total_sport_count > 0
+                      {
+                        isavailble=true
+
+//                         self.viewSport.backgroundColor=SPORTBACK
+//                         self.imgSport.image = self.imgSport.image?.tinted(color:  SPORTTEXRT)
+
+                        self.viewSport.backgroundColor=UIColor.black
+                        self.imgSport.image = self.imgSport.image?.tinted(color:  UIColor.lightGray)
+                      }
+                    else
+                      {
+                        self.viewSport.backgroundColor=UIColor.white
+                        self.imgSport.image = self.imgSport.image?.tinted(color:  UIColor.lightGray)
+                      }
+                    if isavailble == false
+                    {
+                        self.viewSocial.backgroundColor=UIColor.white//SOCAILBACK
+                        self.viewSport.backgroundColor=UIColor.white
+                        self.viewTravel.backgroundColor=UIColor.white
+                        self.viewBusiness.backgroundColor=UIColor.white
+                        
+                       
+                        self.imgSport.image = self.imgSport.image?.tinted(color:  UIColor.lightGray)
+                        self.imgBusiness.image = self.imgBusiness.image?.tinted(color:  UIColor.lightGray)
+                        self.imgTravel.image = self.imgTravel.image?.tinted(color:  UIColor.lightGray)
+                        self.imgSocial.image = self.imgSocial.image?.tinted(color:  UIColor.lightGray)
+                    }
+                    
+                    self.viewBusiness.backgroundColor=UIColor.white
+                    self.fromDelete=false
+
+                }
+                
+                
+                self.btnCreateHangout.isHidden=false
 
                 self.tableHangout.reloadData()
                 
@@ -697,6 +923,7 @@ extension MyHangoutVC
  
                 self.MyHangoutData.removeAll()
                 self.page=0
+                self.fromDelete=true
               self.callGetHangoutApi(page: self.page)
                 
                 

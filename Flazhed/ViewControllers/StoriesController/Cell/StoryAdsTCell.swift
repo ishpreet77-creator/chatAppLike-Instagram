@@ -33,17 +33,28 @@ class StoryAdsTCell: UITableViewCell {
         bannerView.frame = frame
       
            bannerView.rootViewController = rootVC
-        GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers =
-            ["2077ef9a63d2b398840261c8221a0c9b"] // Sample device ID
-           bannerView.load(GADRequest())
+//        GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers =
+//            ["2077ef9a63d2b398840261c8221a0c9b"] // Sample device ID
+         //
         
       //  bannerView.adUnitID = "ca-app-pub-9730116356670864~3963495235"
         
-        bannerView.adUnitID = "ca-app-pub-3940256099942544/2934735716"
+        bannerView.adUnitID =  "ca-app-pub-3940256099942544/2934735716"//"ca-app-pub-3940256099942544/2934735716"
  //       bannerView.delegate = self
-        let adSize = GADAdSizeFromCGSize(CGSize(width: SCREENWIDTH, height: 500))
-        bannerView.adSize=adSize
+        let adSize = GADAdSizeFromCGSize(CGSize(width: 300, height:600))
+       // 300 x 600
+        //336 x 280
+        //300 x 250
+        //bannerView.adSize = GADCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(SCREENWIDTH)
+        DispatchQueue.main.async {
+            bannerView.adSize=adSize
+            bannerView.load(GADRequest())
+        }
+        
+    
            return bannerView
-
+    
        }
+ 
+    
 }

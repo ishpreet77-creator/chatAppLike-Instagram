@@ -29,6 +29,7 @@ class SendFeedbackAlertVC: BaseVC {
     var postID = ""
     var user_name = ""
     var type: ScreenType = .storiesScreen
+    var UserID = ""
     override func viewDidLoad() {
         super.viewDidLoad()
         txtViewFeedback.becomeFirstResponder()
@@ -89,14 +90,34 @@ class SendFeedbackAlertVC: BaseVC {
         
         txtViewFeedback.resignFirstResponder()
         
-        if let message = validateData()
-        {
-            self.openSimpleAlert(message: message)
-        }
-        else
-        {
-            self.callReportBlockApi(reason: self.txtViewFeedback.text!)
-        }
+//        if let message = validateData()
+//        {
+//            self.openSimpleAlert(message: message)
+//        }
+//        else
+//        {
+//            self.callReportBlockApi(reason: self.txtViewFeedback.text!)
+//        }
+        
+                if let message = validateData()
+                {
+                    self.openSimpleAlert(message: message)
+                }
+                else
+                {
+                  
+                    self.blockReason = self.txtViewFeedback.text ?? ""
+                    
+                    if type == .messageScreen
+                    {
+                        self.call_User_Report_Block_Api(reason: self.blockReason)
+                    }
+                    else
+                    {
+                    self.callReportBlockApi(reason: self.blockReason)
+                    }
+                }
+      
        
     }
     
@@ -171,6 +192,8 @@ extension SendFeedbackAlertVC
                 self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
             }
         
+        
+        
     }
     
     func callApiForReportBlock(data:JSONDictionary)
@@ -202,5 +225,64 @@ extension SendFeedbackAlertVC
         
     }
     
+    
+    func call_User_Report_Block_Api(reason:String)
+    {
+        var data = JSONDictionary()
 
+        data[ApiKey.kUser_id] = self.UserID
+   
+       
+            data[ApiKey.kReason_text] = reason
+        
+            
+            if Connectivity.isConnectedToInternet {
+              
+                self.call_Api_For_User_Report_Block(data: data)
+             } else {
+                
+                self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+            }
+        
+    }
+    
+    func call_Api_For_User_Report_Block(data:JSONDictionary)
+    {
+    
+        ChatVM.shared.callApiReportBlockUser(data: data, response: { (message, error) in
+            
+            if error != nil
+            {
+            
+                        self.showErrorMessage(error: error)
+
+                
+            }
+            else{
+             
+                    let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
+                    let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                    destVC.type = .sendFeedback
+                    destVC.Alerttype = .messageScreen
+                    destVC.user_name=self.user_name
+                if  self.fromBlock
+                {
+                destVC.fromBlock="blocked"
+                }
+                else
+                {
+                    destVC.fromBlock="reported"
+                }
+                    destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+                    destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+                    self.present(destVC, animated: true, completion: nil)
+                
+                          
+            }
+
+         
+        })
+        
+    }
+    
 }

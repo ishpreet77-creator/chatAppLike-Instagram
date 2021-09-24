@@ -138,7 +138,7 @@ class CreateHangoutVC: BaseVC {
             
             self.lblRange.text = "\(lower)-\(uper)"
             
-            if self.HangoutDetail?.looking_for == kMale
+            if  kMale.equalsIgnoreCase(string: self.HangoutDetail?.looking_for ?? "")
             {
                 self.imgMale.image = UIImage(named: "maleSelected")
                 self.lblMale.textColor = LINECOLOR
@@ -154,7 +154,7 @@ class CreateHangoutVC: BaseVC {
                 
             }
             
-            else if self.HangoutDetail?.looking_for == kBothGender
+            else if  kBothGender.equalsIgnoreCase(string: self.HangoutDetail?.looking_for ?? "")
             {
                 self.imgfemale.image = UIImage(named: "femaleSelected")
                 self.lblFemale.textColor = LINECOLOR
@@ -227,6 +227,7 @@ class CreateHangoutVC: BaseVC {
         locationmanager.requestAlwaysAuthorization()
         locationmanager.delegate = self
         locationmanager.requestLocation()
+        //locationmanager.startMonitoringSignificantLocationChanges()
         IQKeyboardManager.shared.enableAutoToolbar = true
         
 //        if self.getDeviceModel() == "iPhone 6"
@@ -325,28 +326,21 @@ class CreateHangoutVC: BaseVC {
             let time2 = hangDate.dateFromString(format: .StoryDateFormat, type: .local)
             let date12 = time2.string(format: .ymdDate, type: .gmt)
             
-            //let date = time2.string(format: .longdateTime2, type: .local)
             
-        
+            data[ApiKey.kDate] = hangDate
             
-            
-            
-            data[ApiKey.kDate] = hangDate//self.txtDate.text!
-            
-            
-            let dateFormatter3 = DateFormatter()
-            dateFormatter3.dateFormat = "hh:mm a"
-            let time = dateFormatter3.date(from: self.txtTime.text!) ?? Date()
+                let dateFormatter3 = DateFormatter()
+                dateFormatter3.dateFormat = "hh:mm a"
+                dateFormatter3.timeZone = TimeZone.current
+                dateFormatter3.locale = NSLocale(localeIdentifier: "en_US") as Locale
+                
+                
+                let time = dateFormatter3.date(from: self.txtTime.text!) ?? Date()
+                let dateFormatter4 = DateFormatter()
+                dateFormatter4.dateFormat = "HH:mm:ss"
+                let hangTime = dateFormatter4.string(from: time)
+                data[ApiKey.kTime] = hangTime
 
-            let dateFormatter4 = DateFormatter()
-            dateFormatter4.dateFormat = "HH:mm:ss"
-            let hangTime = dateFormatter4.string(from: time)
-        
-           // let time3 = hangTime.dateFromString(format: .localTime, type: .local)
-           // let date4 = time3.string(format: .longTime12, type: .gmt)
-            
-            data[ApiKey.kTime] = hangTime//self.txtTime.text!
-            
             data[ApiKey.kPlace] = self.txtPlace.text!
             
             if self.txtAdditionDes.text==kEmptyPlaceDescAlert
@@ -689,7 +683,7 @@ extension CreateHangoutVC
         APIManager.callApiForImage(image1: image, imageParaName1: ApiKey.kImage, api: "create-hangout", data: data) { (responseDict) in
             print(responseDict)
 
-            if responseDict[ApiKey.kStatus] as? String == kSucess
+            if  kSucess.equalsIgnoreCase(string: responseDict[ApiKey.kStatus] as? String ?? "")
             {
 //                let storyBoard = UIStoryboard.init(name: "Hangouts", bundle: nil)
 //                let vc = storyBoard.instantiateViewController(withIdentifier: "MyHangoutVC") as! MyHangoutVC
@@ -724,7 +718,7 @@ extension CreateHangoutVC
         APIManager.callApiForImage(image1: image, imageParaName1: ApiKey.kImage, api: ("update-hangout/"+HangoutId), data: data) { (responseDict) in
             print(responseDict)
 
-            if responseDict[ApiKey.kStatus] as? String == kSucess
+            if  kSucess.equalsIgnoreCase(string: responseDict[ApiKey.kStatus] as? String ?? "")
             {
 //                let storyBoard = UIStoryboard.init(name: "Hangouts", bundle: nil)
 //                let vc = storyBoard.instantiateViewController(withIdentifier: "MyHangoutVC") as! MyHangoutVC

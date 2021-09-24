@@ -15,6 +15,7 @@ enum APIServicesAccount:APIService {
     case getNotificationSetup
     case updateNotificationSetup(data: JSONDictionary)
     case updatePayment(data: JSONDictionary)
+    case get_my_subscription
     
     var path: String {
         var path = ""
@@ -33,6 +34,8 @@ enum APIServicesAccount:APIService {
             
         case .updatePayment:
             path = BASE_URL.appending("payment-submit")
+        case .get_my_subscription:
+            path = BASE_URL.appending("get-my-subscription")
             }
         return path
      }
@@ -57,6 +60,9 @@ enum APIServicesAccount:APIService {
             
         case let .updatePayment(data):
             resource = Resource(method: .post, parameters: data, headers:headerDict)
+            
+        case .get_my_subscription:
+            resource = Resource(method: .get, parameters: nil, headers: headerDict)
         }
         return resource
     }

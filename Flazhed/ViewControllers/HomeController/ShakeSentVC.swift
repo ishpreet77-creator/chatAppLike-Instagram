@@ -6,14 +6,15 @@
 //
 
 import UIKit
-
+import CoreLocation
+import SDWebImage
 
 protocol ButtonTapDelegate {
     func buutonName(name:String)
     
 }
 
-class  ShakeSentVC: UIViewController {
+class ShakeSentVC: UIViewController {
 
     @IBOutlet weak var lblShake: UILabel!
     var delegate:ButtonTapDelegate?
@@ -22,7 +23,8 @@ class  ShakeSentVC: UIViewController {
     var gameTimer: Timer?
     var Shaketimer = Timer()
     @IBOutlet weak var lblTime: UILabel!
-    
+    let locationmanager = CLLocationManager()
+
     var count = 3
     
     var comeFrom = ""
@@ -44,7 +46,10 @@ class  ShakeSentVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         lblCounter.text = "3"
-       
+        locationmanager.requestAlwaysAuthorization()
+        locationmanager.delegate = self
+        locationmanager.requestLocation()
+        //locationmanager.startMonitoringSignificantLocationChanges()
         circularProgressView.setProgressWithAnimation(duration: 0, value: 0)
         if self.comeFrom != "Home"
         {
@@ -62,7 +67,15 @@ class  ShakeSentVC: UIViewController {
     //self.openSimpleAlert(message: "Shake your phone.")
     }
     
-    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        debugPrint("********** MEMORY WARNING **********")
+        URLCache.shared.removeAllCachedResponses()
+        URLCache.shared.memoryCapacity = 0
+        URLCache.shared.diskCapacity = 0
+        SDImageCache.shared.clearMemory()
+        SDImageCache.shared.clearDisk()
+    }
     
     override var canBecomeFirstResponder: Bool {
         get {
@@ -85,7 +98,9 @@ class  ShakeSentVC: UIViewController {
                 self.lblCounter.isHidden=false
                 print("Device shaken, shake timer started")
                 circularProgressView.setProgressWithAnimation(duration: 3, value:1)
-                gameTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(self.update), userInfo: nil, repeats: true)            }
+                gameTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(self.update), userInfo: nil, repeats: true)
+                
+            }
 
          }
         
@@ -93,7 +108,7 @@ class  ShakeSentVC: UIViewController {
     override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         if motion == .motionShake
         {
-   
+           
             self.shakeStart = Date()
             print("Device shaken = \(motion) \(self.shakeStart)")
       
@@ -340,16 +355,19 @@ extension ShakeSentVC
               self.showErrorMessage(error: error)
             }
             else{
+                
                 DataManager.comeFromTag=4
                 self.gameTimer?.invalidate()
                 self.Shaketimer.invalidate()
-             
-                
-                if #available(iOS 13.0, *) {
-                    SCENEDEL?.navigateToHome()
-                } else {
-                  
-                    APPDEL.navigateToHome()
+                self.dismiss(animated: false) {
+                    if #available(iOS 13.0, *) {
+                        
+                        SCENEDEL?.navigateToHome()
+                    } else {
+                      
+                        APPDEL.navigateToHome()
+                    }
+
                 }
    
             }
@@ -368,120 +386,172 @@ extension ShakeSentVC
         print("error code = \(code)")
             if  code == 401
             {
-                self.openAlert(title: kAlert,
-                                         message: message,
-                                         alertStyle: .alert,
-                                         actionTitles: ["Ok"],
-                                         actionStyles: [.default, .default],
-                                         actions: [
-                    
-                                           { [self]_ in
-                                                  
-                                               print("okay click")
-                                            if #available(iOS 13.0, *) {
-                                                DataManager.comeFrom = ""
-                                                DataManager.isProfileCompelete = false
-                                                 DataManager.accessToken = ""
-                                                SCENEDEL?.navigateToLogin()
-                                            } else {
-                                                // Fallback on earlier versions
-                                                DataManager.comeFrom = ""
-                                                DataManager.isProfileCompelete = false
-                                                 DataManager.accessToken = ""
-                                                APPDEL.navigateToLogin()
-                                            }
-                                          
-                                               
-                                             }
-                                        ])
+//                self.openAlert(title: kAlert,
+//                                         message: message,
+//                                         alertStyle: .alert,
+//                                         actionTitles: ["Ok"],
+//                                         actionStyles: [.default, .default],
+//                                         actions: [
+//
+//                                           { [self]_ in
+//
+//                                               print("okay click")
+//                                            self.dismiss(animated: false) {
+//                                                DataManager.ShakeId=""
+//                                                if #available(iOS 13.0, *) {
+//                                                    DataManager.comeFrom = ""
+//                                                    DataManager.isProfileCompelete = false
+//                                                     DataManager.accessToken = ""
+//                                                    SCENEDEL?.navigateToLogin()
+//                                                } else {
+//                                                    // Fallback on earlier versions
+//                                                    DataManager.comeFrom = ""
+//                                                    DataManager.isProfileCompelete = false
+//                                                     DataManager.accessToken = ""
+//                                                    APPDEL.navigateToLogin()
+//                                                }
+//
+//                                            }
+//
+//
+//                                             }
+//                                        ])
+                self.count = 3
+                let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
+                let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                destVC.type = .BlockReportError
+                destVC.user_name=message
+                destVC.errorCode=code
+                destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+                destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+
+                self.present(destVC, animated: true, completion: nil)
         
             }
             else if  code == 406
             {
-                self.gameTimer?.invalidate()
-                self.Shaketimer.invalidate()
+//                self.gameTimer?.invalidate()
+//                self.Shaketimer.invalidate()
+                
                // self.navigationController?.popViewController(animated: true)
-            
-               
+                self.count = 3
+             
+                
+                let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
+                let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                destVC.type = .BlockReportError
+                destVC.user_name=message
+                destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+                destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+
+                self.present(destVC, animated: true, completion: nil)
                 
                 
-                self.openAlert(title: kAlert,
-                                         message: message,
-                                         alertStyle: .alert,
-                                         actionTitles: ["Ok"],
-                                         actionStyles: [.default, .default],
-                                         actions: [
-                    
-                                           { [self]_ in
-                                            
-                                            self.dismiss(animated: false, completion: nil)
-                                            /*
-                                            if  DataManager.comeFromPage==0
-                                            {
-                                                if #available(iOS 13.0, *) {
-                                                    SCENEDEL?.navigateToHangout()
-                                                } else {
-                                                    // Fallback on earlier versions
-                                                    APPDEL.navigateToHangout()
-                                                }
-                                            }
-                                           else if  DataManager.comeFromPage==1
-                                            {
-                                                if #available(iOS 13.0, *) {
-                                                    SCENEDEL?.navigateToStories()
-                                                } else {
-                                                    // Fallback on earlier versions
-                                                    APPDEL.navigateToStories()
-                                                }
-                                            }
-                                           else if  DataManager.comeFromPage==2
-                                            {
-                                                if #available(iOS 13.0, *) {
-                                                    SCENEDEL?.navigateToHome()
-                                                } else {
-                                                    // Fallback on earlier versions
-                                                    APPDEL.navigateToHome()
-                                                }
-                                            }
-                                           else if  DataManager.comeFromPage==3
-                                            {
-                                                if #available(iOS 13.0, *) {
-                                                    SCENEDEL?.navigateToChat()
-                                                } else {
-                                                    // Fallback on earlier versions
-                                                    APPDEL.navigateToChat()
-                                                }
-                                            }
-                                           else if  DataManager.comeFromPage==4
-                                            {
-                                                if #available(iOS 13.0, *) {
-                                                    SCENEDEL?.navigateToProfile()
-                                                } else {
-                                                    // Fallback on earlier versions
-                                                    APPDEL.navigateToProfile()
-                                                }
-                                            }
-                                           else
-                                            {
-                                                if #available(iOS 13.0, *) {
-                                                    SCENEDEL?.navigateToHome()
-                                                } else {
-                                                    // Fallback on earlier versions
-                                                    APPDEL.navigateToHome()
-                                                }
-                                            }
-                                            
-                                            */
-                                               
-                                             }
-                                        ])
+                
+//                self.openAlert(title: kAlert,
+//                                         message: message,
+//                                         alertStyle: .alert,
+//                                         actionTitles: ["Ok"],
+//                                         actionStyles: [.default, .default],
+//                                         actions: [
+//
+//                                           { [self]_ in
+//
+//                                            self.dismiss(animated: false, completion: nil)
+//                                            /*
+//                                            if  DataManager.comeFromPage==0
+//                                            {
+//                                                if #available(iOS 13.0, *) {
+//                                                    SCENEDEL?.navigateToHangout()
+//                                                } else {
+//                                                    // Fallback on earlier versions
+//                                                    APPDEL.navigateToHangout()
+//                                                }
+//                                            }
+//                                           else if  DataManager.comeFromPage==1
+//                                            {
+//                                                if #available(iOS 13.0, *) {
+//                                                    SCENEDEL?.navigateToStories()
+//                                                } else {
+//                                                    // Fallback on earlier versions
+//                                                    APPDEL.navigateToStories()
+//                                                }
+//                                            }
+//                                           else if  DataManager.comeFromPage==2
+//                                            {
+//                                                if #available(iOS 13.0, *) {
+//                                                    SCENEDEL?.navigateToHome()
+//                                                } else {
+//                                                    // Fallback on earlier versions
+//                                                    APPDEL.navigateToHome()
+//                                                }
+//                                            }
+//                                           else if  DataManager.comeFromPage==3
+//                                            {
+//                                                if #available(iOS 13.0, *) {
+//                                                    SCENEDEL?.navigateToChat()
+//                                                } else {
+//                                                    // Fallback on earlier versions
+//                                                    APPDEL.navigateToChat()
+//                                                }
+//                                            }
+//                                           else if  DataManager.comeFromPage==4
+//                                            {
+//                                                if #available(iOS 13.0, *) {
+//                                                    SCENEDEL?.navigateToProfile()
+//                                                } else {
+//                                                    // Fallback on earlier versions
+//                                                    APPDEL.navigateToProfile()
+//                                                }
+//                                            }
+//                                           else
+//                                            {
+//                                                if #available(iOS 13.0, *) {
+//                                                    SCENEDEL?.navigateToHome()
+//                                                } else {
+//                                                    // Fallback on earlier versions
+//                                                    APPDEL.navigateToHome()
+//                                                }
+//                                            }
+//
+//                                            */
+//
+//                                             }
+//                                        ])
             }
            else
             {
                 
-                self.openSimpleAlert(message: message)
+               // self.openSimpleAlert(message: message)
+                
+                let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
+                let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                destVC.type = .BlockReportError
+                destVC.user_name=message
+                destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+                destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+
+                self.present(destVC, animated: true, completion: nil)
                
             }
         
+    }
+}
+//MARK:- Get current location
+
+extension ShakeSentVC: CLLocationManagerDelegate
+{
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.first
+        {
+            print("Found user's location: \(location)")
+            CURRENTLAT=location.coordinate.latitude
+            CURRENTLONG=location.coordinate.longitude
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
+    {
+        print("Failed to find user's location: \(error.localizedDescription)")
     }
 }

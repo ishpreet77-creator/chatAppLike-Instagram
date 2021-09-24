@@ -9,18 +9,26 @@ import Foundation
 
 struct UserListModel {
     var profile_data:ProfileData?
+    
+    var second_table_like_dislike:SecondTableLikeDislikeModel?
+    
     var like_dislike:String?
+    var like_mode_by_other_user:String?
+    var like_mode_by_self:String?
+    
     var more_profile_details:MoreProfileDataModel?
     var user_id:String?
+    var is_liked_by_other_user_id:Int?
     
     var is_liked_by_self_user:Int?
-    var is_liked_by_other_user_id:Int?
+    //var is_liked_by_other_user_id:Int?
     var phone_number:Int?
     var country_code:String?
     var social_id:String?
     var social_type:String?
     var email:String?
     var is_block:Int?
+    var enable_red_dot:Int?
     var device_type:String?
     var device_token:String?
     var is_shake_count:Int?
@@ -32,20 +40,40 @@ struct UserListModel {
 
     var Insta_data:InstaDataModel?
     
+    var Single_Hangout_Details:HangoutDataModel?
+    var Single_Story_Details:PostdetailModel?
     
     var like_dislikeData:Like_DisLike_Model?
     var arrAllPostCollection:[AllPostModel]!
+    var story_like_by_self:Int?
+    var hangout_like_by_self:Int?
     
+    var response_other_user:Int?
+    var response_self_user:Int?
+    var continue_chat_status_other_user:Int?
+    var is_read_by_second_user:Int?
+    var is_continue_from_user:Int?
+    var is_continue_to_user:Int?
+    var self_send_message:Int?
+    var prolong_subscription_is_active:Int?
+    var continue_chat_status:Int?
     
     init(detail:JSONDictionary) {
-        
+        self.second_table_like_dislike = SecondTableLikeDislikeModel.init(detail: (detail["second_table_like_dislike"] as? JSONDictionary) ?? [:])
         self.profile_data = ProfileData.init(detail: (detail["profile_data"] as? JSONDictionary) ?? [:])
         self.like_dislike = detail[ApiKey.kName] as? String
+        
+        self.like_mode_by_self = detail["like_mode_by_self"] as? String
+        self.like_mode_by_other_user = detail["like_mode_by_other_user"] as? String
         self.more_profile_details = MoreProfileDataModel.init(detail: (detail["more_profile_details"] as? JSONDictionary) ?? [:])
         self.user_id = detail["user_id"] as? String
         self.is_liked_by_self_user = detail["is_liked_by_self_user"] as? Int
-
         self.is_liked_by_other_user_id = detail["is_liked_by_other_user_id"] as? Int
+        
+        
+        //self.is_liked_by_other_user_id = detail["is_liked_by_other_user_id"] as? Int
+        self.enable_red_dot = detail["enable_red_dot"] as? Int
+        
         
         self.phone_number = detail["phone_number"] as? Int
         self.country_code = detail["country_code"] as? String
@@ -56,9 +84,29 @@ struct UserListModel {
         self.device_type = detail["device_type"] as? String
         self.device_token = detail["device_token"] as? String
         self.is_shake_count = detail["is_shake_count"] as? Int
+        self.story_like_by_self = detail["story_like_by_self"] as? Int
+        self.hangout_like_by_self = detail["hangout_like_by_self"] as? Int
+        
         self.is_block = detail["is_block"] as? Int
+        //MARK:- for match
+        self.response_other_user = detail["response_other_user"] as? Int
+        self.response_self_user = detail["response_self_user"] as? Int
+        self.continue_chat_status_other_user = detail["continue_chat_status_other_user"] as? Int
+        self.is_read_by_second_user = detail["is_read_by_second_user"] as? Int
+        self.continue_chat_status_other_user = detail["continue_chat_status_other_user"] as? Int
+        self.is_continue_from_user = detail["is_continue_from_user"] as? Int
+        self.is_continue_to_user = detail["is_continue_to_user"] as? Int
+        self.self_send_message = detail["self_send_message"] as? Int
+        self.prolong_subscription_is_active = detail["prolong_subscription_is_active"] as? Int
+        self.continue_chat_status = detail["continue_chat_status"] as? Int
+
         
         
+        
+        
+        self.Single_Hangout_Details = HangoutDataModel.init(detail: (detail["single_hangout_details"] as? JSONDictionary) ?? [:])
+        
+        self.Single_Story_Details = PostdetailModel.init(detail: (detail["story_details"] as? JSONDictionary) ?? [:])
         
         hangout_details = [HangoutDataModel]()
        
@@ -371,6 +419,31 @@ struct FacebookDataModel {
 }
 
 
+struct SecondTableLikeDislikeModel {
+    var _id:String?
+    var by_like_mode:String?
+    var first_user_id:String?
+    var hangout_id:String?
+    
+    var is_like_by_first_user_id:Int?
+    var is_like_by_second_user_id:Int?
+    var second_user_id:String?
+    var story_id:String?
+    init(detail:JSONDictionary) {
+        self._id = detail["_id"] as? String
+        self.by_like_mode = detail["by_like_mode"] as? String
+        self.first_user_id = detail["first_user_id"] as? String
+        self.hangout_id = detail["hangout_id"] as? String
+        
+        self.is_like_by_first_user_id = detail["is_like_by_first_user_id"] as? Int
+        self.is_like_by_second_user_id = detail["is_like_by_second_user_id"] as? Int
+        self.second_user_id = detail["hangout_id"] as? String
+        self.story_id = detail["story_id"] as? String
+}
+}
+
+
+
 //Main Collection Model
 enum ProfAttributeType{
     
@@ -429,4 +502,11 @@ struct InstaDataModel {
             self.images?.append(imgStr)
         }
 }
+}
+
+
+
+struct InstagramPostModel {
+    var imageUrl:String = ""
+    var PostType:String = ""
 }

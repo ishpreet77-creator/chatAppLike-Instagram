@@ -16,6 +16,10 @@ class AccountVM {
     var notificationSetupData:NotificationSetupModel?
     
     private init(){}
+    var Prolong_Subsription_Data:SubscriptionModel?
+    var Swiping_Subsription_Data:SubscriptionModel?
+    var Shake_Subsription_Data:SubscriptionModel?
+    
 
     func callApiUpdateMobile(data: JSONDictionary,response: @escaping responseCallBack)
     {
@@ -91,6 +95,18 @@ class AccountVM {
             let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
             
           // self.parseGetPreferenceData(response:responseDict)
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    func callApiGetMySubscription(response: @escaping responseCallBack)
+    {
+        APIManager.callApiGetMySubscription(successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+            
+            self.parseMySubsription(response:responseDict)
             response(message, nil)
         }) { (errorReason, error) in
             response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
@@ -184,6 +200,18 @@ extension APIManager {
         }, failure: failureCallback)
     }
     
+    class func callApiGetMySubscription(successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
+        APIServicesAccount.get_my_subscription.request(isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                print(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
 }
 
 //MARK:- Parsing the data
@@ -217,6 +245,39 @@ extension AccountVM {
         }
     }
   
+    func parseMySubsription(response: JSONDictionary){
+        if let data = response[ApiKey.kData] as? JSONDictionary
+        {
+          
+            if let User = data[ApiKey.kParlong] as? JSONDictionary
+            {
+                let data =  SubscriptionModel(detail: User)
+                self.Prolong_Subsription_Data = data
+            }
+            else
+            {
+                self.Prolong_Subsription_Data = nil
+            }
+            if let User = data[ApiKey.kShake] as? JSONDictionary
+            {
+                let data =  SubscriptionModel(detail: User)
+                self.Shake_Subsription_Data = data
+            }
+            else
+            {
+                self.Shake_Subsription_Data = nil
+            }
+            if let User = data[ApiKey.kSwiping] as? JSONDictionary
+            {
+                let data =  SubscriptionModel(detail: User)
+                self.Swiping_Subsription_Data = data
+            }
+            else
+            {
+                self.Swiping_Subsription_Data = nil
+            }
+        }
+    }
 }
 
 extension APIManager
@@ -322,7 +383,7 @@ extension APIManager
                             })
                         }
                     }
-                    if fileType == "video"
+                    if fileType.equalsIgnoreCase(string: kVideo)//.lowercased() == kVideo.lowercased()
                     {
                     if  !image1.isEmpty
                     {
@@ -341,7 +402,7 @@ extension APIManager
                 method: .post,
                 headers: headers)
                 .responseJSON { (resp) in
-                    
+                
                     print("resp is \(resp)")
                     Indicator.sharedInstance.hideIndicator()
                     if let responseDict = resp.value as? JSONDictionary {
@@ -413,14 +474,24 @@ extension APIManager
     //api_user=1557187836&api_secret=XvUAjDfXERiFWxtUmzC4
 
     
-    //["models":"nudity,wad,offensive","api_user":"1557187836","api_secret":"XvUAjDfXERiFWxtUmzC4"
+    //["models":"nudity,wad,offensive","api_user":"1557187836","api_secret":"XvUAjDfXERiFWxtUmzC4"]
     
-   // ["models":"nudity,wad,offensive","api_user":"134393085","api_secret":"C8pyfycWsTdpacSL8Jim"
+   // ["models":"nudity,wad,offensive","api_user":"134393085","api_secret":"C8pyfycWsTdpacSL8Jim"]
     
-    static func callApiForImageCheck(image1 : Data,imageParaName1:String,api:String,data: JSONDictionary=["models":"nudity,wad,offensive","api_user":"1557187836","api_secret":"XvUAjDfXERiFWxtUmzC4"],successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback)
+    
+   // 'api_user=740176015' \
+    //    -F 'api_secret=R7aZqxLGaHNzbxyScbn4' \
+    
+    
+    //-F 'api_user=1966040274' \
+   // -F 'api_secret=3gVAco2pTUC25gH5AR7k' \
+    
+    //["models":"nudity,wad,offensive","api_user":"1966040274","api_secret":"3gVAco2pTUC25gH5AR7k"]
+    
+    static func callApiForImageCheck(image1 : Data,imageParaName1:String,api:String,data: JSONDictionary=["models":"nudity,wad,offensive","api_user":"134393085","api_secret":"C8pyfycWsTdpacSL8Jim"],successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback)
 
     {
-        Indicator.sharedInstance.showIndicator()
+        //Indicator.sharedInstance.showIndicator()
             
             let urlString =  "https://api.sightengine.com/1.0/check.json"//BASE_URL.appending("https://api.sightengine.com/1.0/check.json")
             
@@ -465,11 +536,16 @@ extension APIManager
                     
                     print("resp is \(resp)")
                     Indicator.sharedInstance.hideIndicator()
+                    
                     if let responseDict = resp.value as? JSONDictionary {
                         print(responseDict)
                         
                         successCallback(responseDict)
                         
+                    }
+                    else
+                    {
+                        successCallback([:])
                     }
                     
                 }

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <customFonts key="customFonts">
+        <array key="Averta Semibold.otf">
+            <string>Averta-Semibold</string>
+        </array>
+    </customFonts>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="ActiveInactiveCCell" id="gTV-IL-0wX" customClass="ActiveInactiveCCell" customModule="Flazhed" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="120" height="96"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="120" height="96"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="C7R-rG-dMY">
+                        <rect key="frame" x="0.0" y="0.0" width="120" height="96"/>
+                        <subviews>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KJq-By-9dK">
+                                <rect key="frame" x="83.5" y="4" width="6" height="6"/>
+                                <color key="backgroundColor" red="0.94901960780000005" green="0.2901960784" blue="0.2901960784" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="6" id="IQp-8e-VkL"/>
+                                    <constraint firstAttribute="height" constant="6" id="SWQ-UV-V3t"/>
+                                </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="3"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Tu-vT-d4R" customClass="CircularProgressView" customModule="Flazhed" customModuleProvider="target">
+                                <rect key="frame" x="30" y="3" width="60" height="60"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                        <real key="value" value="32.5"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                            </view>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="chatUserIMage2" translatesAutoresizingMaskIntoConstraints="NO" id="oUD-IZ-han">
+                                <rect key="frame" x="35" y="8" width="50" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="50" id="bQf-5f-xla"/>
+                                    <constraint firstAttribute="height" constant="50" id="uAh-pO-BcT"/>
+                                </constraints>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="iphone 111" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bQn-cs-l4F">
+                                <rect key="frame" x="8" y="70" width="90" height="26"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="90" id="BWW-Kp-gfS"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" name="Averta-Semibold" family="Averta-Semibold" pointSize="13"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="bQn-cs-l4F" firstAttribute="leading" secondItem="C7R-rG-dMY" secondAttribute="leading" constant="8" id="99t-D0-vfF"/>
+                            <constraint firstItem="oUD-IZ-han" firstAttribute="top" secondItem="C7R-rG-dMY" secondAttribute="top" constant="8" id="Acy-7f-qTU"/>
+                            <constraint firstItem="3Tu-vT-d4R" firstAttribute="top" secondItem="oUD-IZ-han" secondAttribute="top" constant="-5" id="G16-hI-50P"/>
+                            <constraint firstItem="KJq-By-9dK" firstAttribute="top" secondItem="oUD-IZ-han" secondAttribute="top" constant="-4" id="LUZ-SA-Dlv"/>
+                            <constraint firstItem="bQn-cs-l4F" firstAttribute="top" secondItem="3Tu-vT-d4R" secondAttribute="bottom" constant="7" id="Nqb-Mf-U0F"/>
+                            <constraint firstItem="bQn-cs-l4F" firstAttribute="top" secondItem="oUD-IZ-han" secondAttribute="bottom" constant="12" id="SiA-ZT-WB0"/>
+                            <constraint firstItem="KJq-By-9dK" firstAttribute="leading" secondItem="3Tu-vT-d4R" secondAttribute="trailing" constant="-6.5" id="UZA-j0-mP3"/>
+                            <constraint firstItem="oUD-IZ-han" firstAttribute="centerX" secondItem="C7R-rG-dMY" secondAttribute="centerX" id="VUl-ba-ANC"/>
+                            <constraint firstItem="3Tu-vT-d4R" firstAttribute="bottom" secondItem="oUD-IZ-han" secondAttribute="bottom" constant="5" id="Yr7-eq-Y2Y"/>
+                            <constraint firstItem="3Tu-vT-d4R" firstAttribute="trailing" secondItem="oUD-IZ-han" secondAttribute="trailing" constant="5" id="cMO-J6-d8s"/>
+                            <constraint firstAttribute="bottom" secondItem="bQn-cs-l4F" secondAttribute="bottom" id="ph8-oY-ocg"/>
+                            <constraint firstAttribute="bottom" secondItem="bQn-cs-l4F" secondAttribute="bottom" id="pw1-kc-kef"/>
+                            <constraint firstItem="3Tu-vT-d4R" firstAttribute="leading" secondItem="oUD-IZ-han" secondAttribute="leading" constant="-5" id="rLR-uL-Eg9"/>
+                        </constraints>
+                    </view>
+                </subviews>
+            </view>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <constraints>
+                <constraint firstItem="C7R-rG-dMY" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="Hoz-s7-qO2"/>
+                <constraint firstAttribute="bottom" secondItem="C7R-rG-dMY" secondAttribute="bottom" id="cXT-7Y-xir"/>
+                <constraint firstItem="C7R-rG-dMY" firstAttribute="top" secondItem="gTV-IL-0wX" secondAttribute="top" id="ceM-6u-9yM"/>
+                <constraint firstAttribute="trailing" secondItem="C7R-rG-dMY" secondAttribute="trailing" id="lpf-DD-8NQ"/>
+            </constraints>
+            <size key="customSize" width="126" height="96"/>
+            <connections>
+                <outlet property="heighLightColorView" destination="KJq-By-9dK" id="jUU-IH-iR3"/>
+                <outlet property="mainView" destination="C7R-rG-dMY" id="yVr-WS-Dqm"/>
+                <outlet property="progressView" destination="3Tu-vT-d4R" id="1Yz-tg-sq6"/>
+                <outlet property="storyImageView" destination="oUD-IZ-han" id="UxV-ew-Wew"/>
+                <outlet property="userName" destination="bQn-cs-l4F" id="WeD-Vt-1SL"/>
+            </connections>
+            <point key="canvasLocation" x="44.927536231884062" y="64.955357142857139"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <image name="chatUserIMage2" width="50" height="50"/>
+    </resources>
+</document>

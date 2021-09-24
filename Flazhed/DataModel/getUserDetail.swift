@@ -22,7 +22,8 @@ struct getUserDetail
     var deletedAt:String?
     var authToken:String?
     var profile_data:profileModel?
-
+    
+    var more_profile_details:MoreProfileDataModel?
     
     init(detail:JSONDictionary) {
         self.id = detail["_id"] as? String
@@ -34,7 +35,7 @@ struct getUserDetail
         self.social_type = detail[ApiKey.kSocial_type] as? String
         self.is_block = detail[ApiKey.kIsBlock] as? Int
         self.profile_data = profileModel.init(detail: (detail["profile_data"] as? JSONDictionary) ?? [:])
-       
+        self.more_profile_details = MoreProfileDataModel.init(detail: (detail["more_profile_details"] as? JSONDictionary) ?? [:])
     }
 }
 

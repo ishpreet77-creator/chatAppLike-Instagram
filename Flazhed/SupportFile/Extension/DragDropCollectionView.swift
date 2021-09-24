@@ -68,7 +68,7 @@ class DragDropCollectionView: UICollectionView, UIGestureRecognizerDelegate {
         let touchLocation = longPressRecognizer.location(in: self)
         
         switch (longPressRecognizer.state) {
-        case UIGestureRecognizerState.began:
+        case UIGestureRecognizer.State.began:
             
             draggedCellIndexPath = self.indexPathForItem(at: touchLocation)
             
@@ -89,7 +89,7 @@ class DragDropCollectionView: UICollectionView, UIGestureRecognizerDelegate {
             }
             }
             
-        case UIGestureRecognizerState.changed:
+        case UIGestureRecognizer.State.changed:
             if draggedCellIndexPath != nil {
                 if draggedCellIndexPath?.row ?? 0<DataManager.imageCount
                 {
@@ -118,7 +118,7 @@ class DragDropCollectionView: UICollectionView, UIGestureRecognizerDelegate {
                 })
                 }
             }
-        case UIGestureRecognizerState.ended:
+        case UIGestureRecognizer.State.ended:
             if draggedCellIndexPath != nil {
                 if draggedCellIndexPath?.row ?? 0<DataManager.imageCount
                 {
@@ -254,10 +254,10 @@ extension DragDropCollectionView {
                     let scrollBoundsLength: CGFloat = 50.0
                     var scrollRectAtEnd: CGRect
                     switch scrollDirection {
-                    case UICollectionViewScrollDirection.horizontal:
+                    case UICollectionView.ScrollDirection.horizontal:
                         scrollBoundsSize = CGSize(width: scrollBoundsLength, height: self.frame.height)
                         scrollRectAtEnd = CGRect(x: self.frame.origin.x + self.frame.width - scrollBoundsSize.width , y: self.frame.origin.y, width: scrollBoundsSize.width, height: self.frame.height)
-                    case UICollectionViewScrollDirection.vertical:
+                    case UICollectionView.ScrollDirection.vertical:
                         scrollBoundsSize = CGSize(width: self.frame.width, height: scrollBoundsLength)
                         scrollRectAtEnd = CGRect(x: self.frame.origin.x, y: self.frame.origin.y + self.frame.height - scrollBoundsSize.height, width: self.frame.width, height: scrollBoundsSize.height)
                     }

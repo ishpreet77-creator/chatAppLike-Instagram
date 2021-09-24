@@ -9,12 +9,16 @@ import UIKit
 import GoogleMobileAds
 import AVKit
 import CoreLocation
+import AgoraRtmKit
+import FaveButton
 
 class HomeVC: BaseVC {
     
-    //MARK:- All outlets  🍎
+    //MARK:- All outlets
     
-    @IBOutlet weak var btnLikeCard: UIButton!
+    @IBOutlet weak var fvBtn: FaveButton!
+    @IBOutlet weak var viewTableBack: UIView!
+   // @IBOutlet weak var btnLikeCard: UIButton!
     @IBOutlet weak var imgCardLike: UIImageView!
     @IBOutlet weak var viewButtomCard: UIView!
     @IBOutlet weak var shakeView: UIView!
@@ -27,13 +31,24 @@ class HomeVC: BaseVC {
     @IBOutlet weak var rightConst: NSLayoutConstraint!
     @IBOutlet weak var leftConst: NSLayoutConstraint!
     
-    //MARK:- All Variable  🍎
+    @IBOutlet weak var regretView: UIView!
+    @IBOutlet weak var disLikeView: UIView!
+    @IBOutlet weak var hearView: UIView!
+    @IBOutlet weak var likeView: UIView!
+    @IBOutlet weak var changeModeView: UIView!
+    
+    @IBOutlet weak var btnLike: FaveButton!
+    @IBOutlet weak var btnDisLike: FaveButton!
+    @IBOutlet weak var btnMessage: UIButton!
+    
+    //MARK:- All Variable
     var permissionLocationCheck:Bool = false
     var toShow = ""
     var toShowAno = ""
     var isplayVideo=false
     var isAnoModeOn=true
     var isPagination=false
+    var fromRegret=false
     
     var anoCollectionHeight = 50
     var shakeCollectionHeight = 50
@@ -43,7 +58,7 @@ class HomeVC: BaseVC {
     var UserData:UserListModel?
     var bannerView: GADBannerView!
     var other_user_id = ""
-    var other_user_image = ""
+   
     var is_liked_by_other_user_id = 0
     
     let locationmanager = CLLocationManager()
@@ -56,13 +71,31 @@ class HomeVC: BaseVC {
     
     var fromLikeDisLike=false
     var scrollDown=false
+    var postImageData:[PostdetailModel] = []
+    var view_user_id = "601a3769db19430c7ea84786"
+    var likeViewProfile = false
+    var isRegetEnable = false
+    var cellHeights = [IndexPath: CGFloat]()
     
-    //MARK:- View Lifecycle   🍎
+     var scrollStart=false
+    var lastPoint:CGFloat = 0.0
+    var regretPaymentChecked=false
+    var cellHeight = SCREENHEIGHT
+    var swipeRight = UISwipeGestureRecognizer()
+    var swipeDown = UISwipeGestureRecognizer()
+    //MARK:- View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         self.page = 0
-        DataManager.comeFrom = ""
-        DataManager.HomeRefresh = "true"
+        
+        SocketIOManager.shared.initializeSocket()
+        if DataManager.comeFromTag == 100
+        {
+            DataManager.comeFrom = ""
+            DataManager.HomeRefresh = true
+            
+        }
+       
         
         self.cardView.isHidden=true
         self.shakeView.isHidden=false
@@ -70,35 +103,42 @@ class HomeVC: BaseVC {
         locationmanager.requestAlwaysAuthorization()
         locationmanager.delegate = self
         locationmanager.requestLocation()
-        
+        //locationmanager.startMonitoringSignificantLocationChanges()
         
         self.adsSetup()
         
         //MARK:- Hide load view
+        self.regretView.isHidden=true
         
-        self.viewButtomCard.isHidden=true
-        NotificationCenter.default.addObserver(self, selector: #selector(self.openProfileDetails(notification:)), name: Notification.Name("OpenProfileDetails"), object: nil)
+        
+        self.selfJoinSocketEmit()
+        self.updateLocationAPI()
+        self.setUI()
         
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        
+        SocketIOManager.shared.initializeSocket()
+        self.selfJoinSocketEmit()
         self.setUpTable()
+        
         
         locationmanager.requestAlwaysAuthorization()
         locationmanager.delegate = self
         locationmanager.requestLocation()
+        //  locationmanager.startMonitoringSignificantLocationChanges()
         
-        
-        //MARK:-  data manager 5- show initial two card, 4- show shake user, 3- Show card anonyous user
+//MARK:-  data manager 5- show initial two card, 4- show shake user, 3- Show card anonyous user
         
         print("current comefrom tag = \(DataManager.comeFromTag)")
         
         
-        if DataManager.HomeRefresh == "true"
+        if DataManager.HomeRefresh//.equalsIgnoreCase(string: "true")
         //self.isplayVideo==false
         {
+            self.regretPaymentChecked=false
+            self.isRegetEnable=false
             if DataManager.comeFromTag==3
             {
                 self.cardView.isHidden=true
@@ -143,13 +183,45 @@ class HomeVC: BaseVC {
             
             else if DataManager.comeFromTag==5
             {
+                //                self.cardView.isHidden=true
+                //                self.shakeView.isHidden=true
+                //
+                //                self.addsView.isHidden=true
+                //                self.shakeView.isHidden=false
+                //                DataManager.comeFromTag=3
+                
+                
+                
                 self.cardView.isHidden=true
+                self.addsView.isHidden=true
+                self.viewButtomCard.isHidden=true
                 self.shakeView.isHidden=true
                 
-                self.addsView.isHidden=true
-                self.shakeView.isHidden=false
-                DataManager.comeFromTag=3
+                
+                self.AllUserDataArray.removeAll()
+                self.getShakeSentUser(page: 0)
+                
+                
             }
+            else if DataManager.comeFromTag==6
+            {
+                self.view_user_id = DataManager.OtherUserId
+                self.cardView.isHidden=false
+                self.shakeView.isHidden=true
+                self.addsView.isHidden=true
+                DataManager.HomeRefresh=false
+                DataManager.OtherUserId = ""
+                DataManager.comeFromTag=3
+                
+                if Connectivity.isConnectedToInternet {
+                    
+                    //self.callApiForProfileDetails(data: self.view_user_id)
+                } else {
+                    
+                    self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+                }
+            }
+            
             else
             {
                 if toShow == "Card"
@@ -168,7 +240,7 @@ class HomeVC: BaseVC {
         {
             self.isplayVideo=false
             DataManager.comeFrom = ""
-            DataManager.HomeRefresh = "false"
+            DataManager.HomeRefresh = false
         }
         
         if self.getDeviceModel() == "iPhone 6"
@@ -213,10 +285,10 @@ class HomeVC: BaseVC {
         }
         
         
-        
+     //   self.getRTMTokenApi()
         
     }
-    //MARK:- Stop audio  🍎
+    //MARK:- Stop audio
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
@@ -224,24 +296,225 @@ class HomeVC: BaseVC {
         
     }
     
+    func setUI()
+    {
+        self.btnLike.tag = 1
+        
+        self.btnLike.normalColor = UIColor.black
+        self.btnLike.selectedColor = UIColor.red
+        self.btnLike.setImage(UIImage(named: "NewLike"), for: .selected)
+      //  self.btnLike.setImage(UIImage(named: "BlackLike2"), for: .normal)
+        self.btnLike.setSelected(selected: false, animated: true)
+        self.btnLike.delegate=self
+        
+        self.btnDisLike.tag = 2
+        self.btnDisLike.normalColor = UIColor.red
+        self.btnDisLike.selectedColor = UIColor.red
+        self.btnDisLike.setImage(UIImage(named: "crosss"), for: .selected)
+       // self.btnDisLike.setImage(UIImage(named: "crosss"), for: .normal)
+        self.btnDisLike.setSelected(selected: true, animated: true)
+        self.btnDisLike.delegate=self
+        self.btnDisLike.setSelected(selected: false, animated: true)
+        
     
-    //MARK:- Bottom Five (Like , dislike...) Act  🍎
+        
+    }
+    
+    //MARK:- Message Button action
+
+    @IBAction func messageBtnAct (_ sender:UIButton)
+    {
+        
+            
+            let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
+            let vc = storyboard.instantiateViewController(withIdentifier: "MessageVC") as! MessageVC
+        vc.screenType = kHome
+            DataManager.HomeRefresh = false
+            if self.AllUserDataArray.count==1
+            {
+                self.currentUserDetails = self.AllUserDataArray[0]
+            }
+            
+            MusicPlayer.instance.pause()
+       
+            
+            let mode = self.currentUserDetails?.second_table_like_dislike?.by_like_mode ?? ""
+            let cellData = self.currentUserDetails
+            if kStory.equalsIgnoreCase(string: mode)
+            {
+                
+                
+                vc.view_user_id=cellData?.user_id ?? ""
+                vc.profileName=(cellData?.profile_data?.username ?? "").capitalized
+                vc.comfrom=kStory
+                vc.commentTitle=cellData?.Single_Story_Details?.post_text ?? ""
+                
+                let postType = cellData?.Single_Story_Details?.file_type ?? ""
+                
+                if  kVideo.equalsIgnoreCase(string: postType)
+                {
+                vc.commentImage=cellData?.Single_Story_Details?.thumbnail ?? ""
+                }
+                else
+              {
+                vc.commentImage=cellData?.Single_Story_Details?.file_name ?? ""
+              }
+                
+                
+                vc.commentPostId=cellData?.Single_Story_Details?._id ?? ""
+            }
+            else if kHangout.equalsIgnoreCase(string: mode)
+            {
+                vc.view_user_id=cellData?.user_id ?? ""
+                vc.profileName=(cellData?.profile_data?.username ?? "").capitalized
+                vc.comfrom=kHangout
+                vc.commentTitle=cellData?.Single_Hangout_Details?.heading ?? ""
+                vc.commentImage=cellData?.Single_Hangout_Details?.image ?? ""
+                vc.commentPostId=cellData?.Single_Hangout_Details?._id ?? ""
+            }
+           
+            
+            self.navigationController?.pushViewController(vc, animated: true)
+        
+        
+    }
+    //MARK:- respond ToSwipe Gesture action
+    
+    @objc func respondToSwipeGesture(_ sender: UISwipeGestureRecognizer)
+    {
+        print("DataManager.purchasePlan \(DataManager.purchasePlan)")
+//        print("AllUserDataArray.count \(self.AllUserDataArray.count)")
+//
+        if DataManager.purchasePlan
+        {
+            self.tableAllUser.isScrollEnabled=true
+        }
+        else
+        {
+        if sender.direction == .up
+        {
+            print("swipe up")
+            self.tableAllUser.isScrollEnabled=true
+        }
+        else if sender.direction == .down
+        {
+            print("swipe down")
+            self.tableAllUser.isScrollEnabled=false
+        }
+        }
+        
+        
+    }
     
     
-    //MARK:- Regret swipe action  🍎
+    //MARK:- Bottom Five (Like , dislike...) Act
+    
+    
+    //MARK:- Regret swipe action
     
     @IBAction func shareAct(_ sender: UIButton)
     {
-        let storyboard: UIStoryboard = UIStoryboard(name: "Account", bundle: Bundle.main)
-        let destVC = storyboard.instantiateViewController(withIdentifier: "RegretPopUpVC") as!  RegretPopUpVC
-        destVC.type = .Regret
-        destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
-        destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+        //         IAPHandler.shared.validatePurchase(success: { (status) in
+        //
+        //            print("Purchase Status = \(status)")
+        //
+        //        })
         
-        self.present(destVC, animated: true, completion: nil)
+        //        if 1==1//DataManager.purchasePlan==false
+        //        {
+        //
+        //            var data = JSONDictionary()
+        //
+        //            data[ApiKey.kTimezone] = TIMEZONE
+        //
+        //            if Connectivity.isConnectedToInternet {
+        //
+        //                self.callApiForRegretShake(data: data)
+        //            } else {
+        //
+        //                self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        //            }
+        //        }
+        //        else
+        //        {
+        //            let storyboard: UIStoryboard = UIStoryboard(name: "Account", bundle: Bundle.main)
+        //            let destVC = storyboard.instantiateViewController(withIdentifier: "RegretPopUpVC") as!  RegretPopUpVC
+        //            destVC.type = .Regret
+        //            destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+        //            destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+        //
+        //            self.present(destVC, animated: true, completion: nil)
+        
+        //}
+        
+        //MARK:- For payment check api
+        if self.regretPaymentChecked
+        {
+            let active = AccountVM.shared.Swiping_Subsription_Data?.subscription_is_active ?? 0
+            
+            if active == 1
+            {
+                var type = kAnonymous
+                if self.isAnoModeOn==false
+                {
+                    type=kShake
+                }
+               DataManager.purchasePlan=true
+     
+            
+                var data = JSONDictionary()
+                
+                data[ApiKey.kTimezone] = TIMEZONE
+                data[ApiKey.kRegret_type] = type
+                
+                if Connectivity.isConnectedToInternet {
+                    
+                    self.callApiForRegretShake(data: data)
+                } else {
+                    
+                    self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+                }
+                
+               
+            }
+            else
+            {
+                DataManager.purchasePlan=false
+                let storyboard: UIStoryboard = UIStoryboard(name: "Account", bundle: Bundle.main)
+                let destVC = storyboard.instantiateViewController(withIdentifier: "RegretPopUpVC") as!  RegretPopUpVC
+                destVC.type = .Regret
+                destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+                destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+                
+                self.present(destVC, animated: true, completion: nil)
+            }
+
+        }
+        else
+        {
+        
+        if Connectivity.isConnectedToInternet {
+
+            self.getMySubscriptionApi()
+        } else {
+
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
+        }
+        
+//        //MARK:- To show popup
+//
+//        let storyboard: UIStoryboard = UIStoryboard(name: "Account", bundle: Bundle.main)
+//        let destVC = storyboard.instantiateViewController(withIdentifier: "RegretPopUpVC") as!  RegretPopUpVC
+//        destVC.type = .Regret
+//        destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+//        destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+//
+//        self.present(destVC, animated: true, completion: nil)
+        
     }
     
-    //MARK:- Hear voice action  🍎
+    //MARK:- Hear voice action
     
     @IBAction func soundPlayAct(_ sender: UIButton)
     {
@@ -268,91 +541,280 @@ class HomeVC: BaseVC {
         
     }
     
-    //MARK:- Dislike user action  🍎
+    //MARK:- Dislike user action
     
     @IBAction func DisLikeAct(_ sender: UIButton)
     {
         
-        //MARK:- tage 0- card, 2- user details, 3- ads
-        self.other_user_id = self.currentUserDetails?.user_id ?? ""
-        
-        MusicPlayer.instance.pause()
-        
-        
-        let currentTag = DataManager.comeFromTag
-        
-        if self.isAnoModeOn//currentTag == 3
+//MARK:- tage 0- card, 2- user details, 3- ads
+        if self.AllUserDataArray.count==1
         {
-            self.fromLikeDisLike=true
-            
-            self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "2", like_mode: "Anonymous", type: "Ano")
+            self.currentUserDetails = self.AllUserDataArray[0]
         }
-        else
-        {
-            self.fromLikeDisLike=true
-            self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "2", like_mode: "Shake", type: "Shake")
-        }
-        
-        
-    }
-    
-    //MARK:- Like user action  🍎
-    
-    @IBAction func LikeAct(_ sender: UIButton)
-    {
+     
         MusicPlayer.instance.pause()
         self.other_user_id = self.currentUserDetails?.user_id ?? ""
+   
+        print("user name Like: = \(self.currentUserDetails?.profile_data?.username)")
         
-        let currentTag = DataManager.comeFromTag
-    /*
-    
-        var index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+        
+         
+         var index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+         
+         if list.user_id == self.other_user_id
+         {
+         return true
+         }
+         else
+         {
+         return false
+         }
+         
+         
+         } ?? 0
+         
+         
+         print("Index at id = \(index)")
+         
+         if (self.AllUserDataArray.count>index)
+         {
+         self.AllUserDataArray.remove(at: index)
+         }
+        self.currentUserDetails?.user_id = nil
+        
+        if self.isAnoModeOn
+        {
             
-            if list.user_id == self.other_user_id
+            self.imgChangeCard.image = UIImage(named: "phoneRotate")
+            
+            if self.AllUserDataArray.count == 0
             {
-                return true
+                self.AllUserDataArray.removeAll()
+                
+                self.getAnonymousUser(page: self.page)
             }
             else
             {
-                return false
+                tableAllUser.reloadData()
+//                UIView.performWithoutAnimation {
+//
+//                    self.tableAllUser.layoutIfNeeded()
+//                    self.tableAllUser.setContentOffset(CGPoint.zero, animated: true)
+//                    self.tableAllUser.scroll(to: .top, animated: true)
+//                }
+            }
+            self.regretView.isHidden=false
+            self.fromLikeDisLike=false
+         
+            
+            
+            let mode = self.currentUserDetails?.second_table_like_dislike?.by_like_mode ?? ""
+             
+             if (kHangout.equalsIgnoreCase(string: mode))//kStory.equalsIgnoreCase(string: mode) ||
+             {
+                 let id = self.currentUserDetails?.second_table_like_dislike?._id ?? ""
+                 
+                 self.RemoveStoryHangoutAPI(listId: id)
+             }
+             else
+             {
+                self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "2", like_mode: kAnonymous, type: kAnonymous,showIndicator: false)
+             }
+        
+           
+        }
+        else
+        {
+            self.regretView.isHidden=false
+            self.imgChangeCard.image = UIImage(named: "AnoBack")
+            self.fromLikeDisLike=false
+            
+            if self.AllUserDataArray.count == 0
+            {
+                self.AllUserDataArray.removeAll()
+                
+                self.getShakeSentUser(page: self.page)
+            }
+            else
+            {
+                tableAllUser.reloadData()
+
             }
             
+            
+         
+            
+            let mode = self.currentUserDetails?.second_table_like_dislike?.by_like_mode ?? ""
+             
+             if (kHangout.equalsIgnoreCase(string: mode))//kStory.equalsIgnoreCase(string: mode) ||
+             {
+                 let id = self.currentUserDetails?.second_table_like_dislike?._id ?? ""
+                 
+                 self.RemoveStoryHangoutAPI(listId: id)
+             }
+             else
+             {
+                self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "2", like_mode: kShake, type: kShake,showIndicator: false)
+             }
 
-        } ?? 0
-        
-
-        print("Index at id = \(index)")
-        
-        if (self.AllUserDataArray.count>index)
-        {
-            self.AllUserDataArray.remove(at: index)
         }
         
-        self.tableAllUser.reloadData()
+       
+        
+    }
+    
+    //MARK:- Like user action
+    
+    @IBAction func LikeAct(_ sender: UIButton)
+    {
+        if self.AllUserDataArray.count==1
+        {
+            self.currentUserDetails = self.AllUserDataArray[0]
+        }
+        self.lightUp(button: sender)
+        MusicPlayer.instance.pause()
+        self.other_user_id = self.currentUserDetails?.user_id ?? ""
+   
+        print("user name Like: = \(self.currentUserDetails?.profile_data?.username)")
         
         
+         
+         var index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+         
+         if list.user_id == self.other_user_id
+         {
+         return true
+         }
+         else
+         {
+         return false
+         }
+         
+         
+         } ?? 0
+         
+         
+         print("Index at id = \(index)")
+         
+         if (self.AllUserDataArray.count>index)
+         {
+         self.AllUserDataArray.remove(at: index)
+         }
+        self.currentUserDetails?.user_id = nil
         
-        */
+        if self.isAnoModeOn
+        {
+            
+            self.imgChangeCard.image = UIImage(named: "phoneRotate")
+            
+            if self.AllUserDataArray.count == 0
+            {
+                self.AllUserDataArray.removeAll()
+                
+                self.getAnonymousUser(page: self.page)
+            }
+            else
+            {
+                tableAllUser.reloadData()
+//                UIView.performWithoutAnimation {
+//
+//                    self.tableAllUser.layoutIfNeeded()
+//                    self.tableAllUser.setContentOffset(CGPoint.zero, animated: true)
+//                    self.tableAllUser.scroll(to: .top, animated: true)
+//                }
+            }
+            self.regretView.isHidden=false
+            self.fromLikeDisLike=false
+         
+           
+            let mode = self.currentUserDetails?.second_table_like_dislike?.by_like_mode ?? ""
+             
+             if (kHangout.equalsIgnoreCase(string: mode))//kStory.equalsIgnoreCase(string: mode) ||
+             {
+                 let id = self.currentUserDetails?.second_table_like_dislike?._id ?? ""
+                 
+                 self.RemoveStoryHangoutAPI(listId: id)
+             }
+             else
+             {
+                self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kAnonymous, type: kAnonymous,showIndicator: false)
+             }
+        }
+        else
+        {
+            self.regretView.isHidden=false
+            self.imgChangeCard.image = UIImage(named: "AnoBack")
+            self.fromLikeDisLike=false
+            
+            if self.AllUserDataArray.count == 0
+            {
+                self.AllUserDataArray.removeAll()
+                
+                self.getShakeSentUser(page: self.page)
+            }
+            else
+            {
+                tableAllUser.reloadData()
+//                UIView.performWithoutAnimation {
+//
+//                    self.tableAllUser.layoutIfNeeded()
+//                    self.tableAllUser.setContentOffset(CGPoint.zero, animated: true)
+//                    self.tableAllUser.scroll(to: .top, animated: true)
+//                }
+            }
+            
+            
+         
+            
+            
+            let mode = self.currentUserDetails?.second_table_like_dislike?.by_like_mode ?? ""
+             
+             if ( kHangout.equalsIgnoreCase(string: mode))//kStory.equalsIgnoreCase(string: mode) ||
+             {
+                 let id = self.currentUserDetails?.second_table_like_dislike?._id ?? ""
+                 
+                 self.RemoveStoryHangoutAPI(listId: id)
+             }
+             else
+             {
+                self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kShake, type: kShake,showIndicator: false)
+             }
+        }
         
+       
+         
+        /*
         
         
         if self.isAnoModeOn//currentTag == 3
         {
             self.lightUp(button: sender)
             self.fromLikeDisLike=true
-            self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: "Anonymous", type: "Ano")
+            self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kAnonymous, type: kAnonymous,showIndicator: false)
         }
         else
         {
             self.fromLikeDisLike=true
             self.lightUp(button: sender)
-            self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: "Shake", type: "Shake")
+            if likeViewProfile
+            {
+
+                self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kShake, type: kShake,showIndicator: false)
+            }
+            else
+            {
+                self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kShake, type: kShake,showIndicator: false)
+            }
+
+
         }
+ */
+        
         
     }
     
     
-    //MARK:- Shake send to user action  🍎
+    //MARK:- Shake send to user action
     
     @IBAction func shakeSendAct(_ sender: UIButton)
     {
@@ -365,28 +827,30 @@ class HomeVC: BaseVC {
         // self.navigationController?.pushViewController(vc, animated: true)
     }
     
-    //MARK:- Show ano user action  🍎
+    //MARK:- Show ano user action
     
     @IBAction func playCardAnoAct(_ sender: UIButton)
     {
-      
-       // self.tableAllUser.isPagingEnabled=true
+        
+        // self.tableAllUser.isPagingEnabled=true
         MusicPlayer.instance.pause()
         DataManager.comeFromTag=3
         self.AllUserDataArray.removeAll()
         self.fromLikeDisLike=false
-        self.getAnonymousUser(page: 0)
         
+        self.getAnonymousUser(page: 0)
         self.cardView.isHidden=true
         self.shakeView.isHidden=true
         
         self.addsView.isHidden=true
         
         imgChangeCard.image = UIImage(named: "phoneRotate")
+        self.tableAllUser.scrollToTop(animated: false)
+      
         
     }
     
-    //MARK:- Change mode (Ano,Shake) Show action  🍎
+    //MARK:- Change mode (Ano,Shake) Show action
     
     @IBAction func playAnoAct(_ sender: UIButton)
     {
@@ -396,22 +860,22 @@ class HomeVC: BaseVC {
             DataManager.comeFromTag=3
             imgChangeCard.image = UIImage(named: "phoneRotate")
             
-            
+            self.isAnoModeOn=true
             self.AllUserDataArray.removeAll()
             self.fromLikeDisLike=false
             self.getAnonymousUser(page: 0)
-            
+            self.tableAllUser.scrollToTop(animated: false)
         }
         else
         {
-            if  self.imgChangeCard.image == UIImage(named: "phoneRotate") //DataManager.comeFromTag==3
+            if  self.isAnoModeOn//self.imgChangeCard.image == UIImage(named: "phoneRotate") //DataManager.comeFromTag==3//self.isAnoModeOn//
             {
                 self.fromLikeDisLike=false
                 self.AllUserDataArray.removeAll()
-                self.getShakeSentUser()
+                self.getShakeSentUser(page: 0)
                 self.imgChangeCard.image = UIImage(named: "AnoBack")
                 
-                
+                self.tableAllUser.scrollToTop(animated: false)
             }
             else
             {
@@ -419,12 +883,14 @@ class HomeVC: BaseVC {
                 self.fromLikeDisLike=false
                 self.getAnonymousUser(page: 0)
                 imgChangeCard.image = UIImage(named: "phoneRotate")
-                
+                self.tableAllUser.scrollToTop(animated: false)
             }
         }
         
+        
+        
     }
-    //MARK:- Close ads action  🍎
+    //MARK:- Close ads action
     
     @IBAction func closeAdsAct(_ sender: UIButton)
     {
@@ -434,148 +900,231 @@ class HomeVC: BaseVC {
         
         self.addsView.isHidden=true
     }
+    
+    
+    
+    @IBAction func PremiumBtnAct(_ sender: UIButton)
+    {
+        let storyBoard = UIStoryboard.init(name: "Account", bundle: nil)
+        
+        let vc = storyBoard.instantiateViewController(withIdentifier: "PremiumVC") as! PremiumVC //RegretPopUpVC
+        vc.type = .kExtraShakes
+        vc.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+        vc.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+        self.present(vc, animated: true, completion: nil)
+        
+    }
+    
 }
 
 
 
-//MARK:- Table view setup and show data 🍎
+//MARK:- Table view setup and show data
 
 extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
 {
+  
     
     func setUpTable()
     {
         
         self.tableAllUser.register(UINib(nibName: "HomeUserTCell", bundle: nil), forCellReuseIdentifier: "HomeUserTCell")
-        // self.tableAllUser.rowHeight = 100
-        //self.tableAllUser.estimatedRowHeight = UITableView.automaticDimension
-        
+   
+        self.tableAllUser.rowHeight = self.tableAllUser.bounds.height//UIScreen.main.bounds.height
+        self.tableAllUser.estimatedRowHeight = self.tableAllUser.bounds.height//UIScreen.main.bounds.height
+        self.tableAllUser.separatorStyle = .none
+        self.tableAllUser.isPagingEnabled = true
+        self.tableAllUser.bounces = false
+        self.tableAllUser.estimatedSectionHeaderHeight = CGFloat.leastNormalMagnitude
+        self.tableAllUser.sectionHeaderHeight = CGFloat.leastNormalMagnitude
+        self.tableAllUser.estimatedSectionFooterHeight = CGFloat.leastNormalMagnitude
+        self.tableAllUser.sectionFooterHeight = CGFloat.leastNormalMagnitude
+        self.tableAllUser.contentInsetAdjustmentBehavior = .never
         self.tableAllUser.delegate = self
         self.tableAllUser.dataSource = self
+       
+
+        
+     // if  DataManager.purchasePlan==false
+     // {
+       
+        self.swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(self.respondToSwipeGesture))
+        swipeRight.direction = UISwipeGestureRecognizer.Direction.up
+        swipeRight.delegate = self
+            self.viewTableBack.addGestureRecognizer(swipeRight)
+        
+       self.swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(self.respondToSwipeGesture))
+        swipeDown.delegate = self
+
+        swipeDown.direction = UISwipeGestureRecognizer.Direction.down
+            self.viewTableBack.addGestureRecognizer(swipeDown)
+      
+      // }
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        
-        return self.AllUserDataArray.count
-        
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
+    {
+//        if self.AllUserDataArray.count == 1
+//        {
+//            return 2
+//        }
+//        else
+//        {
+            return self.AllUserDataArray.count
+        //}
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
     {
         let cell = tableView.dequeueReusableCell(withIdentifier: "HomeUserTCell") as! HomeUserTCell
+        
+        
         var currentUserDetails:UserListModel?
+      
+        
+        if self.isRegetEnable{
+            self.regretView.isHidden=false
+        }
+        else
+        {
+            self.regretView.isHidden=true
+        }
+        
         
         if self.AllUserDataArray.count>indexPath.row
         {
             currentUserDetails = self.AllUserDataArray[indexPath.row]
-            self.currentUserDetails=self.AllUserDataArray[0]
+            
+            if self.currentUserDetails?.user_id == nil
+            {
+                self.currentUserDetails=self.AllUserDataArray[0]
+            }
+            
         }
+       
         if self.isAnoModeOn
         {
-            
-            
-            //HomeVM.shared.AnonymousUserDataArray[indexPath.row]
-            cell.reloadCollection(userDetails: currentUserDetails, isAnoModeOn: true)
+            cell.reloadCollection(userDetails: currentUserDetails, isAnoModeOn: true, VC: self)
         }
         else
         {
-            // currentUserDetails = self.AllUserDataArray[indexPath.row]//HomeVM.shared.ShakeUserDataArray[indexPath.row]
-            cell.reloadCollection(userDetails: currentUserDetails, isAnoModeOn: false)
+            cell.reloadCollection(userDetails: currentUserDetails, isAnoModeOn: false, VC: self)
         }
         
+        if self.AllUserDataArray.count>0
+        {
         
+            let currentUserDetail=self.AllUserDataArray[0]
+            let mode = currentUserDetail.second_table_like_dislike?.by_like_mode ?? ""
+            let isMatch = currentUserDetail.like_dislikeData?.is_match ?? 0
+            
+            
+            if (kHangout.equalsIgnoreCase(string: mode)) //kStory.equalsIgnoreCase(string: mode) ||
+            {
+                self.btnLike.isHidden=true
+                self.btnMessage.isHidden=false
+            }
+            else if isMatch == 1
+            {
+                self.btnLike.isHidden=true
+                self.btnMessage.isHidden=false
+            }
+            else
+            {
+                self.btnLike.isHidden=false
+                self.btnMessage.isHidden=true
+            }
+            
+        }
+        else
+        {
+            self.btnLike.isHidden=false
+            self.btnMessage.isHidden=true
+        }
         return cell
     }
+  
     
     
-    @objc func openProfileDetails(notification: Notification)
-    {
-        if let data = notification.userInfo as? [String:String]
-        {
-            let storyBoard = UIStoryboard.init(name: "Home", bundle: nil)
-            let vc = storyBoard.instantiateViewController(withIdentifier: "ViewProfileVC") as! ViewProfileVC
-            vc.view_user_id = data["userId"] ?? ""
-            self.isplayVideo=true
-            DataManager.comeFrom = ""
-            self.navigationController?.pushViewController(vc, animated: true)
-        }
-    }
     
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat
     {
+        self.cellHeight = cellHeights[indexPath] ?? self.tableAllUser.frame.height
         
-        print("cell height = \(self.tableAllUser.frame.height)")
-        return self.tableAllUser.frame.height
+        return cellHeights[indexPath] ?? self.tableAllUser.frame.height//self.tableAllUser.frame.height
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        cellHeights[indexPath] = cell.frame.size.height
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return cellHeights[indexPath] ?? self.tableAllUser.frame.height//UITableView.automaticDimension
+    }
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0
+    }
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 0
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView)
     {
+       // print(#function)
         MusicPlayer.instance.pause()
+        
         var index = 0
         
         
         if scrollView == self.tableAllUser
         {
+         
             if let indexPath = self.tableAllUser.indexPathsForVisibleRows?.first {
                 
                 index = indexPath.row
             }
         }
         
-        if self.AllUserDataArray.count>index//HomeVM.shared.AnonymousUserDataArray.count>index
+        if self.AllUserDataArray.count>index
         {
-            self.currentUserDetails = self.AllUserDataArray[index]//HomeVM.shared.AnonymousUserDataArray[index]
+            self.currentUserDetails = self.AllUserDataArray[index]
             
         }
-        
-        //   if self.AllUserDataArray.count>(index-1)
-        //        {
-        //            var user:UserListModel?
-        //
-        //            if index == 0
-        //            {
-        //                if self.AllUserDataArray.count>0
-        //                {
-        //                 user = self.AllUserDataArray[0]
-        //                }
-        //            }
-        //            else
-        //            {
-        //                 user = self.AllUserDataArray[index-1]
-        //            }
-        //
-        //
-        //            if self.isAnoModeOn
-        //            {
-        //
-        //               // self.likeUnlikeAPI(other_user_id: user?.user_id ?? "", action: "2", like_mode: "Anonymous", type: "Ano")
-        //            }
-        //            else
-        //            {
-        //               // self.likeUnlikeAPI(other_user_id: user?.user_id ?? "", action: "2", like_mode: "Shake", type: "Shake")
-        //            }
-        //        }
+        if DataManager.purchasePlan==false
+        {
+        let translation: CGPoint = scrollView.panGestureRecognizer.translation(in: scrollView.superview)
+             let y = translation.y
+
+            if y > 0 {
+                scrollView.isScrollEnabled = false
+            } else {
+                scrollView.isScrollEnabled = true
+            }
+        }
+       
         
     }
     
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        print(#function)
         if scrollView == self.tableAllUser
         {
-         
+            
             if self.AllUserDataArray.count>1
             {
                 if targetContentOffset.pointee.y <= scrollView.contentOffset.y {
                     print(" it's going up")
-                  
+                    
                     self.scrollDown=false
                 }
                 else
                 {
-                    // it's going down
+                   
                     print(" it's going down")
                     self.scrollDown=true
+                   
                 }
             }
             else if self.AllUserDataArray.count==1
@@ -586,9 +1135,10 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
                 }
                 else
                 {
-                    // it's going down
+            
                     print(" it's going down")
                     self.scrollDown=true
+                 
                 }
             }
             else
@@ -597,14 +1147,16 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
             }
             
         }
-        
+    
     }
-    /*
+    
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         
+        print(#function)
         if scrollView == self.tableAllUser
         {
+        
             var index = 0
             
             
@@ -638,46 +1190,325 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
                 
                 if  self.scrollDown
                 {
+                    
                     print("self.scrollDown \(self.scrollDown)")
-                    //                if self.isAnoModeOn
-                    //                {
-                    //                    self.fromLikeDisLike=false
-                    //                    self.likeUnlikeAPI(other_user_id: user?.user_id ?? "", action: "2", like_mode: "Anonymous", type: "Ano")
-                    //                }
-                    //                else
-                    //                {
-                    //                    self.fromLikeDisLike=false
-                    //                    self.likeUnlikeAPI(other_user_id: user?.user_id ?? "", action: "2", like_mode: "Shake", type: "Shake")
-                    //                }
+               
+                    if self.isAnoModeOn
+                    {
+                      
+                        
+                      /*
+                        
+                        if self.AllUserDataArray.count == 1
+                        {
+                            self.AllUserDataArray.removeAll()
+                        }
+                        
+                      else if (self.AllUserDataArray.count>index)
+                        {
+                        self.AllUserDataArray.remove(at: index)
+                       }
+
+                 
+                      
+                   
+                    
+                   
+                       
+                        self.imgChangeCard.image = UIImage(named: "phoneRotate")
+                       
+                        if self.AllUserDataArray.count == 0
+                        {
+                            self.AllUserDataArray.removeAll()
+
+                            self.getAnonymousUser(page: self.page)
+                        }
+                        else
+                        {
+
+                            UIView.performWithoutAnimation {
+                                tableAllUser.reloadData()
+                                self.tableAllUser.layoutIfNeeded()
+                              //  self.tableAllUser.setContentOffset(CGPoint.zero, animated: false)
+                                self.tableAllUser.scroll(to: .top, animated: false)
+                            }
+                        }
+                        self.fromLikeDisLike=false
+                       // self.likeUnlikeAPI(other_user_id: user?.user_id ?? "", action: "2", like_mode: kAnonymous, type: kAnonymous,showIndicator: false)
+                        
+                    
+                      */
+                        self.isRegetEnable=true
+                        self.regretView.isHidden=false
+                        
+                          if self.AllUserDataArray.count == 1
+                        {
+                            self.AllUserDataArray.removeAll()
+                            self.isPagination=true
+                            self.getAnonymousUser(page: 0)
+                            self.tableAllUser.reloadData()
+                            self.tableAllUser.scrollToTop(animated: false)
+                        }
+                    }
+                    else
+                    {
+                        
+                        
+                        let index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+                            
+                            if list.user_id == self.other_user_id
+                            {
+                                return true
+                            }
+                            else
+                            {
+                                return false
+                            }
+                            
+                            
+                        } ?? 0
+                        self.imgChangeCard.image = UIImage(named: "AnoBack")
+                        
+                        if (self.AllUserDataArray.count>index)
+                        {
+                        self.AllUserDataArray.remove(at: index)
+                         }
+
+                        /*
+        
+                        if self.AllUserDataArray.count == 0
+                        {
+                            self.AllUserDataArray.removeAll()
+
+                            self.getShakeSentUser(page: self.page)
+                        }
+                        else
+                        {
+
+                            UIView.performWithoutAnimation {
+                                tableAllUser.reloadData()
+                                self.tableAllUser.layoutIfNeeded()
+                                self.tableAllUser.setContentOffset(CGPoint.zero, animated: true)
+                                self.tableAllUser.scroll(to: .top, animated: true)
+                            }
+                        }
+                        self.fromLikeDisLike=false
+                        */
+                        self.isRegetEnable=true
+                        
+                        self.regretView.isHidden=false
+                       let mode = user?.second_table_like_dislike?.by_like_mode ?? ""
+                        
+                        if (kHangout.equalsIgnoreCase(string: mode)) || kStory.equalsIgnoreCase(string: mode)// ||
+                        {
+                            let id = user?.second_table_like_dislike?._id ?? ""
+                            
+                            self.RemoveStoryHangoutAPI(listId: id)
+                        }
+                        else
+                        {
+                            self.likeUnlikeAPI(other_user_id: user?.user_id ?? "", action: "2", like_mode: kShake, type: kShake,showIndicator: false)
+                        }
+                        print("Shake Array count  = \(AllUserDataArray.count)")
+                      
+                        if self.AllUserDataArray.count == 0 ||  self.AllUserDataArray.count == 1
+                        {
+                            self.AllUserDataArray.removeAll()
+                            self.isPagination=true
+                            self.getShakeSentUser(page: 0)
+                        }
+                        
+                        
+        
+                    }
+                    print("AllUserDataArray count 1 = \(AllUserDataArray.count)")
+                    
+                    
                     
                 }
                 
                 
             }
-        }
-    }
-    */
-    
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+            /*
+            
+            if ((self.tableAllUser.contentOffset.y + self.tableAllUser.frame.size.height) >= self.tableAllUser.contentSize.height-SCREENHEIGHT*2)
+            {
+               
+                if self.AllUserDataArray.count<HomeVM.shared.Pagination_Details?.totalCount ?? 0
+                {
+                    if self.isAnoModeOn
+                    {
+                        self.isPagination=true
+                        self.getAnonymousUser(showIndiacter: false, page: self.page)
+                    }
+                    else
+                    {
+                        self.isPagination=true
+                        self.getShakeSentUser(page: self.page)
+                    }
 
-//        if ((self.tableAllUser.contentOffset.y + self.tableAllUser.frame.size.height) >= self.tableAllUser.contentSize.height-50)
-//            {
-//                if self.AllUserDataArray.count<HomeVM.shared.Pagination_Details?.totalCount ?? 0
+                }
+                else if self.AllUserDataArray.count >= HomeVM.shared.Pagination_Details?.totalCount ?? 0
+                {
+                    if self.isAnoModeOn
+                    {
+                        self.isPagination=true
+                        self.AllUserDataArray.removeAll()
+                        self.getAnonymousUser(showIndiacter: true, page: 0)
+                        self.tableAllUser.scrollToTop(animated: false)
+                    }
+                    else
+                    {
+                        self.AllUserDataArray.removeAll()
+                        self.isPagination=true
+                        self.getShakeSentUser(page: 0)
+                        self.tableAllUser.scrollToTop(animated: false)
+                    }
+                }
+            }
+            else
+            {
+                print("else")
+            }
+            
+            */
+            
+//            print((self.tableAllUser.contentOffset.y + self.tableAllUser.frame.size.height))
+//                print(self.tableAllUser.contentSize.height-50)
+            
+            if ((self.tableAllUser.contentOffset.y + self.tableAllUser.frame.size.height) >= self.tableAllUser.contentSize.height-50)
+            {
+                if self.AllUserDataArray.count<HomeVM.shared.Pagination_Details?.totalCount ?? 0
+                {
+                    if self.isAnoModeOn
+                    {
+                        self.isPagination=true
+                        self.getAnonymousUser(page: self.page)
+                    }
+                    else
+                    {
+                        self.isPagination=true
+                        self.getShakeSentUser(page: self.page)
+                    }
+
+                }
+                else if self.AllUserDataArray.count >= HomeVM.shared.Pagination_Details?.totalCount ?? 0
+                {
+                    if self.isAnoModeOn
+                    {
+                        self.isPagination=true
+                        self.AllUserDataArray.removeAll()
+                        self.getAnonymousUser(page: 0)
+                        self.tableAllUser.scrollToTop(animated: false)
+                    }
+                    else
+                    {
+                        self.AllUserDataArray.removeAll()
+                        self.isPagination=true
+                        self.getShakeSentUser(page: 0)
+                        self.tableAllUser.scrollToTop(animated: false)
+                    }
+                }
+                
+//                else
 //                {
 //                    if self.isAnoModeOn
 //                    {
 //                        self.isPagination=true
-//                        self.getAnonymousUser(page: self.page)
-//                    }
 //
+//                        self.getAnonymousUser(page: 0)
+//                    }
+//                    else
+//                    {
+//
+//                        self.isPagination=true
+//                        self.getShakeSentUser(page: 0)
+//                    }
+//                }
+
+            }
+            
+            
+            
+        }
+    }
+    
+  
+    
+    
+    
+    //
+    //    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+    //
+    //        if ((self.tableAllUser.contentOffset.y + self.tableAllUser.frame.size.height) >= self.tableAllUser.contentSize.height-50)
+    //            {
+    //                if self.AllUserDataArray.count<HomeVM.shared.Pagination_Details?.totalCount ?? 0
+    //                {
+    //                    if self.isAnoModeOn
+    //                    {
+    //                        self.isPagination=true
+    //                        self.getAnonymousUser(page: self.page)
+    //                    }
+    //                    else
+    //                    {
+    //                        self.isPagination=true
+    //                        self.getShakeSentUser(page: self.page)
+    //                    }
+    //
+    //                }
+    //
+    //            }
+    //
+    //    }
+    
+//    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+//
+//
+//
+//        for indexPath in indexPaths {
+//            print("prefetching row of \(indexPath.row)")
+//
+//            let cell = tableView.dequeueReusableCell(withIdentifier: "HomeUserTCell") as! HomeUserTCell
+//
+//
+//            var currentUserDetails:UserListModel?
+//
+//
+//            if self.isRegetEnable{
+//                self.regretView.isHidden=false
+//            }
+//            else
+//            {
+//                self.regretView.isHidden=true
+//            }
+//
+//
+//            if self.AllUserDataArray.count>indexPath.row
+//            {
+//                currentUserDetails = self.AllUserDataArray[indexPath.row]
+//
+//                if self.currentUserDetails?.user_id == nil
+//                {
+//                    self.currentUserDetails=self.AllUserDataArray[0]
 //                }
 //
 //            }
-       
-       
-    }
-    
-    
+//
+//            if self.isAnoModeOn
+//            {
+//                cell.reloadCollection(userDetails: currentUserDetails, isAnoModeOn: true, VC: self)
+//            }
+//            else
+//            {
+//                cell.reloadCollection(userDetails: currentUserDetails, isAnoModeOn: false, VC: self)
+//            }
+//           }
+//    }
+        
+//    func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
+//
+//      print("cancel prefetch row of \(indexPaths)")
+//    }
 }
 
 extension HomeVC:ButtonTapDelegate
@@ -689,7 +1520,7 @@ extension HomeVC:ButtonTapDelegate
     
 }
 
-//MARK:- Ads setup 🍎
+//MARK:- Ads setup
 
 extension HomeVC:GADBannerViewDelegate
 {
@@ -697,7 +1528,7 @@ extension HomeVC:GADBannerViewDelegate
     {
         //Indicator.sharedInstance.showIndicator()
         
-        let size = self.addsView.frame.size
+        
         let bannerView = GADBannerView(frame: self.addsSubView.frame)
         
         bannerView.frame = self.addsSubView.frame
@@ -705,34 +1536,46 @@ extension HomeVC:GADBannerViewDelegate
         bannerView.rootViewController = self
         bannerView.load(GADRequest())
         bannerView.adUnitID = "ca-app-pub-3940256099942544/2934735716"
-        
+        /*
         if self.getDeviceModel() == "iPhone 6"
         {
             let adSize = GADAdSizeFromCGSize(CGSize(width: 300, height: 250))
             bannerView.adSize = adSize//kGADAdSizeSmartBannerPortrait
             bannerView.delegate = self
             
+            //            bannerView.center = CGPoint(x: self.addsSubView.bounds.midX,
+            //                                        y: self.addsSubView.bounds.minY+150)
             self.addsSubView.addSubview(bannerView)
         }
         else if self.getDeviceModel() == "iPhone 8+"
         {
-            let adSize = GADAdSizeFromCGSize(CGSize(width: 300, height: 500))
+           // let adSize = GADAdSizeFromCGSize(CGSize(width: 300, height: 500))
+            let adSize = GADAdSizeFromCGSize(CGSize(width: SCREENWIDTH, height: SCREENHEIGHT-106))
             bannerView.adSize = adSize//kGADAdSizeSmartBannerPortrait
             bannerView.delegate = self
+            bannerView.center = CGPoint(x: self.addsSubView.bounds.midX,
+                                        y: self.addsSubView.bounds.midY)
             
             self.addsSubView.addSubview(bannerView)
         }
         else
         {
             
-            let adSize = GADAdSizeFromCGSize(CGSize(width: 300, height: 500))
+           // let adSize = GADAdSizeFromCGSize(CGSize(width: SCREENWIDTH, height: SCREENHEIGHT-356))//(CGSize(width: 300, height: 500))
+            
+            let adSize = GADAdSizeFromCGSize(CGSize(width: SCREENWIDTH, height: SCREENHEIGHT-106))
             bannerView.adSize = adSize//kGADAdSizeSmartBannerPortrait
             bannerView.delegate = self
             
             self.addsSubView.addSubview(bannerView)
         }
+        */
         
+        let adSize = GADAdSizeFromCGSize(CGSize(width: SCREENWIDTH, height: SCREENHEIGHT))
+        bannerView.adSize = adSize//kGADAdSizeSmartBannerPortrait
+        bannerView.delegate = self
         
+        self.addsSubView.addSubview(bannerView)
         
         
     }
@@ -741,6 +1584,9 @@ extension HomeVC:GADBannerViewDelegate
     func addBannerViewToView(_ bannerView: GADBannerView)
     {
         bannerView.translatesAutoresizingMaskIntoConstraints = false
+        for subview in self.addsSubView.subviews {
+          subview.removeFromSuperview()
+        }
         self.addsSubView.addSubview(bannerView)
         if #available(iOS 11.0, *) {
             // In iOS 11, we need to constrain the view to the safe area.
@@ -797,6 +1643,8 @@ extension HomeVC:GADBannerViewDelegate
     func adViewDidReceiveAd(_ bannerView: GADBannerView) {
         print("adViewDidReceiveAd")
         Indicator.sharedInstance.showIndicator()
+        
+       
         addBannerViewToView(bannerView)
         
         bannerView.alpha = 0
@@ -809,34 +1657,324 @@ extension HomeVC:GADBannerViewDelegate
     }
     
     
-    /// Tells the delegate an ad request failed.
-    func adView(_ bannerView: GADBannerView,
-                didFailToReceiveAdWithError error: GADRequestError) {
-        print("adView:didFailToReceiveAdWithError: \(error.localizedDescription)")
-        Indicator.sharedInstance.hideIndicator()
-    }
-    
-    /// Tells the delegate that a full-screen view will be presented in response
-    /// to the user clicking on an ad.
-    func adViewWillPresentScreen(_ bannerView: GADBannerView) {
-        print("adViewWillPresentScreen")
-    }
-    
-    /// Tells the delegate that the full-screen view will be dismissed.
-    func adViewWillDismissScreen(_ bannerView: GADBannerView) {
-        print("adViewWillDismissScreen")
-    }
-    
-    /// Tells the delegate that the full-screen view has been dismissed.
-    func adViewDidDismissScreen(_ bannerView: GADBannerView) {
-        print("adViewDidDismissScreen")
-    }
+    //    /// Tells the delegate an ad request failed.
+    //    func adView(_ bannerView: GADBannerView,
+    //                didFailToReceiveAdWithError error: GADRequestError) {
+    //        print("adView:didFailToReceiveAdWithError: \(error.localizedDescription)")
+    //        Indicator.sharedInstance.hideIndicator()
+    //    }
+    //
+    //    /// Tells the delegate that a full-screen view will be presented in response
+    //    /// to the user clicking on an ad.
+    //    func adViewWillPresentScreen(_ bannerView: GADBannerView) {
+    //        print("adViewWillPresentScreen")
+    //    }
+    //
+    //    /// Tells the delegate that the full-screen view will be dismissed.
+    //    func adViewWillDismissScreen(_ bannerView: GADBannerView) {
+    //        print("adViewWillDismissScreen")
+    //    }
+    //
+    //    /// Tells the delegate that the full-screen view has been dismissed.
+    //    func adViewDidDismissScreen(_ bannerView: GADBannerView) {
+    //        print("adViewDidDismissScreen")
+    //    }
     
     /// Tells the delegate that a user click will open another app (such as
     /// the App Store), backgrounding the current app.
     func adViewWillLeaveApplication(_ bannerView: GADBannerView) {
         print("adViewWillLeaveApplication")
     }
+}
+//MARK:- Fav buttom Action Like /dislike Action
+
+extension HomeVC:FaveButtonDelegate
+{
+    func faveButton(_ faveButton: FaveButton, didSelected selected: Bool) {
+        if faveButton == self.btnLike
+        {
+            self.regretView.isHidden=false
+            if self.AllUserDataArray.count==1
+            {
+                self.currentUserDetails = self.AllUserDataArray[0]
+            }
+            
+            MusicPlayer.instance.pause()
+            self.other_user_id = self.currentUserDetails?.user_id ?? ""
+       
+            print("user name Like: = \(self.currentUserDetails?.profile_data?.username)")
+            
+            
+             
+             var index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+             
+             if list.user_id == self.other_user_id
+             {
+             return true
+             }
+             else
+             {
+             return false
+             }
+             
+             
+             } ?? 0
+             
+             
+             print("Index at id = \(index)")
+             
+             if (self.AllUserDataArray.count>index)
+             {
+             self.AllUserDataArray.remove(at: index)
+             }
+            self.currentUserDetails?.user_id = nil
+            
+            if self.isAnoModeOn
+            {
+                
+                self.imgChangeCard.image = UIImage(named: "phoneRotate")
+                
+                if self.AllUserDataArray.count == 0
+                {
+                    self.AllUserDataArray.removeAll()
+                    
+                    self.getAnonymousUser(page: self.page)
+                }
+                else
+                {
+                    tableAllUser.reloadData()
+    //                UIView.performWithoutAnimation {
+    //
+    //                    self.tableAllUser.layoutIfNeeded()
+    //                    self.tableAllUser.setContentOffset(CGPoint.zero, animated: true)
+    //                    self.tableAllUser.scroll(to: .top, animated: true)
+    //                }
+                }
+                self.regretView.isHidden=false
+                self.fromLikeDisLike=false
+             
+               
+                
+                let mode = self.currentUserDetails?.second_table_like_dislike?.by_like_mode ?? ""
+                 
+                 if (kHangout.equalsIgnoreCase(string: mode))//kStory.equalsIgnoreCase(string: mode) ||
+                 {
+                     let id = self.currentUserDetails?.second_table_like_dislike?._id ?? ""
+                     
+                     self.RemoveStoryHangoutAPI(listId: id)
+                 }
+                 else
+                 {
+                    self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kAnonymous, type: kAnonymous,showIndicator: false)
+                 }
+               
+            }
+            else
+            {
+                self.regretView.isHidden=false
+                self.imgChangeCard.image = UIImage(named: "AnoBack")
+                self.fromLikeDisLike=false
+                
+                if self.AllUserDataArray.count == 0
+                {
+                    self.AllUserDataArray.removeAll()
+                    
+                    self.getShakeSentUser(page: self.page)
+                }
+                else
+                {
+                    tableAllUser.reloadData()
+    //                UIView.performWithoutAnimation {
+    //
+    //                    self.tableAllUser.layoutIfNeeded()
+    //                    self.tableAllUser.setContentOffset(CGPoint.zero, animated: true)
+    //                    self.tableAllUser.scroll(to: .top, animated: true)
+    //                }
+                }
+                
+                
+             
+                
+                
+                let mode = self.currentUserDetails?.second_table_like_dislike?.by_like_mode ?? ""
+                 
+                 if (kHangout.equalsIgnoreCase(string: mode)) //kStory.equalsIgnoreCase(string: mode) ||
+                 {
+                     let id = self.currentUserDetails?.second_table_like_dislike?._id ?? ""
+                     
+                     self.RemoveStoryHangoutAPI(listId: id)
+                 }
+                 else
+                 {
+                    
+                    if kStory.equalsIgnoreCase(string: mode)
+                    {
+                        let storyId = self.currentUserDetails?.Single_Story_Details?._id ?? ""
+                        
+                        self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kStory, type: kStory,showIndicator: false,story_id: storyId)
+                    }
+                    else
+                    {
+                        self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kShake, type: kShake,showIndicator: false)
+                    }
+                   
+                 }
+
+            }
+            
+           
+             
+            /*
+            
+            
+            if self.isAnoModeOn//currentTag == 3
+            {
+                self.lightUp(button: sender)
+                self.fromLikeDisLike=true
+                self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kAnonymous, type: kAnonymous,showIndicator: false)
+            }
+            else
+            {
+                self.fromLikeDisLike=true
+                self.lightUp(button: sender)
+                if likeViewProfile
+                {
+
+                    self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kShake, type: kShake,showIndicator: false)
+                }
+                else
+                {
+                    self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kShake, type: kShake,showIndicator: false)
+                }
+
+
+            }
+     */
+            
+            
+        }
+        
+      
+        else
+        {
+            self.regretView.isHidden=false
+            //MARK:- tage 0- card, 2- user details, 3- ads
+                    if self.AllUserDataArray.count==1
+                    {
+                        self.currentUserDetails = self.AllUserDataArray[0]
+                    }
+                 
+                    MusicPlayer.instance.pause()
+                    self.other_user_id = self.currentUserDetails?.user_id ?? ""
+               
+                    print("user name Like: = \(self.currentUserDetails?.profile_data?.username)")
+                    
+                    
+                     
+                     var index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+                     
+                     if list.user_id == self.other_user_id
+                     {
+                     return true
+                     }
+                     else
+                     {
+                     return false
+                     }
+                     
+                     
+                     } ?? 0
+                     
+                     
+                     print("Index at id = \(index)")
+                     
+                     if (self.AllUserDataArray.count>index)
+                     {
+                     self.AllUserDataArray.remove(at: index)
+                     }
+                    self.currentUserDetails?.user_id = nil
+                    
+                    if self.isAnoModeOn
+                    {
+                        
+                        self.imgChangeCard.image = UIImage(named: "phoneRotate")
+                        
+                        if self.AllUserDataArray.count == 0
+                        {
+                            self.AllUserDataArray.removeAll()
+                            
+                            self.getAnonymousUser(page: self.page)
+                        }
+                        else
+                        {
+                            tableAllUser.reloadData()
+            //                UIView.performWithoutAnimation {
+            //
+            //                    self.tableAllUser.layoutIfNeeded()
+            //                    self.tableAllUser.setContentOffset(CGPoint.zero, animated: true)
+            //                    self.tableAllUser.scroll(to: .top, animated: true)
+            //                }
+                        }
+                        self.regretView.isHidden=false
+                        self.fromLikeDisLike=false
+                     
+                       
+                        
+                        let mode = self.currentUserDetails?.second_table_like_dislike?.by_like_mode ?? ""
+                         
+                         if (kHangout.equalsIgnoreCase(string: mode))//kStory.equalsIgnoreCase(string: mode) ||
+                         {
+                             let id = self.currentUserDetails?.second_table_like_dislike?._id ?? ""
+                             
+                             self.RemoveStoryHangoutAPI(listId: id)
+                         }
+                         else
+                         {
+                            self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "2", like_mode: kAnonymous, type: kAnonymous,showIndicator: false)
+                         }
+                       
+                    }
+                    else
+                    {
+                        self.regretView.isHidden=false
+                        self.imgChangeCard.image = UIImage(named: "AnoBack")
+                        self.fromLikeDisLike=false
+                        
+                        if self.AllUserDataArray.count == 0
+                        {
+                            self.AllUserDataArray.removeAll()
+                            
+                            self.getShakeSentUser(page: self.page)
+                        }
+                        else
+                        {
+                            tableAllUser.reloadData()
+
+                        }
+                        
+                        
+                        let mode = self.currentUserDetails?.second_table_like_dislike?.by_like_mode ?? ""
+                         
+                         if (kHangout.equalsIgnoreCase(string: mode)) || kStory.equalsIgnoreCase(string: mode)// ||
+                         {
+                             let id = self.currentUserDetails?.second_table_like_dislike?._id ?? ""
+                             
+                             self.RemoveStoryHangoutAPI(listId: id)
+                         }
+                         else
+                         {
+                            self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "2", like_mode: kShake, type: kShake,showIndicator: false)
+                         }
+                    
+                        
+
+                    }
+                    
+                   
+        }
+    }
+    
+    
 }
 
 // MARK:- Extension Api Calls
@@ -846,16 +1984,16 @@ extension HomeVC
 {
     
     
-    //MARK:- Get shake user list 🍎
+    //MARK:- Get shake user list
     
-    func getShakeSentUser()
+    func getShakeSentUser(page:Int,ShowIndicator:Bool=true)
     {
         var data = JSONDictionary()
         
         data[ApiKey.kLatitude] = CURRENTLAT
         data[ApiKey.kLongitude] = CURRENTLONG
-        data[ApiKey.kOffset] = "0"
-        
+        data[ApiKey.kOffset] = "\(page)"
+        data[ApiKey.kShakeUser] = DataManager.ShakeId
         if Connectivity.isConnectedToInternet {
             
             
@@ -877,10 +2015,16 @@ extension HomeVC
             }
             else{
                 
-                //MARK:- Home page  changes
+                
+              //  self.btnLikeCard.isEnabled=true
                 
                 if HomeVM.shared.ShakeUserDataArray.count>0
                 {
+                    self.likeView.isHidden=false
+                    self.disLikeView.isHidden=false
+                    self.regretView.isHidden=false
+                    self.hearView.isHidden=false
+                    self.changeModeView.isHidden=false
                     
                     self.cardView.isHidden=false
                     self.shakeView.isHidden=true
@@ -889,8 +2033,9 @@ extension HomeVC
                     self.shakeView.isHidden=true
                     
                     self.imgCardLike.image = UIImage(named: "BlackLike")
+                    self.imgChangeCard.image = UIImage(named: "AnoBack")
                     
-                    self.btnLikeCard.setImage(nil, for: .normal)
+                   // self.btnLikeCard.setImage(nil, for: .normal)
                     self.viewButtomCard.isHidden=false
                     self.isAnoModeOn=false
                     
@@ -902,15 +2047,36 @@ extension HomeVC
                     }
                     self.page = self.AllUserDataArray.count
                     
-                    if  self.fromLikeDisLike==false
-                    {
-                        
-                        self.tableAllUser.scrollToTop(animated: false)
-                    }
-                    else
-                    {
-                        self.tableAllUser.reloadData()
-                    }
+                    //                    if  self.fromLikeDisLike==false
+                    //                    {
+                    //
+                    //                        self.tableAllUser.scrollToTop(animated: false)
+                    //                    }
+                    //                    else
+                    //                    {
+                    //                        self.tableAllUser.reloadData()
+                    //                    }
+                    //MARK:- Home page  changes
+                    self.currentUserDetails?.user_id = nil
+                    
+                    self.tableAllUser.reloadData()
+                    
+                
+                    //                    if  self.fromRegret
+                    //                    {
+                    //
+                    //                        self.fromRegret=false
+                    //                    }
+                    //                    else
+                    //                    {
+                   
+                    //}
+                    //  self.tableAllUser.scrollToTop(animated: false)
+                    
+                    
+                   
+                    
+                    
                     
                 }
                 else
@@ -927,15 +2093,31 @@ extension HomeVC
                     
                 }
                 
+                if self.AllUserDataArray.count>0
+                {
+                    DataManager.comeFromTag=3
+                }
+                else
+                {
+                    if DataManager.comeFromTag==5
+                    {
+                        self.cardView.isHidden=true
+                        self.addsView.isHidden=true
+                        self.viewButtomCard.isHidden=true
+                        self.shakeView.isHidden=false
+                        DataManager.comeFromTag=3
+                    }
+                }
+                
             }
             
             
         })
     }
     
-    //MARK:-  user like dislike api 🍎
+    //MARK:-  user like dislike api
     
-    func likeUnlikeAPI(other_user_id:String,action:String,like_mode:String,type:String)
+    func likeUnlikeAPI(other_user_id:String,action:String,like_mode:String,type:String,showIndicator:Bool=true,story_id:String=kEmptyString)
     {
         var data = JSONDictionary()
         
@@ -943,10 +2125,11 @@ extension HomeVC
         data[ApiKey.kAction] = action
         data[ApiKey.kLike_mode] = like_mode
         data[ApiKey.kTimezone] = TIMEZONE
+        data[ApiKey.kStoryId] = story_id
         
         if Connectivity.isConnectedToInternet {
             
-            self.callApiForLikeUnlike(data: data,type: type)
+            self.callApiForLikeUnlike(data: data,type: type, action: action,showIndicator:showIndicator)
         } else {
             
             self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
@@ -954,83 +2137,342 @@ extension HomeVC
         
     }
     
-    func callApiForLikeUnlike(data:JSONDictionary,type:String)
+   
+    
+    func callApiForLikeUnlike(data:JSONDictionary,type:String,action:String,showIndicator:Bool)
     {
-        HomeVM.shared.callApiForLikeUnlikeUser(data: data, response: { (message, error) in
+        HomeVM.shared.callApiForLikeUnlikeUser(showIndiacter: showIndicator, data: data, response: { (message, error) in
             
             if error != nil
             {
                 self.showErrorMessage(error: error)
             }
             else{
-                print(" DataManager.comeFromTag = \(message) \(DataManager.comeFromTag)")
                 
-                if message! == "User has been liked successfully."
+                let isMatch = HomeVM.shared.like_Data_Model?.is_match ?? 0
+                self.isRegetEnable=true
+                self.regretView.isHidden=false
+                self.imgCardLike.image = UIImage(named: "BlackLike")
+                self.btnLike.setSelected(selected: false, animated: false)
+                if isMatch == 1
                 {
-                    if self.is_liked_by_other_user_id == 1
-                    {
-                        let storyBoard = UIStoryboard.init(name: "Home", bundle: nil)
-                        let vc = storyBoard.instantiateViewController(withIdentifier: "MatchVC") as!  MatchVC
-                        vc.comefrom = kAppDelegate
-                        vc.user2Image=self.other_user_image
-                        vc.profileImage=self.other_user_image
-                        vc.view_user_id=self.other_user_id
-                        vc.profileName=(self.UserData?.profile_data?.username ?? "").capitalized
-                        self.navigationController?.pushViewController(vc, animated: true)
-                    }
-                    else
-                    {
-                        if type == "Ano"
-                        {
-                            self.imgChangeCard.image = UIImage(named: "phoneRotate")
-                            
-                            self.AllUserDataArray.removeAll()
-                            self.getAnonymousUser(page: 0)
-                            
-                        }
-                        else
-                        {
-                            self.imgChangeCard.image = UIImage(named: "AnoBack")
-                            
-                            
-                            self.AllUserDataArray.removeAll()
-                            
-                            self.getShakeSentUser()
-                        }
-                    }
-                    
-                }
-                else if message! == "User has been disliked successfully." ||  message! == "User has been disliked successfully."
-                {
-                    if type == "Ano"
-                    {
-                        self.imgChangeCard.image = UIImage(named: "phoneRotate")
-                        
-                        self.AllUserDataArray.removeAll()
-                        self.getAnonymousUser(page: 0)
-                    }
-                    else
-                    {
-                        self.imgChangeCard.image = UIImage(named: "AnoBack")
-                        
-                        self.AllUserDataArray.removeAll()
-                        self.getShakeSentUser()
-                    }
+                    let storyBoard = UIStoryboard.init(name: "Home", bundle: nil)
+                    let vc = storyBoard.instantiateViewController(withIdentifier: "MatchVC") as!  MatchVC
+                    vc.comefrom = kHomePage
+                  
+                    vc.view_user_id=self.other_user_id
+                    vc.profileName=(self.currentUserDetails?.profile_data?.username ?? "").capitalized
+                    DataManager.comeFrom = kEmptyString
+                    DataManager.comeFromTag=5
+                    DataManager.HomeRefresh = true
+                    DataManager.comeFromPage=2
+                    self.navigationController?.pushViewController(vc, animated: true)
                 }
                 else
                 {
-                    self.openSimpleAlert(message: message)
+                    
                 }
+                
+               /*
+                
+                
+                
+              
+                if type == "Shake"
+                {
+                    if action == "1"
+                    {
+                        
+                        if self.currentUserDetails?.is_liked_by_other_user_id == 1
+                        {
+                            let storyBoard = UIStoryboard.init(name: "Home", bundle: nil)
+                            let vc = storyBoard.instantiateViewController(withIdentifier: "MatchVC") as!  MatchVC
+                            vc.comefrom = kHomePage
+                          
+                            vc.view_user_id=self.other_user_id
+                            vc.profileName=(self.currentUserDetails?.profile_data?.username ?? "").capitalized
+                            DataManager.comeFrom = kEmptyString
+                            DataManager.comeFromTag=5
+                            DataManager.HomeRefresh = true
+                            DataManager.comeFromPage=2
+                            self.navigationController?.pushViewController(vc, animated: true)
+                        }
+                        /*
+                        else
+                        {
+                            self.imgChangeCard.image = UIImage(named: "AnoBack")
+                           
+                            let index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+                                
+                                if list.user_id == self.other_user_id
+                                {
+                                    return true
+                                }
+                                else
+                                {
+                                    return false
+                                }
+                                
+                                
+                            } ?? 0
+                            
+                            
+                            print("Index at id = \(index)")
+                            if (self.AllUserDataArray.count>index)
+                            {
+                                self.AllUserDataArray.remove(at: index)
+                            }
+                            
+                            if self.AllUserDataArray.count == 0
+                            {
+                                self.AllUserDataArray.removeAll()
+                                
+                                self.getShakeSentUser(page: 0)
+                            }
+                            else
+                            {
+                                self.tableAllUser.reloadData1
+                                {
+                                    self.tableAllUser.scroll(to: .top, animated: false)
+                                }
+                            }
+                            
+                            
+                        }
+                        */
+                    }
+                    else
+                    {
+                        /*
+                        self.imgChangeCard.image = UIImage(named: "AnoBack")
+                        
+                      
+                        
+                        let index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+                            
+                            if list.user_id == self.other_user_id
+                            {
+                                return true
+                            }
+                            else
+                            {
+                                return false
+                            }
+                            
+                            
+                        } ?? 0
+                        
+                        
+                        print("Index at id = \(index)")
+                        if (self.AllUserDataArray.count>index)
+                        {
+                            self.AllUserDataArray.remove(at: index)
+                        }
+                        
+                        if self.AllUserDataArray.count == 0
+                        {
+                            self.AllUserDataArray.removeAll()
+                            
+                            self.getShakeSentUser(page: 0)
+                        }
+                        else
+                        {
+                            self.tableAllUser.reloadData1
+                            {
+                                self.tableAllUser.scroll(to: .top, animated: false)
+                            }
+                        }
+                        */
+                    }
+                    
+                }
+                //     else if type == kViewProfile
+                //                {
+                //                    if action == "1"
+                //                    {
+                //
+                //                        if self.currentUserDetails?.is_liked_by_other_user_id == 1
+                //                        {
+                //                        let storyBoard = UIStoryboard.init(name: "Home", bundle: nil)
+                //                        let vc = storyBoard.instantiateViewController(withIdentifier: "MatchVC") as!  MatchVC
+                //                        vc.comefrom = kHomePage
+                //                        vc.user2Image=self.other_user_image
+                //                        vc.view_user_id=self.other_user_id
+                //                        vc.profileName=(self.currentUserDetails?.profile_data?.username ?? "").capitalized
+                //                        DataManager.comeFrom = kEmptyString
+                //                        DataManager.comeFromTag=5
+                //                        DataManager.comeFromPage=2
+                //                        self.navigationController?.pushViewController(vc, animated: true)
+                //                        }
+                //                        else
+                //                        {
+                //                            self.imgChangeCard.image = UIImage(named: "AnoBack")
+                //
+                //                            self.AllUserDataArray.removeAll()
+                //
+                //                            self.getShakeSentUser(page: 0)
+                //                        }
+                //                    }
+                //                    else
+                //                    {
+                //                        self.imgChangeCard.image = UIImage(named: "AnoBack")
+                //
+                //                        self.AllUserDataArray.removeAll()
+                //
+                //                        self.getShakeSentUser(page: 0)
+                //                    }
+                //                }
+                else
+                {
+                    if action == "1"
+                    {
+                        if self.currentUserDetails?.is_liked_by_other_user_id == 1
+                        {
+                            let storyBoard = UIStoryboard.init(name: "Home", bundle: nil)
+                            let vc = storyBoard.instantiateViewController(withIdentifier: "MatchVC") as!  MatchVC
+                            vc.comefrom = kHomePage
+                           
+                            vc.view_user_id=self.other_user_id
+                            vc.profileName=(self.currentUserDetails?.profile_data?.username ?? "").capitalized
+                            DataManager.HomeRefresh = true
+                            DataManager.comeFromTag=3
+                            self.navigationController?.pushViewController(vc, animated: true)
+                        }
+                        else
+                        {
+                            /*
+                            self.imgChangeCard.image = UIImage(named: "phoneRotate")
+                            
+                            // self.AllUserDataArray.removeAll()
+                            // self.getAnonymousUser(showIndiacter: true, page: 0)
+                            
+                            let index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+                                
+                                if list.user_id == self.other_user_id
+                                {
+                                    return true
+                                }
+                                else
+                                {
+                                    return false
+                                }
+                                
+                                
+                            } ?? 0
+                            
+                            
+                            print("Index at id = \(index)")
+                            if (self.AllUserDataArray.count>index)
+                            {
+                                self.AllUserDataArray.remove(at: index)
+                            }
+                            
+                            if self.AllUserDataArray.count == 0
+                            {
+                                 self.AllUserDataArray.removeAll()
+                                 self.getAnonymousUser(showIndiacter: true, page: 0)
+                            }
+                            else
+                            {
+                                self.tableAllUser.reloadData1
+                                {
+                                    self.tableAllUser.scroll(to: .top, animated: false)
+                                }
+                            }
+                            */
+                        }
+                    
+                    }
+                    else
+                    {
+                        /*
+                        self.imgChangeCard.image = UIImage(named: "phoneRotate")
+                                                
+                        // self.AllUserDataArray.removeAll()
+                        // self.getAnonymousUser(showIndiacter: true, page: 0)
+                        
+                        let index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+                            
+                            if list.user_id == self.other_user_id
+                            {
+                                return true
+                            }
+                            else
+                            {
+                                return false
+                            }
+                            
+                            
+                        } ?? 0
+                        
+                        
+                        print("Index at id = \(index)")
+                        if (self.AllUserDataArray.count>index)
+                        {
+                            self.AllUserDataArray.remove(at: index)
+                        }
+                        
+                        if self.AllUserDataArray.count == 0
+                        {
+                             self.AllUserDataArray.removeAll()
+                             self.getAnonymousUser(showIndiacter: true, page: 0)
+                        }
+                        else
+                        {
+                            self.tableAllUser.reloadData1
+                            {
+                                self.tableAllUser.scroll(to: .top, animated: false)
+                            }
+                        }
+                        */
+                        
+                    }
+                   
+                    
+                }
+                */
             }
             
             
         })
     }
     
+    func RemoveStoryHangoutAPI(listId:String,showIndicator:Bool=true)
+    {
+        var data = JSONDictionary()
+        
+        data[ApiKey.kId] = listId
+  
+        if Connectivity.isConnectedToInternet {
+            
+            self.callApiForRemoveStoryHangout(data: data,showIndicator:showIndicator)
+        } else {
+            
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
+        
+    }
+    func callApiForRemoveStoryHangout(data:JSONDictionary,showIndicator:Bool)
+    {
+        HomeVM.shared.callApiForRemoveStoryHangout(showIndiacter: showIndicator, data: data, response: { (message, error) in
+            
+            if error != nil
+            {
+                self.showErrorMessage(error: error)
+            }
+            else{
+                self.isAnoModeOn=false
+                self.isRegetEnable=true
+            }
+        }
+        )
+        
+    }
+
     
-    //MARK:- Get ano user list 🍎
+    //MARK:- Get ano user list
     
-    func getAnonymousUser(page:Int)
+    func getAnonymousUser(showIndiacter:Bool=true, page:Int)
     {
         var data = JSONDictionary()
         
@@ -1041,7 +2483,7 @@ extension HomeVC
         if Connectivity.isConnectedToInternet {
             
             
-            self.callApiForGetAnonymousUser(data: data)
+            self.callApiForGetAnonymousUser(showIndiacter:showIndiacter, data: data)
         } else {
             
             self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
@@ -1049,9 +2491,9 @@ extension HomeVC
         
     }
     
-    func callApiForGetAnonymousUser(data:JSONDictionary)
+    func callApiForGetAnonymousUser(showIndiacter:Bool, data:JSONDictionary)
     {
-        HomeVM.shared.callApiGetAnonymousUser(data: data, response: { (message, error) in
+        HomeVM.shared.callApiGetAnonymousUser(showIndiacter:showIndiacter, data: data, response: { (message, error) in
             
             if error != nil
             {
@@ -1059,14 +2501,32 @@ extension HomeVC
             }
             else{
                 self.isAnoModeOn=true
+               // self.btnLikeCard.isEnabled=true
+                self.btnLike.isEnabled=true
                 for dict in HomeVM.shared.AnonymousUserDataArray
                 {
                     
-                    self.AllUserDataArray.append(dict)
+                  //  if !(self.AllUserDataArray.count >= HomeVM.shared.Pagination_Details?.totalCount ?? 0)
+                   // {
+                        self.AllUserDataArray.append(dict)
+                   // }
+                   
+                  
                     
                 }
-                self.page = self.AllUserDataArray.count
+                self.page = self.AllUserDataArray.count//self.AllUserDataArray.count
+                self.likeView.isHidden=false
+                self.disLikeView.isHidden=false
+                if self.isRegetEnable{
+                    self.regretView.isHidden=false
+                }
+                else
+                {
+                    self.regretView.isHidden=true
+                }
                 
+                self.hearView.isHidden=false
+                self.changeModeView.isHidden=false
                 //MARK:- Home page changes
                 
                 if self.AllUserDataArray.count>0//HomeVM.shared.AnonymousUserDataArray.count>0
@@ -1079,39 +2539,20 @@ extension HomeVC
                     
                     self.isAnoModeOn=true
                     self.imgCardLike.image = UIImage(named: "BlackLike")
+                    self.imgChangeCard.image = UIImage(named: "phoneRotate")
                     
                     
-                    self.btnLikeCard.setImage(nil, for: .normal)
-                    
-                    
-                    
-                    
+                   // self.btnLikeCard.setImage(nil, for: .normal)
+                    self.btnLike.setSelected(selected: false, animated: false)
                     self.viewButtomCard.isHidden=false
                     
                     self.cardView.isHidden=false
                     
-                  //  self.tableAllUser.reloadData()
-                 
-                   // self.reload(tableView: self.tableAllUser)
-//                    if self.isPagination==true
-//                   {
-//                       //self.tableAllUser.scrollToTop(animated: false, row: 10)
-//                       // self.tableAllUser.isPagingEnabled=false
-//                        self.tableAllUser.reloadData()
-//                   }
-//                    else
-//
-                    if  self.fromLikeDisLike==false
-                    {
-                       // self.tableAllUser.isPagingEnabled=true
-                        self.tableAllUser.scrollToTop(animated: false)
-                    }
-                    else
-                    {
-                        self.tableAllUser.reloadData()
-                       // self.tableAllUser.isPagingEnabled=true
-                    }
-                    
+        
+                    self.currentUserDetails?.user_id = nil
+                    self.tableAllUser.reloadData()
+                  
+                
                 }
                 else
                 {
@@ -1135,7 +2576,223 @@ extension HomeVC
         })
     }
     
-    //MARK:- Show like animation  🍎
+  //  func callApiForProfileDetails(data:String)
+//    {
+//        HomeVM.shared.callApiGetUserDetails(data: data, response: { (message, error) in
+//
+//            if error != nil
+//            {
+//                self.showErrorMessage(error: error)
+//            }
+//            else{
+//
+//                self.likeViewProfile=true
+//                if let UserData = HomeVM.shared.viewProfileUserDetail
+//                {
+//                    self.cardView.isHidden=false
+//                    self.shakeView.isHidden=true
+//
+//                    self.addsView.isHidden=true
+//                    self.shakeView.isHidden=true
+//
+//
+//                    self.btnLike.setSelected(selected: false, animated: false)
+//                   // self.btnLikeCard.setImage(nil, for: .normal)
+//                    self.viewButtomCard.isHidden=false
+//                    self.isAnoModeOn=false
+//
+//
+//                    let isLike = UserData.is_liked_by_self_user ?? 0
+//
+//                    if (UserData.is_liked_by_self_user == 1 && UserData.is_liked_by_other_user_id == 1)
+//
+//                    {
+//                        self.likeView.isHidden=true
+//                        self.disLikeView.isHidden=true
+//                        self.regretView.isHidden=false
+//                        self.hearView.isHidden=false
+//                        self.changeModeView.isHidden=false
+//                    }
+//                    else
+//                    {
+//                        self.likeView.isHidden=false
+//                        self.disLikeView.isHidden=false
+//                        self.regretView.isHidden=false
+//                        self.hearView.isHidden=false
+//                        self.changeModeView.isHidden=false
+//                    }
+//
+//
+//                    if isLike == 1
+//                    {
+//                        //self.imgCardLike.image = UIImage(named: "redLike")
+//                        self.btnLike.setSelected(selected: true, animated: false)
+//                    //    self.btnLikeCard.isEnabled=false
+//                    }
+//                    else
+//                    {
+//                        //self.imgCardLike.image = UIImage(named: "BlackLike")
+//                        self.btnLike.setSelected(selected: false, animated: false)
+//                       // self.btnLikeCard.isEnabled=true
+//                    }
+//
+//                    self.AllUserDataArray.append(UserData)
+//
+//                    if  self.fromLikeDisLike==false
+//                    {
+//
+//                        self.tableAllUser.scrollToTop(animated: false)
+//                    }
+//                    else
+//                    {
+//                        self.tableAllUser.reloadData()
+//                    }
+//
+//                }
+//            }
+//        })
+//    }
+    
+    func callApiForRegretShake(data:JSONDictionary)
+    {
+     
+        HomeVM.shared.callApiGetRegretuser(data: data, response: { (message, error) in
+            
+            if error != nil
+            {
+                self.showErrorMessage(error: error)
+            }
+            else{
+                if self.isAnoModeOn
+                {
+               
+                    self.AllUserDataArray.removeAll()
+            
+                    self.getAnonymousUser(page: 0)
+                 
+                    
+                }
+                else
+                {
+                    self.fromLikeDisLike=false
+                    self.AllUserDataArray.removeAll()
+                    self.getShakeSentUser(page: 0)
+                   // self.imgChangeCard.image = UIImage(named: "AnoBack")
+                    
+                   // self.tableAllUser.scrollToTop(animated: false)
+                }
+            }
+        }
+        )
+    }
+    
+    func updateLocationAPI()
+    {
+        var data = JSONDictionary()
+        
+        data[ApiKey.kLatitude] = CURRENTLAT
+        data[ApiKey.kLongitude] = CURRENTLONG
+        
+        if Connectivity.isConnectedToInternet {
+            
+            self.callApiForUpdateLatLong(data: data)
+        } else {
+            
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
+        
+    }
+    
+    func callApiForUpdateLatLong(data:JSONDictionary)
+    {
+        HomeVM.shared.callApiForUpdateUserLatLong(showIndiacter: false, data: data, response: { (message, error) in
+            
+            
+            if DataManager.comeFromTag==5
+            {
+                
+                //                self.AllUserDataArray.removeAll()
+                //                self.getShakeSentUser(page: 0)
+                
+                
+            }
+        })
+    }
+    
+    
+    func getMySubscriptionApi()
+    {
+        AccountVM.shared.callApiGetMySubscription(response: { (message, error) in
+            
+            if error != nil
+            {
+                self.showErrorMessage(error: error)
+            }
+            else{
+                self.regretPaymentChecked=true
+                let active = AccountVM.shared.Swiping_Subsription_Data?.subscription_is_active ?? 0
+                
+                let active2 = AccountVM.shared.Prolong_Subsription_Data?.subscription_is_active ?? 0
+                print("prolong active =\(active)")
+                if active2 == 1
+                {
+             
+                    DataManager.purchaseProlong=true
+                }
+                else
+                {
+                    DataManager.purchaseProlong=false
+                }
+                
+                
+                if active == 1
+                {
+                   DataManager.purchasePlan=true
+         
+                
+                    var type = kAnonymous
+                    if self.isAnoModeOn==false
+                    {
+                        type=kShake
+                    }
+                   DataManager.purchasePlan=true
+         
+                
+                    var data = JSONDictionary()
+                    
+                    data[ApiKey.kTimezone] = TIMEZONE
+                    data[ApiKey.kRegret_type] = type
+                    
+                    if Connectivity.isConnectedToInternet {
+                        
+                        
+                        self.callApiForRegretShake(data: data)
+                    } else {
+                        
+                        self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+                    }
+                    
+                   
+                }
+                else
+                {
+                    DataManager.purchasePlan=false
+                    let storyboard: UIStoryboard = UIStoryboard(name: "Account", bundle: Bundle.main)
+                    let destVC = storyboard.instantiateViewController(withIdentifier: "RegretPopUpVC") as!  RegretPopUpVC
+                    destVC.type = .Regret
+                    destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+                    destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+                    
+                    self.present(destVC, animated: true, completion: nil)
+                }
+                
+            }
+        })
+    }
+    
+    
+    
+    //MARK:- Show like animation
     
     func lightUp(button: UIButton)
     {
@@ -1150,10 +2807,38 @@ extension HomeVC
             }
             )})
     }
+    //MARK:- getRTMTokenApi
+    func getRTMTokenApi()
+    {
+        ChatVM.shared.callApi_RTM_Token_Generate(showIndiacter: false, response: { (message, error) in
+            if error != nil
+            {
+                
+            }
+            else
+            {
+                let rtmToken = ChatVM.shared.Rtm_token
+                
+                print("RTM token = \(rtmToken)")
+                let rtm = AgoraRtm.shared()
+                rtm.inviterDelegate = self
+                guard let kit = AgoraRtm.shared().kit else {
+                    return
+                }
+                kit.login(account: DataManager.Id, token: rtmToken) { [unowned self] (error) in
+                    print("Rtm login on home page error \(error)")
+                    
+                }
+                
+                
+            }
+            
+        })
+    }
     
 }
 
-//MARK:- Get current location 🍎
+//MARK:- Get current location
 
 extension HomeVC: CLLocationManagerDelegate
 {
@@ -1171,13 +2856,13 @@ extension HomeVC: CLLocationManagerDelegate
         print("Failed to find user's location: \(error.localizedDescription)")
     }
 }
-//MARK:- Shake  popup 🍎
+//MARK:- Shake  popup
 
 extension HomeVC:DiscardDelegate
 {
     func ClickNameAction(name: String)
     {
-        if name == kCancel
+        if name.equalsIgnoreCase(string: kCancel)
         {
             
             self.cardView.isHidden=true
@@ -1189,7 +2874,7 @@ extension HomeVC:DiscardDelegate
             
             self.fromLikeDisLike=false
             self.AllUserDataArray.removeAll()
-            self.getShakeSentUser()
+            self.getShakeSentUser(page: 0)
         }
         else
         {
@@ -1205,19 +2890,63 @@ extension HomeVC:DiscardDelegate
             self.fromLikeDisLike=false
             self.AllUserDataArray.removeAll()
             self.getAnonymousUser(page: 0)
+            self.tableAllUser.scrollToTop(animated: false)
         }
     }
     
     
     func reload(tableView: UITableView)
     {
-
+        
         let contentOffset = tableView.contentOffset
         tableView.reloadData()
         tableView.layoutIfNeeded()
         tableView.setContentOffset(contentOffset, animated: false)
-
+        
     }
     
 }
 
+//MARK:- Socket method
+
+extension HomeVC
+{
+    func selfJoinSocketEmit()
+    {
+        
+        let JoinDict = ["selfUserId":DataManager.Id]
+        SocketIOManager.shared.selfJoinSocket(MessageChatDict: JoinDict)
+        self.selfJoinSocketON()
+    }
+    func selfJoinSocketON()
+    {
+        SocketIOManager.shared.socket.on("online", callback: { (data, error) in
+            
+            print("online = \(data) \(error)")
+        })
+        
+    }
+    
+}
+
+extension HomeVC:UIGestureRecognizerDelegate
+{
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool
+    {
+            return true
+    }
+}
+
+extension HomeVC: AgoraRtmInvitertDelegate {
+    func inviter(_ inviter: AgoraRtmCallKit, didReceivedIncoming invitation: AgoraRtmInvitation) {
+        print(#function)
+        print("didReceivedIncoming")
+
+    }
+
+    func inviter(_ inviter: AgoraRtmCallKit, remoteDidCancelIncoming invitation: AgoraRtmInvitation) {
+        print("remoteDidCancelIncoming")
+        APPDEL.provider?.reportCall(with: APPDEL.uuid, endedAt: Date(), reason: .remoteEnded)
+
+    }
+}

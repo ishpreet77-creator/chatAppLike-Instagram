@@ -47,7 +47,7 @@ class MobileNumberVC: BaseVC {
         manager.requestAlwaysAuthorization()
         manager.delegate = self
         manager.requestLocation()
-        
+       // manager.startMonitoringSignificantLocationChanges()
         if (DataManager.countryPhoneCode != "") && (DataManager.countryName != "")
         {
             
@@ -57,7 +57,7 @@ class MobileNumberVC: BaseVC {
         else
         {
             countryCode=kCurrentCountryCode
-           
+            countryName = "Denmark"
         }
         
         self.textFieldCountry.text = "(\(self.countryCode))  \(countryName.uppercased())"
@@ -285,13 +285,13 @@ extension MobileNumberVC: CLLocationManagerDelegate
 
             
             
-            self.fetchCityAndCountry(from: location) { (city, coutry, error) in
+            self.fetchCityAndCountry(from: location) { (Country, PhoneCode, error) in
                 
-                print("code = \(city)")
-                print("country = \(coutry)")
+                print("code = \(PhoneCode)")
+                print("country = \(Country)")
                 print("error = \(error)")
-                let countryName = city ?? "India"
-                let code = coutry ?? ""
+                let countryName = Country ?? "Denmark"
+                let code = PhoneCode ?? ""
                 
                 let phoneCode = self.getCountryCallingCode(countryRegionCode: code)
                 

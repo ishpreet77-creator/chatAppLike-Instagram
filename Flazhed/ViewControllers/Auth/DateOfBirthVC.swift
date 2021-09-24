@@ -11,6 +11,9 @@ import IQKeyboardManagerSwift
 
 class DateOfBirthVC: BaseVC {
    
+    @IBOutlet weak var txtYear: customTextField!
+    @IBOutlet weak var txtMonth: customTextField!
+    @IBOutlet weak var txtDay: customTextField!
     @IBOutlet weak var lblOtpSent: UILabel!
     @IBOutlet weak var topConst: NSLayoutConstraint!
     @IBOutlet weak var sendButtonConst: NSLayoutConstraint!
@@ -25,6 +28,8 @@ class DateOfBirthVC: BaseVC {
     let dateFormatter2 = DateFormatter()
     var maxDate = Date()
     
+    var selectedAge = 0
+    var typeDate = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,13 +42,13 @@ class DateOfBirthVC: BaseVC {
     {
         let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: lblOtpSent.text ?? "")
         
-        attributedString.setColorForText(textForAttribute: "We will connect you with ", withColor: UIColor.black)
-        attributedString.setColorForText(textForAttribute: "like-minded", withColor: TEXTCOLOR)
-        attributedString.setColorForText(textForAttribute: " people.", withColor: UIColor.black)
+        attributedString.setColorForText(textForAttribute: kWeWill, withColor: UIColor.black)
+        attributedString.setColorForText(textForAttribute: klikeMinded, withColor: TEXTCOLOR)
+        attributedString.setColorForText(textForAttribute: kPeople, withColor: UIColor.black)
 
         lblOtpSent.attributedText = attributedString
         
-        self.setCustomHeader(title: "Date of Birth", showBack: true, showMenuButton: false)
+        self.setCustomHeader(title: kDateofBirth, showBack: true, showMenuButton: false)
         
         if self.getDeviceModel() == "iPhone 6"
         {
@@ -57,20 +62,43 @@ class DateOfBirthVC: BaseVC {
         {
             self.topConst.constant = TOPSPACING+20
         }
+
+        self.txtDay.delegate=self
+        self.txtYear.delegate=self
+
+       self.txtMonth.delegate=self
         
+        txtDay.addTarget(self, action: #selector(textFieldDidChange), for: UIControl.Event.editingChanged)
+        txtMonth.addTarget(self, action: #selector(textFieldDidChange), for: UIControl.Event.editingChanged)
+        txtYear.addTarget(self, action: #selector(textFieldDidChange), for: UIControl.Event.editingChanged)
+
         
-    
-        txtDateOfBirth.attributedPlaceholder = NSAttributedString(string:"Date of Birth", attributes:[NSAttributedString.Key.foregroundColor: PLACEHOLDERCOLOR,NSAttributedString.Key.font :UIFont(name: AppFontName.regular, size: 18)!])
-        self.txtDateOfBirth.delegate=self
-        
-        
+        if DataManager.Selected_DateOfBirth != kEmptyString
+        {
+            
+            let dob=DataManager.Selected_DateOfBirth.components(separatedBy: "-")
+            if dob.count>0
+            {
+                self.txtYear.text=dob[0]
+            }
+            
+            if dob.count>1
+            {
+                self.txtMonth.text=dob[1]
+            }
+            if dob.count>2
+            {
+                self.txtDay.text=dob[2]
+            }
+            self.didSelectDate()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         IQKeyboardManager.shared.enableAutoToolbar = true
         //self.txtDateOfBirth.text = ""
-        txtDateOfBirth.becomeFirstResponder()
+        txtDay.becomeFirstResponder()
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
     
@@ -96,8 +124,9 @@ class DateOfBirthVC: BaseVC {
         else
         {
             let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "dd/M/yyyy"
-            let date = dateFormatter.date(from: self.txtDateOfBirth.text!) ?? Date()
+            dateFormatter.dateFormat = "dd/MM/yyyy"
+            
+            let date = dateFormatter.date(from: self.typeDate) ?? Date()
             dateFormatter2.dateFormat = "yyyy-MM-dd"
             self.userSelectedDate=dateFormatter2.string(from: date)
             
@@ -106,7 +135,7 @@ class DateOfBirthVC: BaseVC {
         vc.imageArray1=self.imageArray1
             
         vc.userDOB=self.userSelectedDate
-        
+        DataManager.Selected_DateOfBirth=self.userSelectedDate
         self.navigationController?.pushViewController(vc, animated: true)
         }
     }
@@ -115,10 +144,29 @@ class DateOfBirthVC: BaseVC {
     // MARK:- validateData Functions
     private func validateData () -> String?
     {
-        if txtDateOfBirth.isEmpty {
-            return kEmptyDOBAlert
-        }
         
+        if ((self.txtDay.text?.count ?? 0==0) && (self.txtMonth.text?.count ?? 0 == 0) && (self.txtYear.text?.count ?? 0 == 0))
+              {
+                  return kEmptyDOBAlert5
+
+              }
+              else
+              {
+                  if txtDay.isEmpty { //txtDateOfBirth.isEmpty
+                      return kEmptyDOBAlert1
+                  }
+                  if txtMonth.isEmpty { //txtDateOfBirth.isEmpty
+                      return kEmptyDOBAlert2
+                  }
+                  if txtYear.isEmpty { //txtDateOfBirth.isEmpty
+                      return kEmptyDOBAlert3
+                  }
+                  if self.selectedAge<18 || self.selectedAge>100
+                  {
+                      return kEmptyDOBAlert4
+                  }
+              }
+    
         return nil
      }
     
@@ -157,11 +205,13 @@ class DateOfBirthVC: BaseVC {
     func calcAge(birthday: String) -> String
     {
         let dateFormater = DateFormatter()
+        //dateFormater.dateFormat = "dd/MM/yyyy"
         dateFormater.dateFormat = "dd/MM/yyyy"
-        let birthdayDate = dateFormater.date(from: birthday)
+
+        let birthdayDate = dateFormater.date(from: birthday) ?? Date()
         let calendar: NSCalendar! = NSCalendar(calendarIdentifier: .gregorian)
         let now = Date()
-        let calcAge = calendar.components([.day,.month,.year], from: birthdayDate!, to: now, options: [])
+        let calcAge = calendar.components([.day,.month,.year], from: birthdayDate, to: now, options: [])
         let year = calcAge.year
         let month = calcAge.month
         let day = calcAge.day
@@ -206,9 +256,13 @@ class DateOfBirthVC: BaseVC {
             {
                 age = "\(year1)" + " years"
             }
-            
+            self.selectedAge=year1
         }
-       
+       else
+        {
+            self.selectedAge = 0
+        }
+    
        
         
         return age //?? 18
@@ -219,16 +273,233 @@ extension DateOfBirthVC: UITextFieldDelegate,PickerDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
 
-     
-        if textField == txtDateOfBirth {
-          
-            self.pickerDelegate=self
-            setDatePicker4(textField: textField, datePickerMode: .date, maximunDate: nil, minimumDate: nil)
-            
-        }
+//
+//        if textField == txtDateOfBirth {
+//
+//            self.pickerDelegate=self
+//            setDatePicker4(textField: textField, datePickerMode: .date, maximunDate: nil, minimumDate: nil)
+//
+//        }
     }
     
-    func didSelectDate(date: Date) {
-        self.lblAge.text = "You are " + "\(self.calcAge(birthday: self.txtDateOfBirth.text!))" + " old."
+    //func didSelectDate(date: Date) {
+    func didSelectDate() {
+
+    var DOB1 = (self.txtDay.text ?? "") + "/" + (self.txtMonth.text ?? "") + "/"
+        
+        let DOB = DOB1 + (self.txtYear.text ?? "")
+        
+//        self.lblAge.text = "You are " + "\(self.calcAge(birthday: self.txtDateOfBirth.text!))" + " old."
+        
+       // print("Date of birth = \(DOB)")
+        self.typeDate = DOB
+        
+        
+        self.lblAge.text = "You are " + "\(self.calcAge(birthday: DOB))" + " old."
+
+    }
+    
+//    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+//        //Format Date of Birth dd-MM-yyyy
+//
+//        //initially identify your textfield
+//
+//        if textField == txtDay {
+//
+//            // check the chars length dd -->2 at the same time calculate the dd-MM --> 5
+//            if (txtDay?.text?.count == 2) || (txtDay?.text?.count == 5) {
+//                //Handle backspace being pressed
+//                if !(string == "") {
+//                    // append the text
+//                    txtDay?.text = (txtDay?.text)! + "/"
+//                }
+//            }
+//            // check the condition not exceed 9 chars
+//            return !(textField.text!.count > 9 && (string.count ) > range.length)
+//        }
+//        else {
+//            return true
+//        }
+//    }
+    
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
+                           replacementString string: String) -> Bool
+    {
+        
+        let maxLength = 50
+        let currentString: NSString = textField.text! as NSString
+        let newString: NSString =
+            currentString.replacingCharacters(in: range, with: string) as NSString
+      
+        
+        if newString.rangeOfCharacter(from: CharacterSet.whitespacesAndNewlines).location == 0
+        
+        {
+            return false
+        }
+        else
+         
+        {
+            textField.text = currentString.capitalized
+            
+            if textField == self.txtDay
+            {
+                return newString.length <= 2
+            }
+            else if textField == self.txtMonth
+            {
+                return newString.length <= 2
+            }
+            else
+            {
+                return newString.length <= 4
+
+            }
+            
+            
+        }
+        
+    }
+    
+    func textFieldShouldEndEditing(_ textField: UITextField) -> Bool
+    {
+        if ((self.txtDay.text?.count ?? 0>0) && (self.txtMonth.text?.count ?? 0 > 0) && (self.txtYear.text?.count ?? 0 > 0))
+        {
+            self.didSelectDate()
+        }
+        return true
+    }
+    
+    @objc func textFieldDidChange(textField: UITextField){
+        
+        let text = textField.text ?? ""
+        let count = text.utf16.count
+        let inputDay = (self.txtDay.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                
+        let day = Int(inputDay) ?? 0
+        
+        let inputMonth = (self.txtMonth.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                
+        let month = Int(inputMonth) ?? 0
+        
+        let inputYear = (self.txtYear.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                
+        let year = Int(inputYear) ?? 0
+        
+        
+//        if textField == self.txtMonth
+//        {
+//            if day<1 || day>31
+//            {
+//                self.openSimpleAlert(message: "day is between 1 to 31")
+//            }
+//        }
+//        if textField == self.txtMonth
+//        {
+//            if day<1 || day>31
+//            {
+//                self.openSimpleAlert(message: "day is between 1 to 31")
+//            }
+//        }
+//        if textField == self.txtYear
+//        {
+//            if month<=2003 || month>31
+//            {
+//                self.openSimpleAlert(message: "day is between 1 to 31")
+//            }
+//        }
+        
+        
+        if textField == self.txtDay
+        {
+            if count>=2
+            {
+                txtMonth.becomeFirstResponder()
+
+            }
+            else
+            {
+                txtDay.becomeFirstResponder()
+            }
+        }
+        else  if textField == self.txtMonth
+        {
+            if count>=2
+            {
+                txtYear.becomeFirstResponder()
+
+            }
+            else if count == 0
+            {
+                txtDay.becomeFirstResponder()
+
+            }
+
+            else
+            {
+                txtMonth.becomeFirstResponder()
+            }
+        }
+        else  if textField == self.txtYear
+        {
+            if count>=4
+            {
+                txtYear.resignFirstResponder()
+
+            }
+//            else if count<4
+//            {
+//                txtYear.becomeFirstResponder()
+//            }
+            else if count == 0
+            {
+                txtMonth.becomeFirstResponder()
+
+            }
+        }
+
+//
+//
+//        if count >= 2{
+//            switch textField
+//            {
+//            case txtDay:
+//                txtMonth.becomeFirstResponder()
+//            case txtMonth:
+//                txtYear.becomeFirstResponder()
+//
+//            case txtYear:
+//
+//                txtYear.resignFirstResponder()
+//                self.didSelectDate()
+//
+//            default:
+//                break
+//            }
+//        }
+//        else{
+//            switch textField
+//            {
+//            case txtDay:
+//                txtDay.resignFirstResponder()
+//            case txtMonth:
+//                txtDay.becomeFirstResponder()
+//            case txtYear:
+//                txtMonth.becomeFirstResponder()
+//
+//
+//            default:
+//                break
+//            }
+//        }
+//
+        
+        
+        
+        if ((self.txtDay.text?.count ?? 0>0) && (self.txtMonth.text?.count ?? 0 > 0) && (self.txtYear.text?.count ?? 0 > 0))
+        {
+            self.didSelectDate()
+        }
     }
 }

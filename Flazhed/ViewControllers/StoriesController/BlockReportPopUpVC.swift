@@ -27,7 +27,7 @@ var titleArray = ["BLOCK ONLY","INAPPROPRIATE CONTENT","PERSON IS MINOR","BAD OF
     var postID = ""
     var UserID = ""
     var user_name = ""
-    
+    var from_user_id = ""
     var fromFeedback = false
     
     override func viewDidLoad() {
@@ -68,8 +68,10 @@ var titleArray = ["BLOCK ONLY","INAPPROPRIATE CONTENT","PERSON IS MINOR","BAD OF
 //        self.dismiss(animated: true) {
             let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
             let destVC = storyboard.instantiateViewController(withIdentifier: "SendFeedbackAlertVC") as!  SendFeedbackAlertVC
-        destVC.type = type
-        destVC.user_name=self.user_name
+              destVC.type = type
+            destVC.user_name=self.user_name
+        destVC.UserID=self.UserID
+        destVC.type = self.type
             destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
             self.present(destVC, animated: true, completion: nil)
@@ -159,6 +161,8 @@ extension BlockReportPopUpVC:UITableViewDelegate,UITableViewDataSource
             destVC.delegate=self
             destVC.postID=self.postID
             destVC.user_name=self.user_name
+            destVC.UserID=self.UserID
+            destVC.type = self.type
             destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
             self.present(destVC, animated: true, completion: nil)
@@ -207,7 +211,7 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
         
         if type == .messageScreen
         {
-            if text == kfromBack
+            if text.equalsIgnoreCase(string: kfromBack)
             {
                 self.tableReport.reloadData()
             }
@@ -222,7 +226,7 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
         }
         else
         {
-        if text == kfromBack
+            if text.equalsIgnoreCase(string: kfromBack)
         {
             self.tableReport.reloadData()
         }
@@ -253,10 +257,10 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
         }
             
             if Connectivity.isConnectedToInternet {
-              
+
                 self.callApiForReportBlock(data: data)
              } else {
-                
+
                 self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
             }
         
@@ -274,6 +278,7 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
                 {
                     self.dismiss(animated: true) {
                         self.showErrorMessage(error: error)
+                        
                     }
                 }
                 else
@@ -365,11 +370,13 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
                     let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
                     let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
                     destVC.type = .sendFeedback
-                destVC.Alerttype = .messageScreen
+                    destVC.Alerttype = .messageScreen
                     destVC.user_name=self.user_name
                 if  self.fromBlock
                 {
                 destVC.fromBlock="blocked"
+                    
+                    self.sendMatchBlockNoti_Method()
                 }
                 else
                 {
@@ -387,6 +394,12 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
         
     }
     
+    func sendMatchBlockNoti_Method()
+    {
+        print("sendSMS ")
     
+        let dict2 = ["from_user_id":self.from_user_id,"to_user_id":self.UserID,"alert_type":"removematch"]
+        SocketIOManager.shared.sendMatchBlockNoti(MessageChatDict: dict2)
+    }
     
 }

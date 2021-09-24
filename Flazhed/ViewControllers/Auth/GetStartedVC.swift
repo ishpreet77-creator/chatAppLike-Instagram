@@ -40,7 +40,7 @@ class GetStartedVC: BaseVC {
         self.imgSwipe.image = self.imgSwipe.image?.tinted(color: UIColor.lightGray)
         self.imgNearby.image = self.imgNearby.image?.tinted(color: UIColor.lightGray)
         
-        //self.updateUnit()
+        self.updateUnit()
     }
     @IBAction func NextAct(_ sender: UIButton)
     {
@@ -48,7 +48,7 @@ class GetStartedVC: BaseVC {
         
         let storyBoard = UIStoryboard.init(name: "Profile", bundle: nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "PreferencesVC") as! PreferencesVC
-        vc.comeFrom="Auth"
+        vc.comeFrom=kAppDelegate
          self.navigationController?.pushViewController(vc, animated: true)
     }
     

@@ -39,6 +39,25 @@ extension UIImageView {
         gifImageView.animationImages = images
         return gifImageView
     }
+ 
+    static func fromURLGif(frame: CGRect, resourceName: String,url:String) -> UIImageView?
+        {
+
+            let url = URL(string: url)!
+            guard let gifData = try? Data(contentsOf: url),
+                let source =  CGImageSourceCreateWithData(gifData as CFData, nil) else { return nil }
+            var images = [UIImage]()
+            let imageCount = CGImageSourceGetCount(source)
+            for i in 0 ..< imageCount {
+                if let image = CGImageSourceCreateImageAtIndex(source, i, nil) {
+                    images.append(UIImage(cgImage: image))
+                }
+            }
+            let gifImageView = UIImageView(frame: frame)
+            gifImageView.animationImages = images
+            return gifImageView
+        }
+    
 }
 extension UIImageView
 {
@@ -64,6 +83,25 @@ extension UIImage {
         UIGraphicsEndImageContext()
         return image
     }
+    func getImageSizeWithURL(url:String?) -> CGSize
+        {
+            var imageSize:CGSize = .zero
+            guard let imageUrlStr = url   else { return imageSize }
+            guard imageUrlStr != "" else {return imageSize}
+            guard let imageUrl = URL(string: imageUrlStr) else { return imageSize }
+     
+            guard let imageSourceRef = CGImageSourceCreateWithURL(imageUrl as CFURL, nil) else {return imageSize}
+            guard let imagePropertie = CGImageSourceCopyPropertiesAtIndex(imageSourceRef, 0, nil)  as? Dictionary<String,Any> else {return imageSize }
+            imageSize.width = CGFloat((imagePropertie[kCGImagePropertyPixelWidth as String] as! NSNumber).floatValue)
+            imageSize.height = CGFloat((imagePropertie[kCGImagePropertyPixelHeight as String] as! NSNumber).floatValue)
+            
+            return imageSize
+        
+            
+        }
+
+    
+    
 }
 extension UIImageView {
   func enableZoom() {
@@ -121,3 +159,93 @@ extension UIImage {
         return nil
     }
  }
+public extension UIImage {
+    func height(forWidth width: CGFloat) -> CGFloat {
+        let boundingRect = CGRect(
+            x: 0,
+            y: 0,
+            width: width,
+            height: CGFloat(MAXFLOAT)
+        )
+        let rect = AVMakeRect(
+            aspectRatio: size,
+            insideRect: boundingRect
+        )
+        return rect.size.height
+    }
+    
+    
+    func imageWithSize(size:CGSize) -> UIImage
+    {
+        var scaledImageRect = CGRect.zero;
+
+        let aspectWidth:CGFloat = size.width / self.size.width;
+        let aspectHeight:CGFloat = size.height / self.size.height;
+        let aspectRatio:CGFloat = min(aspectWidth, aspectHeight);
+
+        scaledImageRect.size.width = self.size.width * aspectRatio;
+        scaledImageRect.size.height = self.size.height * aspectRatio;
+        scaledImageRect.origin.x = (size.width - scaledImageRect.size.width) / 2.0;
+        scaledImageRect.origin.y = (size.height - scaledImageRect.size.height) / 2.0;
+
+        UIGraphicsBeginImageContextWithOptions(size, false, 0);
+
+        self.draw(in: scaledImageRect);
+
+        guard let scaledImage = UIGraphicsGetImageFromCurrentImageContext() else { return UIImage() };
+        UIGraphicsEndImageContext();
+
+        return scaledImage;
+    }
+    
+   
+}
+extension UIImage {
+    var grayed: UIImage {
+        guard let ciImage = CIImage(image: self)
+            else { return self }
+        let filterParameters = [ kCIInputColorKey: CIColor.white, kCIInputIntensityKey: 1.0 ] as [String: Any]
+        let grayscale = ciImage.applyingFilter("CIColorMonochrome", parameters: filterParameters)
+        return UIImage(ciImage: grayscale)
+    }
+}
+extension UIImageView
+{
+    func getThumbnailImageFromVideoUrl(url: URL, completion: @escaping ((_ image: UIImage?)->Void)) {
+        DispatchQueue.global().async { //1
+            let asset = AVAsset(url: url) //2
+            let avAssetImageGenerator = AVAssetImageGenerator(asset: asset) //3
+            avAssetImageGenerator.appliesPreferredTrackTransform = true //4
+            let thumnailTime = CMTimeMake(value: 2, timescale: 1) //5
+            do {
+                let cgThumbImage = try avAssetImageGenerator.copyCGImage(at: thumnailTime, actualTime: nil) //6
+                let thumbImage = UIImage(cgImage: cgThumbImage) //7
+                DispatchQueue.main.async { //8
+                    completion(thumbImage) //9
+                }
+            } catch {
+                print(error.localizedDescription) //10
+                DispatchQueue.main.async {
+                    completion(nil) //11
+                }
+            }
+        }
+    }
+    func convertToGrayScale(image: UIImage) -> UIImage? {
+            let imageRect:CGRect = CGRect(x:0, y:0, width:image.size.width, height: image.size.height)
+            let colorSpace = CGColorSpaceCreateDeviceGray()
+            let width = image.size.width
+            let height = image.size.height
+            let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.none.rawValue)
+            let context = CGContext(data: nil, width: Int(width), height: Int(height), bitsPerComponent: 8, bytesPerRow: 0, space: colorSpace, bitmapInfo: bitmapInfo.rawValue)
+            if let cgImg = image.cgImage {
+                context?.draw(cgImg, in: imageRect)
+                if let makeImg = context?.makeImage() {
+                    let imageRef = makeImg
+                    let newImage = UIImage(cgImage: imageRef)
+                    return newImage
+                }
+            }
+            return UIImage()
+        }
+}

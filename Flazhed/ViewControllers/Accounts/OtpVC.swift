@@ -25,7 +25,7 @@ class OtpVC: BaseVC {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if self.forTesting=="yes"
+        if self.forTesting.equalsIgnoreCase(string: "yes") 
         {
         self.txtFieldOtp.text=SentOTP
         }
@@ -55,6 +55,8 @@ class OtpVC: BaseVC {
             self.topConstraint.constant = TOPSPACING+48
         }
       //  self.topConstraint.constant = 48
+        
+        self.txtFieldOtp.delegate=self
         
     }
     
@@ -145,6 +147,30 @@ class OtpVC: BaseVC {
     
 }
 
+extension OtpVC:UITextFieldDelegate {
+    
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
+                   replacementString string: String) -> Bool
+    {
+        
+        let maxLength = 4
+        let currentString: NSString = textField.text! as NSString
+        let newString: NSString =
+            currentString.replacingCharacters(in: range, with: string) as NSString
+        
+        if newString.rangeOfCharacter(from: CharacterSet.whitespacesAndNewlines).location == 0
+        
+        {
+            return false
+        }
+        else
+        {
+            return newString.length <= maxLength
+        }
+    }
+}
+
 // MARK:- Extension Api Calls
 extension OtpVC
 {
@@ -163,6 +189,7 @@ extension OtpVC
         
                 let vc = storyBoard.instantiateViewController(withIdentifier: "AccountsVC") as! AccountsVC
                 vc.comeFromVerify=true
+                DataManager.comeFrom = kOTPValidAlert
                 self.navigationController?.pushViewController(vc, animated: false)
 
             }

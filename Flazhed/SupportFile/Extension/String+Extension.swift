@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import UIKit
+
 extension String {
     func capitalizingFirstLetter() -> String {
       return prefix(1).uppercased() + self.lowercased().dropFirst()
@@ -14,4 +16,9 @@ extension String {
     mutating func capitalizeFirstLetter() {
       self = self.capitalizingFirstLetter()
     }
+}
+extension String{
+  func equalsIgnoreCase(string:String) -> Bool{
+    return self.caseInsensitiveCompare(string) == .orderedSame//self.uppercased() == string.uppercased()
+  }
 }

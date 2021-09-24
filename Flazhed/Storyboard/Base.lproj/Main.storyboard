@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="FrC-pT-pH0">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="FrC-pT-pH0">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -67,7 +67,7 @@
                                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
-                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="flash2" translatesAutoresizingMaskIntoConstraints="NO" id="6FS-x7-znc">
+                                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="6FS-x7-znc">
                                                         <rect key="frame" x="105" y="278" width="204" height="204"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="204" id="Wy8-eL-Hnr"/>
@@ -332,7 +332,7 @@
                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="VuB-tX-sW8">
+                                            <stackView hidden="YES" opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="VuB-tX-sW8">
                                                 <rect key="frame" x="40" y="113" width="334" height="50"/>
                                                 <subviews>
                                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="0" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="8CE-A4-vgp">
@@ -364,6 +364,36 @@
                                                     <constraint firstAttribute="height" constant="50" id="o3h-oB-bwX"/>
                                                 </constraints>
                                             </stackView>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gul-Xn-6O1" customClass="DPOTPView" customModule="Flazhed" customModuleProvider="target">
+                                                <rect key="frame" x="40" y="113" width="334" height="50"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="count">
+                                                        <integer key="value" value="4"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isBottomLineTextField" value="YES"/>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColorTextField">
+                                                        <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidthTextField">
+                                                        <real key="value" value="3"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="selectedBorderColorTextField">
+                                                        <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="dismissOnLastEntry" value="YES"/>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="selectedBorderWidthTextField">
+                                                        <real key="value" value="4"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="0000"/>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="backGroundColorFilledTextField">
+                                                        <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="backGroundColorTextField">
+                                                        <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                            </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0TE-7P-rF2">
                                                 <rect key="frame" x="121" y="203" width="172" height="32"/>
                                                 <subviews>
@@ -458,16 +488,20 @@
                                             <constraint firstItem="yxL-C1-sVc" firstAttribute="trailing" secondItem="0TE-7P-rF2" secondAttribute="trailing" id="0Fb-BQ-MQ9"/>
                                             <constraint firstAttribute="trailing" secondItem="VuB-tX-sW8" secondAttribute="trailing" constant="40" id="113-IV-nbr"/>
                                             <constraint firstItem="yxL-C1-sVc" firstAttribute="bottom" secondItem="0TE-7P-rF2" secondAttribute="bottom" id="52u-TP-WB7"/>
+                                            <constraint firstItem="gul-Xn-6O1" firstAttribute="bottom" secondItem="VuB-tX-sW8" secondAttribute="bottom" id="8Sr-cr-Y2I"/>
                                             <constraint firstItem="yxL-C1-sVc" firstAttribute="leading" secondItem="0TE-7P-rF2" secondAttribute="leading" id="AZz-kb-Laz"/>
                                             <constraint firstItem="c3Z-AE-Qha" firstAttribute="top" secondItem="YGT-5K-8cc" secondAttribute="top" constant="24" id="CTL-xc-THm"/>
                                             <constraint firstAttribute="trailing" secondItem="mGW-4A-19J" secondAttribute="trailing" constant="24" id="NOb-xs-AQf"/>
                                             <constraint firstAttribute="bottom" secondItem="mGW-4A-19J" secondAttribute="bottom" constant="26" id="W6d-Ax-obr"/>
+                                            <constraint firstItem="gul-Xn-6O1" firstAttribute="leading" secondItem="VuB-tX-sW8" secondAttribute="leading" id="Y6y-Hx-Xgl"/>
                                             <constraint firstItem="yxL-C1-sVc" firstAttribute="top" secondItem="0TE-7P-rF2" secondAttribute="top" id="YNu-RD-0nM"/>
                                             <constraint firstItem="c3Z-AE-Qha" firstAttribute="leading" secondItem="YGT-5K-8cc" secondAttribute="leading" id="aAR-Iv-4nc"/>
+                                            <constraint firstItem="gul-Xn-6O1" firstAttribute="trailing" secondItem="VuB-tX-sW8" secondAttribute="trailing" id="f6L-6E-o4D"/>
                                             <constraint firstAttribute="trailing" secondItem="c3Z-AE-Qha" secondAttribute="trailing" id="j6g-wG-zUM"/>
                                             <constraint firstItem="0TE-7P-rF2" firstAttribute="centerX" secondItem="YGT-5K-8cc" secondAttribute="centerX" id="jNQ-VV-plK"/>
                                             <constraint firstItem="VuB-tX-sW8" firstAttribute="top" secondItem="c3Z-AE-Qha" secondAttribute="bottom" constant="76" id="pJY-3h-ZOQ"/>
                                             <constraint firstItem="VuB-tX-sW8" firstAttribute="leading" secondItem="YGT-5K-8cc" secondAttribute="leading" constant="40" id="uoV-yU-p5p"/>
+                                            <constraint firstItem="gul-Xn-6O1" firstAttribute="top" secondItem="VuB-tX-sW8" secondAttribute="top" id="xVK-A1-hK6"/>
                                             <constraint firstItem="0TE-7P-rF2" firstAttribute="top" secondItem="VuB-tX-sW8" secondAttribute="bottom" constant="40" id="xhm-2E-s3n"/>
                                         </constraints>
                                     </view>
@@ -499,6 +533,7 @@
                         <outlet property="txt2" destination="hb7-3O-UF1" id="8v2-Tq-fTZ"/>
                         <outlet property="txt3" destination="vG5-ux-NSX" id="1tK-Lc-FKd"/>
                         <outlet property="txt4" destination="1uB-ab-XnR" id="R8R-VQ-I7w"/>
+                        <outlet property="txtDPOTPView" destination="gul-Xn-6O1" id="zfK-cG-8dE"/>
                         <outlet property="viewOTPSuccess" destination="0TE-7P-rF2" id="h3m-a9-3dZ"/>
                         <outlet property="viewResend" destination="yxL-C1-sVc" id="zzr-mQ-lNB"/>
                     </connections>
@@ -559,28 +594,28 @@ this mobile to verify.</string>
                                                             <constraint firstAttribute="height" constant="24" id="Upr-Fx-Qaf"/>
                                                         </constraints>
                                                     </imageView>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+91" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vWl-OI-8Lm">
-                                                        <rect key="frame" x="48" y="20" width="30" height="21.5"/>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+45" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vWl-OI-8Lm">
+                                                        <rect key="frame" x="48" y="20" width="33" height="21.5"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Polygon 19" translatesAutoresizingMaskIntoConstraints="NO" id="gvn-nn-5JT">
-                                                        <rect key="frame" x="86" y="27.5" width="12" height="6"/>
+                                                        <rect key="frame" x="89" y="27.5" width="12" height="6"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="6" id="TaC-YO-8QP"/>
                                                             <constraint firstAttribute="width" constant="12" id="vwh-Dm-aWy"/>
                                                         </constraints>
                                                     </imageView>
                                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="PhonelIne" translatesAutoresizingMaskIntoConstraints="NO" id="sNw-R6-09i">
-                                                        <rect key="frame" x="106" y="18.5" width="2" height="24"/>
+                                                        <rect key="frame" x="109" y="18.5" width="2" height="24"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="2" id="nvV-aL-ozJ"/>
                                                             <constraint firstAttribute="height" constant="24" id="xDd-7n-QH2"/>
                                                         </constraints>
                                                     </imageView>
                                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Phone number" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="adb-jQ-PcX">
-                                                        <rect key="frame" x="116" y="0.0" width="210" height="61"/>
+                                                        <rect key="frame" x="119" y="0.0" width="207" height="61"/>
                                                         <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                                         <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
                                                     </textField>
@@ -1706,8 +1741,8 @@ You can also create a "Hangout" or a "Story" which will stay for 24 hours and   
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2D3-3L-cGQ">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="106"/>
                                 <subviews>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1u9-pM-MV8">
-                                        <rect key="frame" x="319.5" y="51" width="5" height="5"/>
+                                    <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1u9-pM-MV8">
+                                        <rect key="frame" x="319.5" y="50" width="5" height="5"/>
                                         <color key="backgroundColor" red="0.94901960784313721" green="0.29019607843137252" blue="0.29019607843137252" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="5" id="Jnm-aM-XEl"/>
@@ -1860,7 +1895,7 @@ You can also create a "Hangout" or a "Story" which will stay for 24 hours and   
                                     <constraint firstAttribute="height" constant="106" id="NbP-c8-Tgc"/>
                                     <constraint firstItem="52O-Mq-EOi" firstAttribute="leading" secondItem="2D3-3L-cGQ" secondAttribute="leading" constant="18" id="bSW-dT-2BC"/>
                                     <constraint firstAttribute="bottom" secondItem="52O-Mq-EOi" secondAttribute="bottom" constant="20" id="fRZ-hS-cJC"/>
-                                    <constraint firstItem="mMc-HM-6Nz" firstAttribute="top" secondItem="1u9-pM-MV8" secondAttribute="top" constant="-5" id="mhy-Mz-kax"/>
+                                    <constraint firstItem="mMc-HM-6Nz" firstAttribute="top" secondItem="1u9-pM-MV8" secondAttribute="top" constant="-4" id="mhy-Mz-kax"/>
                                     <constraint firstItem="mMc-HM-6Nz" firstAttribute="trailing" secondItem="1u9-pM-MV8" secondAttribute="trailing" constant="10" id="v78-4n-wMh"/>
                                 </constraints>
                             </view>
@@ -1911,19 +1946,19 @@ You can also create a "Hangout" or a "Story" which will stay for 24 hours and   
                                 <rect key="frame" x="0.0" y="44" width="414" height="852"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="We will connect you with like-minded people." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eFN-8M-ehK">
-                                        <rect key="frame" x="0.0" y="50" width="414" height="15.5"/>
+                                        <rect key="frame" x="0.0" y="50" width="414" height="13"/>
                                         <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="13"/>
                                         <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jHI-t3-5U6">
-                                        <rect key="frame" x="40" y="141.5" width="334" height="50"/>
+                                        <rect key="frame" x="40" y="139" width="334" height="0.0"/>
                                         <subviews>
                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Rectangle 769" translatesAutoresizingMaskIntoConstraints="NO" id="b24-Mu-F4O">
-                                                <rect key="frame" x="0.0" y="0.0" width="334" height="50"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="334" height="0.0"/>
                                             </imageView>
-                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Date of Birth" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="oCH-qu-Fhz" customClass="customTextField" customModule="Flazhed" customModuleProvider="target">
-                                                <rect key="frame" x="8" y="0.0" width="318" height="50"/>
+                                            <textField hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Date of Birth" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="oCH-qu-Fhz" customClass="customTextField" customModule="Flazhed" customModuleProvider="target">
+                                                <rect key="frame" x="8" y="0.0" width="318" height="0.0"/>
                                                 <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="17"/>
                                                 <textInputTraits key="textInputTraits" keyboardType="alphabet"/>
@@ -1937,9 +1972,89 @@ You can also create a "Hangout" or a "Story" which will stay for 24 hours and   
                                             <constraint firstAttribute="trailing" secondItem="oCH-qu-Fhz" secondAttribute="trailing" constant="8" id="CJB-7e-z2Q"/>
                                             <constraint firstItem="oCH-qu-Fhz" firstAttribute="top" secondItem="jHI-t3-5U6" secondAttribute="top" id="OFu-pD-1up"/>
                                             <constraint firstAttribute="bottom" secondItem="b24-Mu-F4O" secondAttribute="bottom" id="Rkz-DA-OCK"/>
-                                            <constraint firstAttribute="height" constant="50" id="VzU-Px-fbK"/>
+                                            <constraint firstAttribute="height" id="VzU-Px-fbK"/>
                                             <constraint firstItem="oCH-qu-Fhz" firstAttribute="leading" secondItem="jHI-t3-5U6" secondAttribute="leading" constant="8" id="cdw-Xd-UhE"/>
                                             <constraint firstAttribute="bottom" secondItem="oCH-qu-Fhz" secondAttribute="bottom" id="zbi-E5-PTc"/>
+                                        </constraints>
+                                    </view>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="O1a-LD-Wf0">
+                                        <rect key="frame" x="40" y="139" width="334" height="50"/>
+                                        <subviews>
+                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Rectangle 769" translatesAutoresizingMaskIntoConstraints="NO" id="0um-XB-WpU">
+                                                <rect key="frame" x="0.0" y="0.0" width="334" height="50"/>
+                                            </imageView>
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="trailing" contentVerticalAlignment="center" placeholder="DD" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="1ma-fQ-au8" customClass="customTextField" customModule="Flazhed" customModuleProvider="target">
+                                                <rect key="frame" x="76" y="0.0" width="50" height="50"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="50" id="rLq-c8-Myp"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="17"/>
+                                                <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
+                                            </textField>
+                                            <textField opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text=" / " placeholder="/" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="GzW-GI-Y51" customClass="customTextField" customModule="Flazhed" customModuleProvider="target">
+                                                <rect key="frame" x="126" y="0.0" width="16" height="50"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="16" id="5T7-Ox-d1z"/>
+                                                </constraints>
+                                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="17"/>
+                                                <textInputTraits key="textInputTraits" keyboardType="alphabet"/>
+                                            </textField>
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="MM" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="bRi-Fb-z0L" customClass="customTextField" customModule="Flazhed" customModuleProvider="target">
+                                                <rect key="frame" x="142" y="0.0" width="50" height="50"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="50" id="EM5-4G-K4n"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="17"/>
+                                                <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
+                                            </textField>
+                                            <textField opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text=" / " placeholder="/" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="9N7-IW-ceW" customClass="customTextField" customModule="Flazhed" customModuleProvider="target">
+                                                <rect key="frame" x="192" y="0.0" width="16" height="50"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="16" id="cXT-cB-p7H"/>
+                                                </constraints>
+                                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="17"/>
+                                                <textInputTraits key="textInputTraits" keyboardType="alphabet"/>
+                                            </textField>
+                                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="YYYY" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="EuY-VG-j4j" customClass="customTextField" customModule="Flazhed" customModuleProvider="target">
+                                                <rect key="frame" x="216" y="0.0" width="100" height="50"/>
+                                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="100" id="hox-yr-Fj3"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="17"/>
+                                                <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
+                                            </textField>
+                                        </subviews>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstItem="GzW-GI-Y51" firstAttribute="top" secondItem="1ma-fQ-au8" secondAttribute="top" id="51g-yi-gb8"/>
+                                            <constraint firstItem="bRi-Fb-z0L" firstAttribute="top" secondItem="GzW-GI-Y51" secondAttribute="top" id="6Uw-ES-nEQ"/>
+                                            <constraint firstItem="bRi-Fb-z0L" firstAttribute="top" secondItem="O1a-LD-Wf0" secondAttribute="top" id="7ID-bQ-Y1X"/>
+                                            <constraint firstItem="EuY-VG-j4j" firstAttribute="top" secondItem="9N7-IW-ceW" secondAttribute="top" id="85g-SH-Npe"/>
+                                            <constraint firstItem="9N7-IW-ceW" firstAttribute="leading" secondItem="bRi-Fb-z0L" secondAttribute="trailing" id="AQV-RF-vKE"/>
+                                            <constraint firstItem="EuY-VG-j4j" firstAttribute="bottom" secondItem="9N7-IW-ceW" secondAttribute="bottom" id="By2-Gn-0OC"/>
+                                            <constraint firstAttribute="bottom" secondItem="0um-XB-WpU" secondAttribute="bottom" id="J68-pW-1TE"/>
+                                            <constraint firstItem="GzW-GI-Y51" firstAttribute="bottom" secondItem="1ma-fQ-au8" secondAttribute="bottom" id="VjG-h7-Rxw"/>
+                                            <constraint firstItem="bRi-Fb-z0L" firstAttribute="leading" secondItem="GzW-GI-Y51" secondAttribute="trailing" id="Wa6-vB-Vcj"/>
+                                            <constraint firstAttribute="height" constant="50" id="a0c-DL-xId"/>
+                                            <constraint firstItem="EuY-VG-j4j" firstAttribute="leading" secondItem="9N7-IW-ceW" secondAttribute="trailing" constant="8" id="byv-nE-DZv"/>
+                                            <constraint firstItem="9N7-IW-ceW" firstAttribute="bottom" secondItem="bRi-Fb-z0L" secondAttribute="bottom" id="d5x-IA-3Iu"/>
+                                            <constraint firstAttribute="trailing" secondItem="0um-XB-WpU" secondAttribute="trailing" id="gfc-vz-tVH"/>
+                                            <constraint firstItem="9N7-IW-ceW" firstAttribute="top" secondItem="bRi-Fb-z0L" secondAttribute="top" id="jH0-Oh-ELs"/>
+                                            <constraint firstAttribute="bottom" secondItem="bRi-Fb-z0L" secondAttribute="bottom" id="m9y-0J-1uw"/>
+                                            <constraint firstItem="0um-XB-WpU" firstAttribute="leading" secondItem="O1a-LD-Wf0" secondAttribute="leading" id="pOt-7r-2Lc"/>
+                                            <constraint firstItem="bRi-Fb-z0L" firstAttribute="centerX" secondItem="O1a-LD-Wf0" secondAttribute="centerX" id="tXg-Zt-c0s"/>
+                                            <constraint firstItem="0um-XB-WpU" firstAttribute="top" secondItem="O1a-LD-Wf0" secondAttribute="top" id="teL-rO-tQ6"/>
+                                            <constraint firstItem="bRi-Fb-z0L" firstAttribute="bottom" secondItem="GzW-GI-Y51" secondAttribute="bottom" id="wMe-vU-GIj"/>
+                                            <constraint firstItem="GzW-GI-Y51" firstAttribute="leading" secondItem="1ma-fQ-au8" secondAttribute="trailing" id="zH8-UI-bU3"/>
                                         </constraints>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AgW-m8-Gm2" customClass="RoundedShadowView" customModule="Flazhed" customModuleProvider="target">
@@ -1981,8 +2096,8 @@ You can also create a "Hangout" or a "Story" which will stay for 24 hours and   
                                             <constraint firstAttribute="height" constant="3" id="cdw-aq-vwU"/>
                                         </constraints>
                                     </view>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You are 18 years old." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VF5-dM-rsh">
-                                        <rect key="frame" x="150.5" y="201.5" width="113" height="14"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You are 0 year old." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VF5-dM-rsh">
+                                        <rect key="frame" x="155.5" y="199" width="103.5" height="12"/>
                                         <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="12"/>
                                         <color key="textColor" red="0.0" green="0.40784313725490196" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
@@ -1990,6 +2105,7 @@ You can also create a "Hangout" or a "Story" which will stay for 24 hours and   
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
+                                    <constraint firstItem="O1a-LD-Wf0" firstAttribute="top" secondItem="jHI-t3-5U6" secondAttribute="top" id="3sa-xn-WPM"/>
                                     <constraint firstAttribute="trailing" secondItem="eFN-8M-ehK" secondAttribute="trailing" id="4NE-V1-q13"/>
                                     <constraint firstItem="jHI-t3-5U6" firstAttribute="top" secondItem="eFN-8M-ehK" secondAttribute="bottom" constant="76" id="6zh-qh-n5f"/>
                                     <constraint firstAttribute="bottom" secondItem="AgW-m8-Gm2" secondAttribute="bottom" constant="26" id="C5X-y4-woY"/>
@@ -1998,8 +2114,10 @@ You can also create a "Hangout" or a "Story" which will stay for 24 hours and   
                                     <constraint firstItem="eFN-8M-ehK" firstAttribute="leading" secondItem="ZrX-fA-onw" secondAttribute="leading" id="Myp-A9-1cd"/>
                                     <constraint firstAttribute="trailing" secondItem="jHI-t3-5U6" secondAttribute="trailing" constant="40" id="QFK-Zg-Gj2"/>
                                     <constraint firstItem="wHx-mZ-rd5" firstAttribute="leading" secondItem="ZrX-fA-onw" secondAttribute="leading" id="QpK-Jv-2W2"/>
-                                    <constraint firstItem="VF5-dM-rsh" firstAttribute="top" secondItem="jHI-t3-5U6" secondAttribute="bottom" constant="10" id="YAL-Xk-IMa"/>
+                                    <constraint firstItem="O1a-LD-Wf0" firstAttribute="leading" secondItem="jHI-t3-5U6" secondAttribute="leading" id="Y7G-qN-1sm"/>
+                                    <constraint firstItem="VF5-dM-rsh" firstAttribute="top" secondItem="jHI-t3-5U6" secondAttribute="bottom" constant="60" id="YAL-Xk-IMa"/>
                                     <constraint firstAttribute="bottom" secondItem="wHx-mZ-rd5" secondAttribute="bottom" id="YXc-yJ-MVq"/>
+                                    <constraint firstItem="O1a-LD-Wf0" firstAttribute="trailing" secondItem="jHI-t3-5U6" secondAttribute="trailing" id="lDJ-Hl-Pxu"/>
                                     <constraint firstItem="VF5-dM-rsh" firstAttribute="centerX" secondItem="ZrX-fA-onw" secondAttribute="centerX" id="sWU-pz-66B"/>
                                     <constraint firstItem="eFN-8M-ehK" firstAttribute="top" secondItem="ZrX-fA-onw" secondAttribute="top" constant="50" id="uch-p1-dLt"/>
                                 </constraints>
@@ -2021,6 +2139,9 @@ You can also create a "Hangout" or a "Story" which will stay for 24 hours and   
                         <outlet property="sendButtonConst" destination="C5X-y4-woY" id="U5L-e3-cnk"/>
                         <outlet property="topConst" destination="uch-p1-dLt" id="qlw-YR-AvV"/>
                         <outlet property="txtDateOfBirth" destination="oCH-qu-Fhz" id="XPl-5Y-HLB"/>
+                        <outlet property="txtDay" destination="1ma-fQ-au8" id="4Ii-By-kvp"/>
+                        <outlet property="txtMonth" destination="bRi-Fb-z0L" id="XXf-TK-ptW"/>
+                        <outlet property="txtYear" destination="EuY-VG-j4j" id="s7b-xf-6GP"/>
                         <outlet property="viewProgress" destination="YXc-yJ-MVq" id="iGg-Fi-ktc"/>
                     </connections>
                 </viewController>
@@ -2030,8 +2151,23 @@ You can also create a "Hangout" or a "Story" which will stay for 24 hours and   
         </scene>
     </scenes>
     <designables>
+        <designable name="1ma-fQ-au8">
+            <size key="intrinsicContentSize" width="25" height="18.5"/>
+        </designable>
+        <designable name="9N7-IW-ceW">
+            <size key="intrinsicContentSize" width="17" height="18.5"/>
+        </designable>
+        <designable name="EuY-VG-j4j">
+            <size key="intrinsicContentSize" width="42" height="18.5"/>
+        </designable>
+        <designable name="GzW-GI-Y51">
+            <size key="intrinsicContentSize" width="17" height="18.5"/>
+        </designable>
+        <designable name="bRi-Fb-z0L">
+            <size key="intrinsicContentSize" width="30" height="18.5"/>
+        </designable>
         <designable name="oCH-qu-Fhz">
-            <size key="intrinsicContentSize" width="96" height="21.5"/>
+            <size key="intrinsicContentSize" width="100.5" height="18.5"/>
         </designable>
     </designables>
     <resources>
@@ -2059,7 +2195,7 @@ You can also create a "Hangout" or a "Story" which will stay for 24 hours and   
         <image name="Swipe" width="21" height="21"/>
         <image name="chat" width="23" height="23"/>
         <image name="femaleSelected" width="61" height="61"/>
-        <image name="flash2" width="249.5" height="249.5"/>
+        <image name="logo" width="512" height="512"/>
         <image name="maleUnselected" width="61" height="61"/>
         <image name="nearBypepople" width="31" height="32"/>
         <image name="phoneBack" width="318" height="53"/>

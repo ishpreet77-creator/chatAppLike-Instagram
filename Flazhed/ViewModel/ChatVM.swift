@@ -12,20 +12,26 @@ class ChatVM {
     
     static var shared = ChatVM()
     var Pagination_Details:Pagination_Details_Model?
+    var Match_Pagination_Details:Pagination_Details_Model?
     var lastPage = 0
     var page = 0
     var MatchUserDataArray:[UserListModel] = []
     var chat_room_details_Array:[chat_room_details_Model] = []
     var chat_Room_Data:chat_room_Model?
+    var chat_Room_Like_Data:Like_DisLike_Model?
+    
     var allMessageToShow:[chat_room_details_Model] = []
+    var Rtm_token = ""
+    var is_come_from_story_hangout = 0
+    var Audio_video_calling_data:audio_video_calling_Model?
     
     private init(){}
 
     
     
-    func callApiMatchesProfile(data: JSONDictionary,response: @escaping responseCallBack)
+    func callApiMatchesProfile(showIndiacter:Bool,data: JSONDictionary,response: @escaping responseCallBack)
     {
-        APIManager.callApiMatchProfile(data:data,successCallback: { (responseDict) in
+        APIManager.callApiMatchProfile(showIndiacter:showIndiacter, data:data,successCallback: { (responseDict) in
         
             let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
             self.MatchUserDataArray.removeAll()
@@ -44,6 +50,7 @@ class ChatVM {
          
             let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
             self.allMessageToShow.removeAll()
+            
             self.parseCreateRoom(response:responseDict)
             response(message, nil)
         }) { (errorReason, error) in
@@ -51,9 +58,9 @@ class ChatVM {
         }
     }
     
-    func callApiGetActiveChat(data: JSONDictionary,response: @escaping responseCallBack)
+    func callApiGetActiveChat(showIndiacter:Bool, data: JSONDictionary,response: @escaping responseCallBack)
     {
-        APIManager.callApiActiveChat(data:data,successCallback: { (responseDict) in
+        APIManager.callApiActiveChat(showIndiacter:showIndiacter, data:data,successCallback: { (responseDict) in
          
             let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
             self.chat_room_details_Array.removeAll()
@@ -64,9 +71,9 @@ class ChatVM {
         }
     }
     
-    func callApiGetInActiveChat(data: JSONDictionary,response: @escaping responseCallBack)
+    func callApiGetInActiveChat(showIndiacter:Bool, data: JSONDictionary,response: @escaping responseCallBack)
     {
-        APIManager.callApiInActiveChat(data:data,successCallback: { (responseDict) in
+        APIManager.callApiInActiveChat(showIndiacter:showIndiacter,data:data,successCallback: { (responseDict) in
          
             let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
             self.chat_room_details_Array.removeAll()
@@ -91,6 +98,78 @@ class ChatVM {
         }
     }
     
+    
+    func callApiDeleteChat(data: JSONDictionary,response: @escaping responseCallBack)
+    {
+        APIManager.callApiDeleteChat(data:data,successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+           
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    func callApiContinueChat(data: JSONDictionary,response: @escaping responseCallBack)
+    {
+        APIManager.callApiContinueChat(data:data,successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+           
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    func callApiActiveToInactiveChat(data: JSONDictionary,response: @escaping responseCallBack)
+    {
+        APIManager.callApiActiveToInActiveChat(data:data,successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+           
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    
+    func callApiRemoveMatch(data: JSONDictionary,response: @escaping responseCallBack)
+    {
+        APIManager.callApiRemoveMatch(data:data,successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+           
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    
+    func callApiAudioVideoCallNotification(ShowIndicator:Bool=true,data: JSONDictionary,response: @escaping responseCallBack)
+    {
+        APIManager.callApiAudioVideoCallNotification(ShowIndicator:ShowIndicator,data:data,successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+            self.parseAudioVideoCall(response: responseDict)
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    
+    func callApi_RTM_Token_Generate(showIndiacter:Bool=true, response: @escaping responseCallBack)
+    {
+        APIManager.callApi_RTM_Token_Generate(showIndiacter:showIndiacter, successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+            self.parseRTMToken_Generate(response: responseDict)
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    
+    
 }
 extension APIManager {
     
@@ -98,8 +177,8 @@ extension APIManager {
     
     //MARK:- call Api Match profile
 
-    class func callApiMatchProfile(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
-        APIServicesChat.getMatchesProfile(data: data).request(isJsonRequest: true,success: { (response) in
+    class func callApiMatchProfile(showIndiacter:Bool=true,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
+        APIServicesChat.getMatchesProfile(data: data).request(showIndiacter:showIndiacter, isJsonRequest: true,success: { (response) in
             if let responseDict = response as? JSONDictionary {
                 print(responseDict)
 
@@ -127,8 +206,8 @@ extension APIManager {
     }
     
     
-    class func callApiActiveChat(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
-        APIServicesChat.activeChat(data: data).request(isJsonRequest: true,success:{ (response) in
+    class func callApiActiveChat(showIndiacter:Bool, data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
+        APIServicesChat.activeChat(data: data).request(showIndiacter:showIndiacter, isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
                 print(responseDict)
 
@@ -140,8 +219,8 @@ extension APIManager {
     }
   
     
-    class func callApiInActiveChat(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
-        APIServicesChat.inActiveChat(data: data).request(isJsonRequest: true,success:{ (response) in
+    class func callApiInActiveChat(showIndiacter:Bool,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
+        APIServicesChat.inActiveChat(data: data).request(showIndiacter: showIndiacter, isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
                 print(responseDict)
 
@@ -152,7 +231,8 @@ extension APIManager {
         }, failure: failureCallback)
     }
     
-    class func callApiReportBlockUser(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
+    class func callApiReportBlockUser(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback)
+    {
         APIServicesChat.Report_Block_user(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
                 print(responseDict)
@@ -163,6 +243,87 @@ extension APIManager {
             }
         }, failure: failureCallback)
     }
+    
+    
+    class func callApiDeleteChat(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback)
+    {
+        APIServicesChat.Delete_Chat(data: data).request(isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                print(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
+    class func callApiContinueChat(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback)
+    {
+        APIServicesChat.Continue_chats(data: data).request(isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                print(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
+    class func callApiActiveToInActiveChat(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback)
+    {
+        APIServicesChat.Active_Inactive_chats(data: data).request(isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                print(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    class func callApiRemoveMatch(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback)
+    {
+        APIServicesChat.Remove_Match(data: data).request(isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                print(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
+    class func callApiAudioVideoCallNotification(ShowIndicator:Bool=true,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback)
+    {
+        APIServicesChat.Audio_Video_Call_Notification(data: data).request(showIndiacter: ShowIndicator, isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                print(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
+    class func callApi_RTM_Token_Generate(showIndiacter:Bool=true, successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback)
+    {
+        APIServicesChat.Rtm_Token_Generate.request(showIndiacter:showIndiacter, isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                print(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
+    
+    
 }
 //MARK:- Parsing the data
 extension ChatVM {
@@ -183,7 +344,7 @@ extension ChatVM {
             if let Pagination_details = data[ApiKey.kPagination_details] as? JSONDictionary
             {
                 let details = Pagination_Details_Model(detail: Pagination_details)
-                self.Pagination_Details = details
+                self.Match_Pagination_Details = details
             }
         }
     }
@@ -214,11 +375,27 @@ extension ChatVM {
     func parseCreateRoom(response: JSONDictionary){
         if let data = response[ApiKey.kData] as? JSONDictionary
         {
+            if let is_come_from_story_hangout1 = data["is_come_from_story_hangout"] as? Int
+            {
+                
+                self.is_come_from_story_hangout = is_come_from_story_hangout1
+            }
+            
             if let Pagination_details = data[ApiKey.kPagination_details] as? JSONDictionary
             {
                 let details = Pagination_Details_Model(detail: Pagination_details)
                 self.Pagination_Details = details
             }
+            if let like_data = data[ApiKey.kFindLikeDislike] as? JSONDictionary
+            {
+                let details = Like_DisLike_Model(detail: like_data)
+                self.chat_Room_Like_Data = details
+            }
+            else
+            {
+                self.chat_Room_Like_Data =  nil
+            }
+            
             if let Chat_room = data[ApiKey.kChat_room] as? JSONDictionary
             {
                 let details = chat_room_Model(detail: Chat_room)
@@ -239,4 +416,19 @@ extension ChatVM {
     }
  
  
+    func parseRTMToken_Generate(response: JSONDictionary){
+        if let data = response[ApiKey.kData] as? JSONDictionary
+        {
+            self.Rtm_token = data["rtm_token"] as? String ?? ""
+        }
+    }
+    
+    
+       func parseAudioVideoCall(response: JSONDictionary){
+           if let data = response[ApiKey.kData] as? JSONDictionary
+           {
+               let detail = audio_video_calling_Model(detail: data)
+            self.Audio_video_calling_data = detail
+           }
+       }
 }

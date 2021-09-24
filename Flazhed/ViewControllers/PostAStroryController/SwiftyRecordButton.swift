@@ -40,17 +40,24 @@ class SwiftyRecordButton: SwiftyCamButton {
     }
     
     public  func growButton() {
-        innerCircle = UIView(frame: CGRect(x: 0, y: 0, width: 1, height: 1))
+        innerCircle = UIView(frame: CGRect(x: 0, y: 0, width: 2, height: 2))
         innerCircle.center = CGPoint(x: self.bounds.midX, y: self.bounds.midY)
-        innerCircle.backgroundColor = UIColor.red
+       // innerCircle.backgroundColor = UIColor.red
+        
+        innerCircle.backgroundColor = UIColor.white
+        
         innerCircle.layer.cornerRadius = innerCircle.frame.size.width / 2
         innerCircle.clipsToBounds = true
         self.addSubview(innerCircle)
         
         UIView.animate(withDuration: 0.6, delay: 0.0, options: .curveEaseOut, animations: {
             self.innerCircle.transform = CGAffineTransform(scaleX: 62.4, y: 62.4)
-            self.circleBorder.setAffineTransform(CGAffineTransform(scaleX: 1.352, y: 1.352))
-            self.circleBorder.borderWidth = (6 / 1.352)
+//            self.circleBorder.setAffineTransform(CGAffineTransform(scaleX: 1.352, y: 1.352))
+//            self.circleBorder.borderWidth = (6 / 1.352)
+            
+            
+            self.circleBorder.setAffineTransform(CGAffineTransform(scaleX: 1.8, y: 1.8))
+            self.circleBorder.borderWidth = (6 / 1.8)
 
         }, completion: nil)
     }

@@ -9,7 +9,7 @@ import UIKit
 
 class TapControllerVC: BaseVC {
     
-    //MARK:- All outlets  🍎
+    //MARK:- All outlets  
     
     @IBOutlet weak var hangoutButton: UIButton!
     @IBOutlet weak var chatButton: UIButton!
@@ -22,8 +22,9 @@ class TapControllerVC: BaseVC {
     @IBOutlet weak var RoundRedView: UIView!
     @IBOutlet weak var topView: UIView!
     @IBOutlet weak var topHeight: NSLayoutConstraint!
+    var gameTimer: Timer?
     
-    //MARK:- All Variable  🍎
+    //MARK:- All Variable  
     
     lazy var hangoutVC: UIViewController = {
         let storyBoard = UIStoryboard.init(name: "Hangouts", bundle: nil)
@@ -33,7 +34,7 @@ class TapControllerVC: BaseVC {
     
     lazy var chatVC: UIViewController = {
         let storyBoard = UIStoryboard.init(name: "Chat", bundle: nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "ChatScreenVC") as!  ChatScreenVC
+        let vc = storyBoard.instantiateViewController(withIdentifier: "NewChatSectionVC") as!  NewChatSectionVC//ChatScreenVC
         return vc
     }()
     
@@ -62,10 +63,18 @@ class TapControllerVC: BaseVC {
     var comeFrom = ""
     var push=true
     
-    //MARK:- View Lifecycle   🍎
+    //MARK:- View Lifecycle   
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        SocketIOManager.shared.initializeSocket()
+        // gameTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(runTimedCode), userInfo: nil, repeats: true)
+        
+        DataManager.isMessagePageOpen=false
+        
+        
+        
+        
         if self.getDeviceModel() == "iPhone 6"
         {
             
@@ -87,7 +96,7 @@ class TapControllerVC: BaseVC {
         
         
         
-        self.RoundRedView.isHidden=false
+        self.RoundRedView.isHidden=true
         
         self.topHeight.constant = 106//STATUSBARHEIGHT+44+20
         
@@ -106,12 +115,26 @@ class TapControllerVC: BaseVC {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        
+        print("Tap controller appear")
+     //   self.selfJoinSocketEmit()
+       // self.badgeCountIntervalCheckEmit()
+        self.badgeCountIntervalCheckON()
+        //MARK:-Uncomment when done
+        
+       // APPDEL.timerBudgeCount = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(runTimedCode), userInfo: nil, repeats: true)
+        //  RunLoop.main.add(APPDEL.timerBudgeCount ?? Timer(), forMode: RunLoop.Mode.common)
         super.viewWillAppear(true)
+        self.RoundRedView.isHidden=true
         changeVC(index: selectedIndex)
+        DataManager.isPrefrenceSet = true
+        DataManager.isEditProfile=true
+        APPDEL.timerTimeLeftCheck?.invalidate()
+        
         
         if selectedIndex == 0
         {
-            self.RoundRedView.isHidden=false
+            
             hangoutButton.setImage(#imageLiteral(resourceName: "hangout-Blue"), for: .normal)
             chatButton.setImage(#imageLiteral(resourceName: "Stories"), for: .normal)
             homeButton.setImage(#imageLiteral(resourceName: "Home-gray"), for: .normal)
@@ -124,7 +147,7 @@ class TapControllerVC: BaseVC {
             
             hangoutButton.setImage(#imageLiteral(resourceName: "smile"), for: .normal)
             chatButton.setImage(#imageLiteral(resourceName: "stories-blue"), for: .normal)
-            self.RoundRedView.isHidden=false
+            
             homeButton.setImage(#imageLiteral(resourceName: "Home-gray"), for: .normal)
             storiesButton.setImage(#imageLiteral(resourceName: "chat"), for: .normal)
             profileButton.setImage(#imageLiteral(resourceName: "profile"), for: .normal)
@@ -133,7 +156,6 @@ class TapControllerVC: BaseVC {
         {
             hangoutButton.setImage(#imageLiteral(resourceName: "smile"), for: .normal)
             chatButton.setImage(#imageLiteral(resourceName: "Stories"), for: .normal)
-            self.RoundRedView.isHidden=false
             homeButton.setImage(#imageLiteral(resourceName: "Home"), for: .normal)
             storiesButton.setImage(#imageLiteral(resourceName: "chat"), for: .normal)
             profileButton.setImage(#imageLiteral(resourceName: "profile"), for: .normal)
@@ -145,7 +167,7 @@ class TapControllerVC: BaseVC {
         {
             hangoutButton.setImage(#imageLiteral(resourceName: "smile"), for: .normal)
             chatButton.setImage(#imageLiteral(resourceName: "Stories"), for: .normal)
-            self.RoundRedView.isHidden=true
+            //self.RoundRedView.isHidden=true
             homeButton.setImage(#imageLiteral(resourceName: "Home-gray"), for: .normal)
             storiesButton.setImage(#imageLiteral(resourceName: "chat-Blue"), for: .normal)
             profileButton.setImage(#imageLiteral(resourceName: "profile"), for: .normal)
@@ -155,20 +177,37 @@ class TapControllerVC: BaseVC {
         {
             hangoutButton.setImage(#imageLiteral(resourceName: "smile"), for: .normal)
             chatButton.setImage(#imageLiteral(resourceName: "Stories"), for: .normal)
-            self.RoundRedView.isHidden=false
+            
             homeButton.setImage(#imageLiteral(resourceName: "Home-gray"), for: .normal)
             storiesButton.setImage(#imageLiteral(resourceName: "chat"), for: .normal)
             profileButton.setImage(#imageLiteral(resourceName: "profile-Blue"), for: .normal)
         }
         
-   
+        
         DataManager.comeFromPage=selectedIndex
         
     }
     
-    //MARK:- Home,camera switch getsture   🍎
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        print("Tap controller disappear")
+        
+        APPDEL.timerBudgeCount?.invalidate()
+        
+    }
+    @objc func runTimedCode()
+    {
+        DispatchQueue.main.async {
+            self.selfJoinSocketEmit()
+            self.badgeCountIntervalCheckEmit()
+            self.badgeCountIntervalCheckON()
+        }
+        
+    }
+    //MARK:- Home,camera switch getsture   
     
     @objc func panButton(pan: UIPanGestureRecognizer) {
+        DataManager.currentScreen=kCamera
         if pan.state == .began {
             buttonCenter = homeButton.center // store old button center
         } else if pan.state == .ended || pan.state == .failed || pan.state == .cancelled {
@@ -193,7 +232,6 @@ class TapControllerVC: BaseVC {
                     push=false
                     hangoutButton.setImage(#imageLiteral(resourceName: "smile"), for: .normal)
                     chatButton.setImage(#imageLiteral(resourceName: "Stories"), for: .normal)
-                    self.RoundRedView.isHidden=false
                     homeButton.setImage(#imageLiteral(resourceName: "Home-gray"), for: .normal)
                     storiesButton.setImage(#imageLiteral(resourceName: "chat"), for: .normal)
                     profileButton.setImage(#imageLiteral(resourceName: "profile"), for: .normal)
@@ -210,27 +248,34 @@ class TapControllerVC: BaseVC {
         
     }
     
-    //MARK:- All Top Tab Button action  🍎
+    //MARK:- All Top Tab Button action  
     
-    //MARK:- Hangout button action  🍎
+    //MARK:- Hangout button action  
     @IBAction func hangoutBtnAction(_ sender: UIButton) {
         selectedIndex  = 0
         DataManager.comeFrom = kEmptyString
         DataManager.comeFromPage=selectedIndex
+        DataManager.currentScreen=kStory
         changeVC(index: 0)
         hangoutButton.setImage(#imageLiteral(resourceName: "hangout-Blue"), for: .normal)
         chatButton.setImage(#imageLiteral(resourceName: "Stories"), for: .normal)
-        self.RoundRedView.isHidden=false
         homeButton.setImage(#imageLiteral(resourceName: "Home-gray"), for: .normal)
         storiesButton.setImage(#imageLiteral(resourceName: "chat"), for: .normal)
         profileButton.setImage(#imageLiteral(resourceName: "profile"), for: .normal)
         DataManager.comeFromPage=selectedIndex
+        SocketIOManager.shared.initializeSocket()
+        
+        //self.badgeCountIntervalCheckEmit()
+        // self.badgeCountIntervalCheckON()
         
     }
     
-    //MARK:- Story button action  🍎
+    //MARK:- Story button action  
     
     @IBAction func chatButtonAction(_ sender: UIButton) {
+        
+        
+        DataManager.currentScreen=kHangout
         DataManager.comeFrom = kEmptyString
         selectedIndex  = 1
         DataManager.comeFrom = ""
@@ -241,38 +286,41 @@ class TapControllerVC: BaseVC {
         hangoutButton.setImage(#imageLiteral(resourceName: "smile"), for: .normal)
         chatButton.setImage(#imageLiteral(resourceName: "stories-blue"), for: .normal)
         homeButton.setImage(#imageLiteral(resourceName: "Home-gray"), for: .normal)
-        self.RoundRedView.isHidden=false
         storiesButton.setImage(#imageLiteral(resourceName: "chat"), for: .normal)
         profileButton.setImage(#imageLiteral(resourceName: "profile"), for: .normal)
         
+        SocketIOManager.shared.initializeSocket()
+        //  self.badgeCountIntervalCheckEmit()
+        // self.badgeCountIntervalCheckON()
         
     }
-    //MARK:- Home button action  🍎
+    //MARK:- Home button action  
     
     @IBAction func homeButtonAction(_ sender: UIButton) {
         DataManager.comeFrom = kEmptyString
         DataManager.comeFromTag=5
-        DataManager.HomeRefresh = "true"
+        DataManager.HomeRefresh = true
         selectedIndex  = 2
         DataManager.comeFromPage=selectedIndex
-        
+        DataManager.currentScreen=kHomePage
         changeVC(index: 2)
         hangoutButton.setImage(#imageLiteral(resourceName: "smile"), for: .normal)
         chatButton.setImage(#imageLiteral(resourceName: "Stories"), for: .normal)
-        self.RoundRedView.isHidden=false
         homeButton.setImage(#imageLiteral(resourceName: "Home"), for: .normal)
         storiesButton.setImage(#imageLiteral(resourceName: "chat"), for: .normal)
         profileButton.setImage(#imageLiteral(resourceName: "profile"), for: .normal)
+        SocketIOManager.shared.initializeSocket()
+        //self.badgeCountIntervalCheckEmit()
+        // self.badgeCountIntervalCheckON()
         
         
     }
-    //MARK:- Camera button action  🍎
+    //MARK:- Camera button action  
     
     @IBAction func camerButtonAction(_ sender: UIButton) {
-      
+        DataManager.currentScreen=kCamera
         hangoutButton.setImage(#imageLiteral(resourceName: "smile"), for: .normal)
         chatButton.setImage(#imageLiteral(resourceName: "Stories"), for: .normal)
-        self.RoundRedView.isHidden=false
         homeButton.setImage(#imageLiteral(resourceName: "Home-gray"), for: .normal)
         storiesButton.setImage(#imageLiteral(resourceName: "chat"), for: .normal)
         profileButton.setImage(#imageLiteral(resourceName: "profile"), for: .normal)
@@ -283,40 +331,48 @@ class TapControllerVC: BaseVC {
         self.navigationController?.pushViewController(vc, animated: true)
         
     }
-    //MARK:- Chat button action  🍎
+    //MARK:- Chat button action  
     
     @IBAction func storiesButtonAction(_ sender: UIButton) {
         selectedIndex  = 3
         DataManager.comeFrom = kEmptyString
         DataManager.comeFromPage=selectedIndex
+        DataManager.currentScreen=kChat
         changeVC(index: 3)
         
         hangoutButton.setImage(#imageLiteral(resourceName: "smile"), for: .normal)
         chatButton.setImage(#imageLiteral(resourceName: "Stories"), for: .normal)
-        self.RoundRedView.isHidden=true
+        // self.RoundRedView.isHidden=true
         homeButton.setImage(#imageLiteral(resourceName: "Home-gray"), for: .normal)
         storiesButton.setImage(#imageLiteral(resourceName: "chat-Blue"), for: .normal)
         profileButton.setImage(#imageLiteral(resourceName: "profile"), for: .normal)
+        SocketIOManager.shared.initializeSocket()
+        // self.badgeCountIntervalCheckEmit()
+        // self.badgeCountIntervalCheckON()
         
     }
     
-    //MARK:- profile button action  🍎
+    //MARK:- profile button action  
     
     @IBAction func profileButtonAction(_ sender: UIButton) {
         selectedIndex  = 4
         DataManager.comeFromPage=selectedIndex
         DataManager.comeFrom = kEmptyString
+        DataManager.currentScreen=kProfile
         changeVC(index: 4)
         hangoutButton.setImage(#imageLiteral(resourceName: "smile"), for: .normal)
         chatButton.setImage(#imageLiteral(resourceName: "Stories"), for: .normal)
-        self.RoundRedView.isHidden=false
         homeButton.setImage(#imageLiteral(resourceName: "Home-gray"), for: .normal)
         storiesButton.setImage(#imageLiteral(resourceName: "chat"), for: .normal)
         profileButton.setImage(#imageLiteral(resourceName: "profile-Blue"), for: .normal)
+        SocketIOManager.shared.initializeSocket()
+        // self.badgeCountIntervalCheckEmit()
+        //self.badgeCountIntervalCheckON()
+        
     }
 }
 
-//MARK: Container Setup and Methods   🍎
+//MARK: Container Setup and Methods   
 
 extension TapControllerVC  {
     
@@ -374,3 +430,61 @@ extension TapControllerVC  {
     }
 }
 
+
+//MARK:- Socket method
+
+extension TapControllerVC
+{
+    func selfJoinSocketEmit()
+    {
+        
+        let JoinDict = ["selfUserId":DataManager.Id]
+        SocketIOManager.shared.selfJoinSocket(MessageChatDict: JoinDict)
+        
+    }
+    func badgeCountIntervalCheckEmit()
+    {
+        
+        let JoinDict = ["userId":DataManager.Id]
+        
+        print("badgeCountIntervalCheckEmit \(JoinDict)")
+        SocketIOManager.shared.badgeCountIntervalCheckEmit(MessageChatDict: JoinDict)
+        DispatchQueue.main.async {
+            self.badgeCountIntervalCheckON()
+        }
+        
+    }
+    func badgeCountIntervalCheckON()
+    {
+        SocketIOManager.shared.socket.on("receivedBadgeCount", callback: { (data, error) in
+            
+            self.RoundRedView.isHidden=true
+            //  print("badgeCountIntervalCheckON \(data) \(error)")
+            
+            if let data = data as? JSONArray
+            {
+                for dict in data
+                {
+                    
+                    let badgeCount =  dict["badgeCount"] as? Int ?? 0
+                    if badgeCount > 0
+                    {
+                        self.RoundRedView.isHidden=false
+                    }
+                    else
+                    {
+                        self.RoundRedView.isHidden=true
+                    }
+                }
+            }
+            else
+            {
+                self.RoundRedView.isHidden=true
+            }
+            
+            //  print("receivedBadgeCount = \(data) \(error)")
+        })
+        
+    }
+    
+}

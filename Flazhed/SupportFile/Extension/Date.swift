@@ -129,6 +129,8 @@ extension String{
             dateFormatter.dateFormat = "h:mm a"
             dateFormatter.amSymbol = "AM"
             dateFormatter.pmSymbol = "PM"
+            dateFormatter.timeZone = TimeZone.current
+            dateFormatter.locale = NSLocale(localeIdentifier: "en_US") as Locale
             return dateFormatter.string(from: date)
         }
         return nil
@@ -154,12 +156,12 @@ extension String{
     {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        let enteredDate = dateFormatter.date(from: startTime)!
-        let endOfMonth = Calendar.current.date(byAdding: .hour, value: 0, to: enteredDate)!
+        let enteredDate = dateFormatter.date(from: startTime) ?? Date()
+        let endOfMonth = Calendar.current.date(byAdding: .hour, value: 0, to: enteredDate) ?? Date()
         let now = Date()
       
-        let diffComponents = Calendar.current.dateComponents([.hour, .minute], from: enteredDate, to: now)
-        guard let hours = diffComponents.hour else { return 0 }
+        let diffComponents = Calendar.current.dateComponents([.minute], from: enteredDate, to: now)
+        guard let hours = diffComponents.minute else { return 0 }
         let minutes = diffComponents.minute
         
         
@@ -174,7 +176,218 @@ extension String{
 //        }
         return hours
     }
+    func checkHoursTimeDiffrent(startTime:String) -> String
+    {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        let enteredDate = dateFormatter.date(from: startTime) ?? Date()
+        let endOfMonth = Calendar.current.date(byAdding: .hour, value: kTimeRing48, to: enteredDate) ?? Date()
+    //    let now = Date()
+      
+        //let difference = Calendar.current.dateComponents([.month,.weekOfMonth,.day,.hour, .minute,.second], from: now, to: endOfMonth)
+//        guard let hours = diffComponents.hour else { return 0 }
+//        let minutes = diffComponents.minute
+//
+        
+//        if (endOfMonth < now)
+//        {
+//            print("Expired - \(enteredDate) - \(endOfMonth)")
+//        }
+//        else
+//        {
+//            // valid
+//            print("valid - now: \(now) entered: \(enteredDate)")
+//        }
+        
+       // print("Ago time = \(endOfMonth.timeAgoSinceNow)")
+        
+//              let seconds = "\(difference.second ?? 0)"
+//               let minutes = "\(difference.minute ?? 0):" + "" + seconds
+//               let hours = "\(difference.hour ?? 0):" + "" + minutes
+//               let days = "\(difference.day ?? 0)d" + "" + hours
+//
+//               if let day = difference.day, day          > 0 { return days }
+//               if let hour = difference.hour, hour       > 0 { return hours }
+//               if let minute = difference.minute, minute > 0 { return minutes }
+//               if let second = difference.second, second > 0 { return seconds }
+        return endOfMonth.timeAgoSinceNow
+        
+
+    }
     
+    func checkHoursTimeDiffrent2(startTime:String) -> String
+    {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        let enteredDate = dateFormatter.date(from: startTime) ?? Date()
+        let endOfMonth = Calendar.current.date(byAdding: .hour, value: kTimeRing48, to: enteredDate) ?? Date()
+        return endOfMonth.timeAgoSinceNow
+        /*
+        let now = Date()
+      
+        let difference = Calendar.current.dateComponents([.hour, .minute,.second], from: now, to: endOfMonth)
+        
+        let seconds = "\(difference.second ?? 0)"
+        var minutes = ""
+        let min = (difference.minute ?? 0)
+        if min>1
+        {
+            minutes = "\(difference.minute ?? 0) minutes" + " "
+        }
+        else
+        {
+             minutes = "\(difference.minute ?? 0) minute" + " "
+        }
+        
+        var hours = ""
+        let hr = (difference.hour ?? 0)
+        
+        if hr>1
+        {
+            hours = "\(difference.hour ?? 0) hours" + " " + minutes
+        }
+        else
+        {
+            hours = "\(difference.hour ?? 0) hour" + " " + minutes
+        }
+        
+        var days = ""
+        
+        let day = (difference.day ?? 0)
+        if day>1
+        {
+            days = "\(difference.day ?? 0) days" + " " + hours
+        }
+        else
+        {
+            days = "\(difference.day ?? 0) day" + " " + hours
+        }
+
+               if let day = difference.day, day          > 0 { return days }
+               if let hour = difference.hour, hour       > 0 { return hours }
+               if let minute = difference.minute, minute > 0 { return minutes }
+               if let second = difference.second, second > 0 { return seconds }
+               return ""
+        
+        */
+        
+    }
+    
+    
+    func checkHoursLeftForRing(startTime:String) -> Int
+    {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        let enteredDate = dateFormatter.date(from: startTime) ?? Date()
+        let endOfMonth = Calendar.current.date(byAdding: .minute, value: kTimeRing, to: enteredDate) ?? Date()
+        let now = Date()
+      
+        let difference = Calendar.current.dateComponents([.minute], from: now, to: endOfMonth)
+
+
+        
+        let hr = (difference.minute ?? 0)
+        
+        if let hour = difference.minute, hour       > 0 { return hr }
+
+               return 0
+
+    }
+    func checkHoursLeftForRing24Hr(startTime:String) -> Int
+    {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        let enteredDate = dateFormatter.date(from: startTime) ?? Date()
+        
+        
+//        let endOfMonth = Calendar.current.date(byAdding: .minute, value: kTimeRing24, to: enteredDate) ?? Date()
+        let now = Date()
+      
+        let difference = Calendar.current.dateComponents([.minute], from: enteredDate, to: now)
+
+
+        
+        let hr = (difference.minute ?? 0)
+        
+        if let hour = difference.minute, hour       > 0 { return hr }
+
+               return 0
+
+    }
+    func checkHoursLeftForRing48Hr(startTime:String) -> Int
+    {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        let enteredDate = dateFormatter.date(from: startTime) ?? Date()
+        
+        
+//        let endOfMonth = Calendar.current.date(byAdding: .minute, value: kTimeRing24, to: enteredDate) ?? Date()
+        let now = Date()
+      
+        let difference = Calendar.current.dateComponents([.minute], from: enteredDate, to: now)
+
+
+        
+        let hr = (difference.minute ?? 0)
+        
+        if let hour = difference.minute, hour > 0 { return hr }
+
+               return 0
+
+    }
+    
+    func checkHoursLeftNoReply(startTime:String) -> Int
+    {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        let enteredDate = dateFormatter.date(from: startTime) ?? Date()
+        let endOfMonth = Calendar.current.date(byAdding: .minute, value: kTimeLeft48, to: enteredDate) ?? Date() //kTimeLeft48
+        let now = Date()
+      
+        let difference = Calendar.current.dateComponents([.minute], from: now, to: endOfMonth)
+
+
+        
+        let hr = (difference.minute ?? 0)
+        
+        if let hour = difference.minute, hour       > 0 { return hr }
+
+               return 0
+
+    }
+    
+    func checkHoursRemaining(startTime:String) -> Int
+    {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        let enteredDate = dateFormatter.date(from: startTime) ?? Date()
+        let endOfMonth = Calendar.current.date(byAdding: .day, value: 3, to: enteredDate) ?? Date() //kTimeLeft48
+        let now = Date()
+        
+        let difference = Calendar.current.dateComponents([.hour], from: now, to: endOfMonth)
+
+
+        
+        let hr = (difference.hour ?? 0)
+        
+        if let hour = difference.hour, hour       > 0 { return hr }
+
+        
+        
+      
+//        let difference = Calendar.current.dateComponents([.minute], from: now, to: endOfMonth)
+//
+//
+//
+//        let hr = (difference.minute ?? 0)
+//
+//        if let hour = difference.minute, hour       > 0 { return hr }
+
+               return 0
+
+    }
     
 }
 
@@ -210,5 +423,17 @@ extension Date {
         }
 
         return dateFormatter.string(from: self)
+    }
+}
+extension Date {
+    func CurrentTimeString(format: String="h:mm a") -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        formatter.amSymbol = "AM"
+        formatter.pmSymbol = "PM"
+        formatter.timeZone = TimeZone.current
+        formatter.locale = NSLocale(localeIdentifier: "en_US") as Locale
+        formatter.dateFormat = format
+        return formatter.string(from: self)
     }
 }

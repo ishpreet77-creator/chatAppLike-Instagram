@@ -42,7 +42,7 @@ class UnitsVC: BaseVC {
     {
         if changesMade
         {
-            DataManager.comeFrom = kEmptyString
+            DataManager.comeFrom = kOTPValidAlert
          self.updateUnit()
         }
         else
@@ -99,8 +99,21 @@ extension UnitsVC
               
                  if AccountVM.shared.unitData.count>0
                   {
-                    self.txtFieldUnits.text = AccountVM.shared.unitData[0].unit
+                    let unit = AccountVM.shared.unitData[0].unit ?? ""
+                    if unit != ""
+                    {
+                        self.txtFieldUnits.text = AccountVM.shared.unitData[0].unit
+                    }
+                     else
+                    {
+                       self.txtFieldUnits.text = kCentimeters
+                    }
+                    
                   }
+                else
+                 {
+                    self.txtFieldUnits.text = kCentimeters
+                 }
  
             }
         })
@@ -131,7 +144,7 @@ extension UnitsVC
                 self.showErrorMessage(error: error)
             }
             else{
-              
+                DataManager.comeFrom = kOTPValidAlert
                 self.navigationController?.popViewController(animated: true)
             }
             

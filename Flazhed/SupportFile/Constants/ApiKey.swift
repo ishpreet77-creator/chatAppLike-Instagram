@@ -34,7 +34,7 @@ class ApiKey {
     static let kChildrenId = "children_id"
     static let kDevicetype = "device_type"
     static let KDeviceToken = "device_token"
-    
+    static let KVoip_device_token = "voip_device_token"
     //MARK:- Verify OTP
     static let kUser = "user"
     static let kAuthToken = "authToken"
@@ -94,16 +94,23 @@ class ApiKey {
     static let keducation_name = "education_name"
     static let kchildren_name = "children_name"
     static let kis_selected = "is_selected"
+    static let kEducation_selected = "education_selected"
+    static let kChildren_selected = "children_selected"
+    static let kHair_selected = "hair_selected"
     
     //MARK:- Home page
     
     static let kOffset = "offset"
     static let kUsers = "users"
+    static let kShakeUser = "send_shake_id"
     
     static let kOther_user_id = "other_user_id"
+    static let kStoryId = "story_id"
+  
     static let kAction = "action"
     static let kLike_mode = "like_mode"
-    
+    static let kStory_Id = "story_id"
+    static let kHangout_Id = "hangout_id"
     //MARK:- Edit profile
     static let kAge = "age"
     static let kJob_title = "job_title"
@@ -189,6 +196,8 @@ class ApiKey {
     static let kHangout_id = "hangout_id"
     static let kHangout_details = "hangout_details"
     static let kFilter_type = "filter_type"
+    static let kIs_like = "is_like"
+    
     
     static let ksocial = "social"
     static let ktravel = "travel"
@@ -208,6 +217,22 @@ class ApiKey {
     static let kChat_room_details = "chat_room_details"
     static let kChat_room = "chat_room"
     static let kChat_details = "chat_details"
+    static let kChat_room_id = "chat_room_id"
+    static let kFindLikeDislike = "findLikeDislike"
     
+    static let kAmount = "amount"
+    static let kSubscription_type = "subscription_type"
+    static let kSubName = "name"
+    static let kExtra_shake = "extra_shake"
+    static let kMonth_up_to = "month_up_to"
+    
+    static let kParlong = "Parlong"
+    static let kSwiping = "Swiping"
+    static let kShake = "Shake"
+    
+    static let kTo_user_id = "to_user_id"
+    static let kCall_type = "call_type"
+    static let kRole_type = "role_type"
+    static let kRegret_type = "type"
     
 }

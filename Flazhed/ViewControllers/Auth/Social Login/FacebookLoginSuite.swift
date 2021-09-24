@@ -17,6 +17,8 @@ let kFBEmail = "email"
 let kFBImageUrl = "picture.type(large)"
 let kFBUser_posts = "photos"
 let kInstagram_basic = "instagram_basic"
+let kBirthday = "birthday"
+let kFBGender = "user_gender"
 
 let kfeed = "feed.limit(3)"
 
@@ -24,7 +26,7 @@ let kfeed = "feed.limit(3)"
 enum ReadPermission : String  {
     case  public_profile, email,user_photos//, public_actions, user_videos, user_photos
     
-    static let allValues = [public_profile, email,user_photos] // ,public_actions,user_videos,user_photos
+    static let allValues = [public_profile, email, user_photos]//,user_photos] // ,public_actions,user_videos,user_photos
     
     static func defaultPermissions() -> [String] {
         var permissions = [String]()
@@ -48,7 +50,7 @@ class FacebookLoginSuite {
     }
     
     private var fbLoginManager = LoginManager()
-    private var graphConnection: GraphRequestConnection?
+    private var graphConnection=GraphRequestConnection()
     
     //MARK:- Intializers
     init(permissions: [String]) {
@@ -57,6 +59,7 @@ class FacebookLoginSuite {
     
     convenience init(){
         self.init(permissions:ReadPermission.defaultPermissions())
+    
     }
     
     //MARK:- Account
@@ -79,7 +82,9 @@ class FacebookLoginSuite {
         
         //Request login
         Indicator.sharedInstance.hideIndicator()
-       // fbLoginManager.loginBehavior = .browser
+      // fbLoginManager.loginBehavior = .browser
+      //  fbLoginManager
+
         fbLoginManager.logIn(permissions: permissions, from: controller) { result, err in
             
             if err != nil {
@@ -112,15 +117,48 @@ class FacebookLoginSuite {
         Indicator.sharedInstance.showIndicator()
         //me
         let graphRequest = GraphRequest(graphPath: "me", parameters: ["fields":"\(kFBName),\(kFBID),\(kFBEmail),\(kFBUser_posts),\(kFBImageUrl)"])
-        
-        graphConnection = graphRequest.start(completionHandler: { (connection, result, err) -> Void in
+       //
+        graphConnection.add(graphRequest, completionHandler: { (connection, result, err) -> Void in
             Indicator.sharedInstance.hideIndicator()
             if err != nil {
                 error1((err?.localizedDescription)!, err)
                 return
             }
-            let userData = result as? Dictionary<String,AnyObject>
+           let userData = result as? Dictionary<String,AnyObject>
             print(userData)
+            Indicator.sharedInstance.hideIndicator()
+            success(true, userData)
+        })
+        self.graphConnection.start()
+        
+//        graphConnection.add(GraphRequest(graphPath: "/me", parameters: ["fields":"email"])) { httpResponse, result, error   in
+//            if error != nil {
+//                NSLog(error.debugDescription)
+//                return
+//            }
+//
+//            print(result)
+//            // Handle vars
+//            if let result = result as? [String:String],
+//                let email: String = result["email"],
+//                let fbId: String = result["id"] {
+//
+//                // internal usage of the email
+//                //self.userService.loginWithFacebookMail(facebookMail: email)
+//
+//            }
+//
+//        }
+    
+        
+//        graphConnection = graphRequest.start(completionHandler: { (connection, result, err) -> Void in
+//            Indicator.sharedInstance.hideIndicator()
+//            if err != nil {
+//                error1((err?.localizedDescription)!, err)
+//                return
+//            }
+//           let userData = result as? Dictionary<String,AnyObject>
+//            print(userData)
 //            let id = userData?[ApiKey.kId] as! String
 //            self.requestWithPath(path: "/\(id)/photos") { (sucees, dic) in
 //                print(dic)
@@ -132,14 +170,14 @@ class FacebookLoginSuite {
 //            } error: { (er, error) in
 //                print(error)
 //            }
-            success(true, userData)
-        })
+        //    success(true, userData)
+      //  })
         
         let accessToken = AccessToken.current?.tokenString
             let params = ["access_token" : accessToken ?? ""]
         
         print("Facebook login token = \(accessToken)")
-        let request = GraphRequest(graphPath: "me/photos", parameters: params, httpMethod: .get)
+        let request = GraphRequest(graphPath: "albums", parameters: params, httpMethod: .get)
 
            request.start(completionHandler: { (test, result, error) in
                if(error == nil)
@@ -147,6 +185,28 @@ class FacebookLoginSuite {
                   print(result!)
                }
            })
+        GraphRequest(graphPath: "/me/albums", parameters: ["fields":"id,name,user_photos"], httpMethod: HTTPMethod(rawValue: "GET")).start(completionHandler: {  (connection, result, error) in
+print("result = ")
+            
+            
+
+                print(result!)
+        })
+        
+        let connection = GraphRequestConnection()
+
+        connection.add(GraphRequest(graphPath: "/me/albums", parameters: ["fields":"id,name,user_photos"])) { httpResponse, result, error   in
+            if error != nil {
+                NSLog(error.debugDescription)
+                return
+            }
+            print(result)
+
+           
+
+        }
+    
+        
         
 //        self.requestWithPath(path: "photos") { (sucees, dic) in
 //            print(dic)
@@ -169,21 +229,21 @@ class FacebookLoginSuite {
         
         let graphRequest = GraphRequest(graphPath: path)
         
-        graphConnection = graphRequest.start(completionHandler: { (connection, result, err) -> Void in
-            if err != nil {
-                error((err?.localizedDescription)!,err)
-                return
-                
-            }
-            
-            success(true,result)
-        })
+//        graphConnection = graphRequest.start(completionHandler: { (connection, result, err) -> Void in
+//            if err != nil {
+//                error((err?.localizedDescription)!,err)
+//                return
+//
+//            }
+//
+//            success(true,result)
+//        })
       
     }
     
     func cancelRequest() {
-        graphConnection?.cancel()
-        graphConnection = nil
+      //  graphConnection?.cancel()
+       // graphConnection = nil
     }
     
     func resetFacebookAccessToken() {

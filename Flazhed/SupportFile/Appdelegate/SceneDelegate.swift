@@ -6,24 +6,16 @@
 //
 
 import UIKit
+import FBSDKCoreKit
+import FBSDKLoginKit
+
 @available(iOS 13.0, *)
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-
-  
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-//        for family in UIFont.familyNames {
-//            print("\(family)")
-//
-//            for name in UIFont.fontNames(forFamilyName: family) {
-//                print("\(name)")
-//            }
-//        }
+
         UIApplication.shared.windows.forEach { window in
                    //here you can switch between the dark and light
             if #available(iOS 13.0, *)
@@ -36,7 +28,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         if DataManager.isProfileCompelete
         {
-            self.navigateToHome()
+            if DataManager.isPrefrenceSet == false
+            {
+               
+                self.navigateToPrefrence()
+            }
+          else if DataManager.isEditProfile == false
+            {
+               
+                self.navigateToEditProfile()
+            }
+            else
+            {
+                self.navigateToHome(userId: "")
+            }
         }
         else
         {
@@ -45,11 +50,31 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         guard let _ = (scene as? UIWindowScene) else { return }
     }
+  
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else {
+            return
+        }
+
+        ApplicationDelegate.shared.application(
+            UIApplication.shared,
+            open: url,
+            sourceApplication: nil,
+            annotation: [UIApplication.OpenURLOptionsKey.annotation]
+        )
+    }
     
-    func navigateToHome() {
+      func navigateToHome(userId:String = "") {
             
             let storyBoard = UIStoryboard.storyboard(storyboard: .Main)
             let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+        vc.selectedIndex=2
+        if userId != ""
+        {
+        DataManager.HomeRefresh=true
+        DataManager.OtherUserId = userId
+        DataManager.comeFromTag=6
+        }
             let nav = UINavigationController(rootViewController: vc)
             nav.navigationBar.isHidden = true
            // UIApplication.shared.windows.first?.layer.add(self.transition, forKey: kCATransition)
@@ -146,7 +171,84 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     }
     
-   
+    func navigateToPrefrence()
+    {
+    
+        let storyBoard = UIStoryboard.storyboard(storyboard: .Profile)
+        let vc = storyBoard.instantiateViewController(withIdentifier: "PreferencesVC") as! PreferencesVC
+        vc.comeFrom=kAppDelegate
+        let nav = UINavigationController(rootViewController: vc)
+        nav.navigationBar.isHidden = true
+       // UIApplication.shared.windows.first?.layer.add(self.transition, forKey: kCATransition)
+
+        UIApplication.shared.windows.first?.rootViewController = nav
+        UIApplication.shared.windows.first?.makeKeyAndVisible()
+
+    }
+    
+    func navigateToEditProfile()
+    {
+    
+        let storyBoard = UIStoryboard.storyboard(storyboard: .Profile)
+        let vc = storyBoard.instantiateViewController(withIdentifier: "EditProfileVC") as! EditProfileVC
+        vc.comeFrom=kAppDelegate
+        let nav = UINavigationController(rootViewController: vc)
+        nav.navigationBar.isHidden = true
+       // UIApplication.shared.windows.first?.layer.add(self.transition, forKey: kCATransition)
+
+        UIApplication.shared.windows.first?.rootViewController = nav
+        UIApplication.shared.windows.first?.makeKeyAndVisible()
+
+    }
+
+    
+    func navigateToAudioCall(sendDetail:JSONDictionary)
+    {
+       let details = sendDetail["object_data"] as? JSONDictionary ?? [:]
+        
+        let storyBoard = UIStoryboard.storyboard(storyboard: .Chat)
+        let vc = storyBoard.instantiateViewController(withIdentifier: "AudioCallingVC") as! AudioCallingVC
+        vc.comeFrom=kAppDelegate
+        vc.agoraChannelName = details["chanel_name"] as? String ?? ""
+        vc.agoraToken = details["rtc_token_subscriber"] as? String ?? ""
+        vc.agoraChannelUID = details["uid_subscriber"] as? String ?? ""
+        vc.profileImageUrl = details["profile_image"] as? String ?? ""
+        vc.userName = sendDetail["from_user_name"] as? String ?? ""
+        
+        vc.uid_publish = details["uid_publish"] as? String ?? ""
+        vc.uid_subscriber = details["uid_subscriber"] as? String ?? ""
+        
+        let nav = UINavigationController(rootViewController: vc)
+        nav.navigationBar.isHidden = true
+       // UIApplication.shared.windows.first?.layer.add(self.transition, forKey: kCATransition)
+
+        UIApplication.shared.windows.first?.rootViewController = nav
+        UIApplication.shared.windows.first?.makeKeyAndVisible()
+
+    }
+    func navigateToVideoCall(sendDetail:JSONDictionary)
+    {
+       let details = sendDetail["object_data"] as? JSONDictionary ?? [:]
+        
+        let storyBoard = UIStoryboard.storyboard(storyboard: .Chat)
+        let vc = storyBoard.instantiateViewController(withIdentifier: "VideoCallingVC") as! VideoCallingVC
+        vc.comeFrom=kAppDelegate
+        vc.agoraChannelName = details["chanel_name"] as? String ?? ""
+        vc.agoraToken = details["rtc_token_subscriber"] as? String ?? ""
+        vc.agoraChannelUID = details["uid_subscriber"] as? String ?? ""
+        vc.profileImageUrl = details["profile_image"] as? String ?? ""
+        vc.userName = sendDetail["from_user_name"] as? String ?? ""
+        
+        vc.uid_publish = details["uid_publish"] as? String ?? ""
+        vc.uid_subscriber = details["uid_subscriber"] as? String ?? ""
+        let nav = UINavigationController(rootViewController: vc)
+        nav.navigationBar.isHidden = true
+       // UIApplication.shared.windows.first?.layer.add(self.transition, forKey: kCATransition)
+
+        UIApplication.shared.windows.first?.rootViewController = nav
+        UIApplication.shared.windows.first?.makeKeyAndVisible()
+
+    }
     
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.

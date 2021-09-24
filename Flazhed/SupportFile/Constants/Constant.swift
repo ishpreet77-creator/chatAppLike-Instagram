@@ -11,11 +11,13 @@ import UIKit
 
 let SCREENHEIGHT =  UIScreen.main.bounds.height
 let SCREENWIDTH =  UIScreen.main.bounds.width
+let APPSTATE = UIApplication.shared.applicationState
 
 var TOPSPACING =  CGFloat(22)
 var NAVIHEIGHT =  CGFloat(44)
 var STATUSBARHEIGHT =  CGFloat(20)
 var TOPLABELSAPACING =  CGFloat(21)
+var BLUR_ALPHA:CGFloat =  0.95
 
 var CURRENTLAT =  30.69951335
 var CURRENTLONG =  76.69104083
@@ -26,6 +28,11 @@ var COUNTRYCODE =  Locale.current.regionCode
 var CURRENTUNIT =  "Centimeters"
 
 let APPCOLOR = UIColor.init(red: 29/255, green: 121/255, blue: 255/255, alpha: 1) //
+
+let APPCOLORX = UIColor.init(red: 46/255, green: 129/255, blue: 250/255, alpha: 1)
+
+let COMMENTCOLOR = UIColor.init(red: 29/255, green: 121/255, blue: 255/255, alpha: 0.7)
+let COMMENTCOLOR2 = UIColor.init(red: 29/255, green: 121/255, blue: 255/255, alpha: 2)
 
 let APPCOLOR2 = UIColor.init(red: 5/255, green: 112/255, blue: 178/255, alpha: 1)
 let APPCOLOR3 = UIColor.init(red: 0/255, green: 105/255, blue: 162/255, alpha: 1)

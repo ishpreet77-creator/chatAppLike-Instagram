@@ -11,15 +11,15 @@ import CoreLocation
 
 class LoginVC: BaseVC {
     
-    //MARK:- All outlets  🍎
+    //MARK:- All outlets  
     @IBOutlet weak var viewButtom: UIView!
     
-    //MARK:- All Variable  🍎
+    //MARK:- All Variable  
     
     let manager = CLLocationManager()
     var currentCoutryCode = kCurrentCountryCode
     
-    //MARK:- View Lifecycle   🍎
+    //MARK:- View Lifecycle   
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,6 +33,7 @@ class LoginVC: BaseVC {
         manager.requestAlwaysAuthorization()
         manager.delegate = self
         manager.requestLocation()
+       // manager.startMonitoringSignificantLocationChanges()
         if self.getDeviceModel() == "iPhone 6"
         {
             
@@ -61,6 +62,8 @@ class LoginVC: BaseVC {
             //  self.openSettings(message: kLocation)
         }
         
+        self.clearLocalData()
+        
     }
     
     
@@ -69,12 +72,12 @@ class LoginVC: BaseVC {
         super.viewWillDisappear(true)
         GIDSignIn.sharedInstance()?.signOut()
     }
-    //MARK:- change status bar tint color 🍎
+    //MARK:- change status bar tint color 
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         .lightContent
     }
-    //MARK:- Google login button action 🍎
+    //MARK:- Google login button action 
     
     @IBAction func googleLoginAct(_ sender: Any)
     {
@@ -88,7 +91,7 @@ class LoginVC: BaseVC {
         }
         
     }
-    //MARK:- Facebook login button action 🍎
+    //MARK:- Facebook login button action 
     
     @IBAction func facebookLoginAct(_ sender: UIButton)
     {
@@ -102,37 +105,40 @@ class LoginVC: BaseVC {
         }
         
     }
-    //MARK:- phone number login button action 🍎
+    //MARK:- phone number login button action 
     
     @IBAction func phoneLoginAct(_ sender: Any)
     {
         let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)//Main
-        let vc = storyBoard.instantiateViewController(withIdentifier: "MobileVerificationVC") as! MobileVerificationVC//MobileVerificationVC ProfilePicVC AddVoiceVC
-       // vc.countryCode = self.currentCoutryCode
-        
+        let vc = storyBoard.instantiateViewController(withIdentifier: "MobileVerificationVC") as! MobileVerificationVC//MobileVerificationVC ProfilePicVC AddVoiceVC DateOfBirthVC
+      //  vc.countryCode = self.currentCoutryCode
+
         self.navigationController?.pushViewController(vc, animated: true)
-        
     }
     
-    //MARK:- Term & condition button action 🍎
+    //MARK:- Term & condition button action 
     
     @IBAction func termCondtionAct(_ sender: Any)
     {
         let storyBoard = UIStoryboard.init(name: "Account", bundle: nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "WebVC") as! WebVC
+        vc.pageTitle=kTermOfService
+        vc.pageUrl=TERM_URL
         self.navigationController?.pushViewController(vc, animated: true)
         
     }
-    //MARK:- Privacy policy button action 🍎
+    //MARK:- Privacy policy button action 
     
     @IBAction func privacyPolicyAct(_ sender: Any)
     {
         let storyBoard = UIStoryboard.init(name: "Account", bundle: nil)
         let vc = storyBoard.instantiateViewController(withIdentifier: "WebVC") as! WebVC
+        vc.pageTitle=kPrivacyPolicy
+        vc.pageUrl=Privacy_Policy_URL
         self.navigationController?.pushViewController(vc, animated: true)
         
     }
-    //MARK:- Login with facebook function 🍎
+    //MARK:- Login with facebook function 
     
     func loginWithFb()
     {
@@ -153,6 +159,7 @@ class LoginVC: BaseVC {
             data[ApiKey.kEmail] = email
             data[ApiKey.kDevicetype] = kDeviceType
             data[ApiKey.KDeviceToken] =  AppDelegate.DeviceToken
+            data[ApiKey.KVoip_device_token] = AppDelegate.VOIPDeviceToken
             self.socialLoginApi(data: data, profileName: name, profileImage: profileImageUrl)
             
             print("Api call here")
@@ -163,7 +170,7 @@ class LoginVC: BaseVC {
             Indicator.sharedInstance.hideIndicator()
         }
     }
-    //MARK:- check google Setup function 🍎
+    //MARK:- check google Setup function 
     
     func checkgoogleSetup()
     {
@@ -175,7 +182,7 @@ class LoginVC: BaseVC {
     }
     
     
-    // MARK:- user Did SignIn Google  Notification 🍎
+    // MARK:- user Did SignIn Google  Notification 
     
     @objc private func userDidSignInGoogle(_ notification: Notification) {
         if let user = GIDSignIn.sharedInstance()?.currentUser
@@ -207,7 +214,7 @@ class LoginVC: BaseVC {
             data[ApiKey.kEmail] = email
             data[ApiKey.kDevicetype] = kDeviceType
             data[ApiKey.KDeviceToken] = AppDelegate.DeviceToken
-            
+            data[ApiKey.KVoip_device_token] = AppDelegate.VOIPDeviceToken
             self.socialLoginApi(data: data, profileName: fullName, profileImage: pic)
             
             print("Api call here")
@@ -215,10 +222,18 @@ class LoginVC: BaseVC {
     }
 }
 
-//MARK:- Google facebook signin api 🍎
+//MARK:- Google facebook signin api 
 
 extension LoginVC
 {
+    
+    func clearLocalData()
+    {
+        DataManager.Selected_Gender=kEmptyString
+        DataManager.userNameType=kEmptyString
+
+        DataManager.Selected_DateOfBirth=kEmptyString
+    }
     
     func socialLoginApi(data:JSONDictionary,profileName:String,profileImage:URL?)
     {
@@ -232,7 +247,10 @@ extension LoginVC
                 
                 if (OnBoardingVM.shared.loginUserDetail?.profile_data?.username != nil)
                 {
-                    let vc = self.storyboard?.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+                    
+                    
+                   if (OnBoardingVM.shared.loginUserDetail?.more_profile_details?.bio == nil)
+                    {
                     DataManager.comeFromTag=5
                     DataManager.accessToken=OnBoardingVM.shared.loginUserDetail?.authToken ?? ""
                     DataManager.isProfileCompelete=true
@@ -247,9 +265,50 @@ extension LoginVC
                         
                         DataManager.userImage=img ?? ""
                     }
+                    DataManager.isEditProfile=false
+                   
+                                if #available(iOS 13.0, *) {
+                                    SCENEDEL?.navigateToEditProfile()
+                                } else {
+                                    // Fallback on earlier versions
+                                    APPDEL.navigateToEditProfile()
+                                }
+                    }
+                    else
+                   {
+                    let vc = self.storyboard?.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+                    DataManager.comeFromTag=5
+                    DataManager.isEditProfile=true
+                    DataManager.accessToken=OnBoardingVM.shared.loginUserDetail?.authToken ?? ""
+                    DataManager.isProfileCompelete=true
+                    DataManager.userName=OnBoardingVM.shared.loginUserDetail?.name ?? ""
+                    DataManager.Id=OnBoardingVM.shared.loginUserDetail?.id ?? ""
+                    DataManager.userId=OnBoardingVM.shared.loginUserDetail?.profile_data?.username ?? ""
+                    DataManager.userName=OnBoardingVM.shared.loginUserDetail?.profile_data?.username ?? ""
+                    let active = OnBoardingVM.shared.Swiping_Subsription_Data?.subscription_is_active ?? 0
+                    
+                    if active == 1
+                    {
+                       DataManager.purchasePlan=true
+                    }
+                    else
+                    {
+                        DataManager.purchasePlan=false
+                    }
+                    
+                    if OnBoardingVM.shared.loginUserDetail?.profile_data?.images?.count ?? 0>0
+                    {
+                        let img=OnBoardingVM.shared.loginUserDetail?.profile_data?.images?[0].image
+                        
+                        DataManager.userImage=img ?? ""
+                    }
                     
                     
                     self.navigationController?.pushViewController(vc, animated: true)
+                   }
+                    
+                    
+                 
                 }
                 else
                 {
@@ -270,7 +329,7 @@ extension LoginVC
     }
     
 }
-//MARK:- Get current location 🍎
+//MARK:- Get current location 
 
 extension LoginVC: CLLocationManagerDelegate
 {
@@ -283,14 +342,16 @@ extension LoginVC: CLLocationManagerDelegate
             CURRENTLAT=location.coordinate.latitude
             CURRENTLONG=location.coordinate.longitude
             
-            self.fetchCityAndCountry(from: location) { (city, coutry, error) in
+            self.fetchCityAndCountry(from: location) { (Country, phoneCode, error) in
                 
-                let code = coutry ?? ""
+                let code = phoneCode ?? "45"
+                let country = Country ?? "Denmark"
+                
                 let phoneCode = self.getCountryCallingCode(countryRegionCode: code)
                 
                 self.currentCoutryCode = "+"+phoneCode
                 DataManager.countryPhoneCode=self.currentCoutryCode
-                DataManager.countryName = code
+                DataManager.countryName = country
                 print(self.currentCoutryCode)
                 
             }

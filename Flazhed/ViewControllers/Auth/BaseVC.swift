@@ -10,7 +10,7 @@ import UIKit
 import Photos
 import MobileCoreServices
 import CoreTelephony
-import Quickblox
+import SDWebImage
 
 @objc protocol PickerDelegate {
     @objc optional func didSelectItem(at index: Int, item: String)
@@ -36,6 +36,11 @@ enum ScreenType: String{
     
     case shakeSent = "Shake Sent"
     case ShareStory = "Share story"
+    
+    case BlockReportError = "Block Report Error"
+    case GrayOut = "User time gray out"
+    case GrayOut48Hrs = "User time gray out after 48 hrs"
+    case onceContinue = "One user cotinue chat"
 }
 
 class BaseVC: UIViewController {
@@ -55,18 +60,31 @@ class BaseVC: UIViewController {
     //MARK:- Class Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        datePickerView.locale = Locale(identifier: "en_US_POSIX")
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-       
+        
+        if !DataManager.isViewProfile
+        {
+            DataManager.isViewProfile=true
+            NotificationCenter.default.addObserver(self, selector: #selector(self.methodOfReceivedNotification(notification:)), name: Notification.Name("ViewProfileNotification"), object: nil)
+        }
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        //self.updateLocationAPI()
         let naviHeight = self.navigationController?.navigationBar.frame.height ?? 44
         NAVIHEIGHT = naviHeight
         STATUSBARHEIGHT = getStatusBarHeight()
         self.becomeFirstResponder()
+        self.selfJoinSocketEmit2()
     }
-    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+
+       
+    }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
     }
@@ -77,6 +95,27 @@ class BaseVC: UIViewController {
         URLCache.shared.removeAllCachedResponses()
         URLCache.shared.memoryCapacity = 0
         URLCache.shared.diskCapacity = 0
+        SDImageCache.shared.clearMemory()
+        SDImageCache.shared.clearDisk()
+    }
+    
+    func showToastMessage(_ ToastMessage:String=kSucess)
+    {
+        print("Toast call  = \(ToastMessage)")
+        var style = ToastStyle()
+        style.messageColor = .white
+        self.view.makeToast(ToastMessage, duration: 2.0, position: .center, style: style)
+
+    }
+    
+    func ClearMemory()
+    {
+        debugPrint("********** MEMORY Clear **********")
+        URLCache.shared.removeAllCachedResponses()
+        URLCache.shared.memoryCapacity = 0
+        URLCache.shared.diskCapacity = 0
+        SDImageCache.shared.clearMemory()
+        SDImageCache.shared.clearDisk()
     }
 }
 
@@ -130,9 +169,10 @@ extension BaseVC {
         if showBack
         {
             let backButton = UIButton()
+          
             let backImage = UIImageView()
             
-            backButton.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+            backButton.frame = CGRect(x: 0, y: 0, width: 90, height: 90)
             backImage.frame = CGRect(x: 40, y: naviHeight/2-13, width: 18, height: 18)
             backImage.image = #imageLiteral(resourceName: "BackArrow")
             backImage.contentMode = .scaleAspectFit
@@ -532,29 +572,18 @@ extension BaseVC {
         }
     }
     
-    func openSettings(message:String)
+    func openSettings(message:String = kSettingMessage)
     {
         
-        let alertController = UIAlertController (title: kAlert, message: message, preferredStyle: .alert)
-
-           let settingsAction = UIAlertAction(title: "Ok", style: .default) { (_) -> Void in
-
-               guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
-                   return
-               }
-
-               if UIApplication.shared.canOpenURL(settingsUrl) {
-                   UIApplication.shared.open(settingsUrl, completionHandler: { (success) in
-                       print("Settings opened: \(success)") // Prints true
-                   })
-               }
-           }
-        let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: nil)
-        alertController.addAction(cancelAction)
-           alertController.addAction(settingsAction)
-           
-
-           present(alertController, animated: true, completion: nil)
+        DispatchQueue.main.async {
+        let story = UIStoryboard(name: kAccount, bundle: nil)
+        
+        let vc = story.instantiateViewController(withIdentifier: "DeleteAccountPopUpVC") as! DeleteAccountPopUpVC
+        vc.comeFrom = kSetting
+        vc.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+        vc.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+        self.present(vc, animated: true, completion: nil)
+        }
     }
     
     
@@ -595,43 +624,63 @@ extension BaseVC {
             let code = (error! as NSError).code
             if  code == 401 || code == 451
             {
-                self.openAlert(title: kAlert,
-                                         message: message,
-                                         alertStyle: .alert,
-                                         actionTitles: ["Ok"],
-                                         actionStyles: [.default, .default],
-                                         actions: [
-                    
-                                           { [self]_ in
-                                                  
-                                               print("okay click")
-                                            if #available(iOS 13.0, *) {
-                                                DataManager.comeFrom = ""
-                                                DataManager.isProfileCompelete = false
-                                                 DataManager.accessToken = ""
-                                                SCENEDEL?.navigateToLogin()
-                                            } else {
-                                                // Fallback on earlier versions
-                                                DataManager.comeFrom = ""
-                                                DataManager.isProfileCompelete = false
-                                                 DataManager.accessToken = ""
-                                                APPDEL.navigateToLogin()
-                                            }
-                                          
-                                               
-                                             }
-                                        ])
+//                self.openAlert(title: kAlert,
+//                                         message: message,
+//                                         alertStyle: .alert,
+//                                         actionTitles: ["Ok"],
+//                                         actionStyles: [.default, .default],
+//                                         actions: [
+//
+//                                           { [self]_ in
+//                                            DataManager.ShakeId = ""
+//                                               print("okay click")
+//                                            if #available(iOS 13.0, *) {
+//                                                DataManager.comeFrom = ""
+//                                                DataManager.isProfileCompelete = false
+//                                                 DataManager.accessToken = ""
+//                                                SCENEDEL?.navigateToLogin()
+//                                            } else {
+//                                                // Fallback on earlier versions
+//                                                DataManager.comeFrom = ""
+//                                                DataManager.isProfileCompelete = false
+//                                                 DataManager.accessToken = ""
+//                                                APPDEL.navigateToLogin()
+//                                            }
+//
+//
+//                                             }
+//                                        ])
                 
                 // self.appDelegate?.navigateToHome()
                  // DataManager.userType = ""
                  // DataManager.accessToken = ""
+                
+                let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
+                let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                destVC.type = .BlockReportError
+                destVC.user_name=message
+                destVC.errorCode=code
+                destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+                destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+
+                self.present(destVC, animated: true, completion: nil)
+                
               
             }
            else
             {
                 
-                self.openSimpleAlert(message: message)
+              //  self.openSimpleAlert(message: message)
                
+                let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
+                let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                destVC.type = .BlockReportError
+                destVC.user_name=message
+                destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+                destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+
+                self.present(destVC, animated: true, completion: nil)
+                
             }
         
     }
@@ -748,6 +797,52 @@ extension BaseVC {
         })
         return labelText
     }
+    
+    //MARK:- Open on notiifcation
+    
+    @objc func methodOfReceivedNotification(notification: Notification) {
+        //let id =  self.HangoutListArray[sender.tag].user_id ?? ""
+        var pushed = false
+        print("Pushed = \(pushed)")
+        if !pushed
+        {
+        if let details = notification.userInfo as? [String:Any]
+        {
+            pushed = true
+            if let nav = self.navigationController
+            {
+                print("Navi true")
+                let storyBoard = UIStoryboard.init(name: "Home", bundle: nil)
+                let vc = storyBoard.instantiateViewController(withIdentifier: "ViewProfileVC") as! ViewProfileVC
+//                    vc.view_user_id = dict["view_user_id"] as? String ?? ""
+//                    vc.likeMode=dict["likeMode"] as? String ?? ""
+//                vc.story_id=dict["story_id"] as? String ?? ""
+//                vc.hangout_id=dict["hangout_id"] as? String ?? ""
+                
+                
+               // let Noti_type = details["noti_type"] as? String ?? ""
+                
+                DataManager.comeFrom = kEmptyString
+                vc.view_user_id  = details["from_user_id"] as? String ?? ""
+                
+                vc.likeMode = details["like_mode"] as? String ?? ""
+                vc.story_id = details["story_id"] as? String ?? ""
+                vc.hangout_id = details["hangout_id"] as? String ?? ""
+              
+                vc.comeFrom = kBaseVC
+                nav.pushViewController(vc, animated: true)
+            }
+            else
+            {
+                print("Navi false")
+                DataManager.comeFrom = kEmptyString
+                APPDEL.openHangoutDetails(details: details)
+               
+            }
+        }
+        }
+   
+    }
 }
 
 
@@ -819,6 +914,7 @@ extension BaseVC: UIPickerViewDelegate,UIPickerViewDataSource {
         datePickerView.backgroundColor = UIColor.lightGray
         datePickerView.maximumDate = maximunDate
         datePickerView.minimumDate = minimumDate
+        datePickerView.locale = Locale(identifier: "en_US_POSIX")
         datePickerView.addTarget(self, action: #selector(self.didDatePickerViewValueChanged(sender:)), for: .valueChanged)
         
         
@@ -1137,13 +1233,14 @@ extension BaseVC
     func isImageAppropriate(dataImage:Data,successCallback: @escaping JSONDictionaryResponseCallback)
     {
         var isAppropriate=false
-        
+        if Connectivity.isConnectedToInternet {
+
         APIManager.callApiForImageCheck(image1: dataImage,imageParaName1: kMedia, api: "",successCallback: {
             
             (responseDict) in
             print(responseDict)
            
-            if responseDict[ApiKey.kStatus] as? String == kSucess
+            if kSucess.equalsIgnoreCase(string: responseDict[ApiKey.kStatus] as? String ?? "")//responseDict[ApiKey.kStatus] as? String == kSucess
             {
               
              let data =   self.parseImageCheckData(response: responseDict)
@@ -1195,28 +1292,116 @@ extension BaseVC
             print(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
             
         })
-        
+        } else {
+            
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
       //  return isAppropriate
     }
     
-    //MARK: - Connect/Disconnect
-    func connect(completion: QBChatCompletionBlock? = nil) {
-        let currentUser = Profile()
-        
-        guard currentUser.isFull == true else {
-            completion?(NSError(domain: LoginConstant.chatServiceDomain,
-                                code: LoginConstant.errorDomaimCode,
-                                userInfo: [
-                                    NSLocalizedDescriptionKey: "Please enter your login and username."
-                ]))
-            return
+    
+    func getAspectRatioAccordingToiPhones(cellImageFrame:CGSize,downloadedImage: UIImage)->CGFloat {
+            let widthOffset = downloadedImage.size.width - cellImageFrame.width
+            let widthOffsetPercentage = (widthOffset*100)/downloadedImage.size.width
+            let heightOffset = (widthOffsetPercentage * downloadedImage.size.height)/100
+            let effectiveHeight = downloadedImage.size.height - heightOffset
+            return(effectiveHeight)
         }
-        if QBChat.instance.isConnected == true {
-            completion?(nil)
+    
+    func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage {
+        let size = image.size
+
+        let widthRatio  = targetSize.width  / size.width
+        let heightRatio = targetSize.height / size.height
+
+        // Figure out what our orientation is, and use that to form the rectangle
+        var newSize: CGSize
+        if(widthRatio > heightRatio) {
+            newSize = CGSize(width: size.width * heightRatio, height: size.height * heightRatio)
         } else {
-            QBSettings.autoReconnectEnabled = true
-            QBChat.instance.connect(withUserID: currentUser.ID, password: currentUser.password, completion: completion)
+            newSize = CGSize(width: size.width * widthRatio,  height: size.height * widthRatio)
         }
+
+        // This is the rect that we've calculated out and this is what is actually used below
+        let rect = CGRect(x: 0, y: 0, width: newSize.width, height: newSize.height)
+
+        // Actually do the resizing to the rect using the ImageContext stuff
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+        image.draw(in: rect)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return newImage ?? UIImage()
+    }
+    
+    func showImageCheckLoader(vc:UIViewController)
+    {
+    
+    let alert = UIAlertController(title: nil, message: "Image content checking...", preferredStyle: .alert)
+    let activityIndicator = UIActivityIndicatorView(style: .gray)
+    activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+    activityIndicator.isUserInteractionEnabled = false
+    activityIndicator.startAnimating()
+
+    alert.view.addSubview(activityIndicator)
+    alert.view.heightAnchor.constraint(equalToConstant: 95).isActive = true
+
+    activityIndicator.centerXAnchor.constraint(equalTo: alert.view.centerXAnchor, constant: 0).isActive = true
+    activityIndicator.bottomAnchor.constraint(equalTo: alert.view.bottomAnchor, constant: -20).isActive = true
+
+        vc.present(alert, animated: true)
     }
     
  }
+
+//MARK:-Socket method
+
+extension BaseVC
+{
+    func selfJoinSocketEmit2()
+    {
+        if DataManager.Id != kEmptyString
+        {
+            let JoinDict = ["selfUserId":DataManager.Id]
+            SocketIOManager.shared.selfJoinSocket(MessageChatDict: JoinDict)
+            self.selfJoinSocketON2()
+        }
+       
+    }
+    func selfJoinSocketON2()
+    {
+        SocketIOManager.shared.socket.on("online", callback: { (data, error) in
+            
+            print("online = \(data) \(error)")
+        })
+        
+    }
+}
+//extension BaseVC
+//{
+//    func updateLocationAPI()
+//    {
+//        var data = JSONDictionary()
+//        
+//        data[ApiKey.kLatitude] = CURRENTLAT
+//        data[ApiKey.kLongitude] = CURRENTLONG
+//        
+//        if Connectivity.isConnectedToInternet {
+//            
+//            self.callApiForUpdateLatLong(data: data)
+//        } else {
+//            
+//            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+//        }
+//        
+//    }
+//    
+//    func callApiForUpdateLatLong(data:JSONDictionary)
+//    {
+//        HomeVM.shared.callApiForUpdateUserLatLong(showIndiacter: false, data: data, response: { (message, error) in
+//            print("Location update api = \(message)")
+//            
+//        })
+//    }
+//    
+//}

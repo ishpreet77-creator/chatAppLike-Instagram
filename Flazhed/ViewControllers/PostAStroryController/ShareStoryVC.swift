@@ -35,11 +35,19 @@
             super.viewDidLoad()
             
            
-            txtShare.text = ""
-            txtShare.becomeFirstResponder()
+            if self.getDeviceModel() == "iPhone 6"
+            {
+                IQKeyboardManager.shared.enableAutoToolbar = false
+                
+            }
+            else
+            {
+                IQKeyboardManager.shared.enableAutoToolbar = false
+            }
+         
             
-            IQKeyboardManager.shared.enableAutoToolbar = true
-            if self.comeFrom == kVideo
+            
+            if self.comeFrom.equalsIgnoreCase(string: "video")
             {
                 
                 
@@ -74,6 +82,9 @@
             {
                 btnShare.isEnabled=false
             }
+            
+            txtShare.text = ""
+            txtShare.becomeFirstResponder()
         }
         
         override func viewWillDisappear(_ animated: Bool) {
@@ -100,9 +111,9 @@
             let destVC = storyboard.instantiateViewController(withIdentifier: "StoryDiscardVC") as!  StoryDiscardVC
             destVC.delegate=self
             destVC.type = .discardPost
-            if self.comeFrom == kVideo
+            if self.comeFrom.equalsIgnoreCase(string: "video")
             {
-            destVC.postType = "Video"
+            destVC.postType = kVideo
             }
             else
             {
@@ -124,10 +135,23 @@
         
         //MARK:- popup delegate method
         
+        func showFacebookInstallPopup()
+        {
+            let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
+            let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+            destVC.delegate=self
+            destVC.type = .BlockReportError
+            destVC.user_name=kInstallFacebookAlert
+            destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+            destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+
+            self.present(destVC, animated: true, completion: nil)
+        }
+        
         func ClickNameAction(name: String)
         {
             
-            if name == kDiscard
+            if name.equalsIgnoreCase(string: kDiscard)
             {
               //  self.navigationController?.popViewController(animated: true)
                 let storyBoard = UIStoryboard.init(name: "Stories", bundle: nil)
@@ -135,23 +159,29 @@
                 vc.selectedIndex = self.selectedIndex
                 self.navigationController?.pushViewController(vc, animated: false)
             }
-            else if name == kCancel
+            else if name.equalsIgnoreCase(string: kCancel)
             {
                 self.dismiss(animated: true) {
-                    if #available(iOS 13.0, *) {
-                        SCENEDEL?.navigateToStories()
-                    } else {
-                        // Fallback on earlier versions
-                        APPDEL.navigateToStories()
-                    }
+//                    if #available(iOS 13.0, *) {
+//                        SCENEDEL?.navigateToStories()
+//                    } else {
+//                        // Fallback on earlier versions
+//                        APPDEL.navigateToStories()
+//                    }
+                    
+                    let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
+                    let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+                    vc.selectedIndex=1
+                    self.navigationController?.pushViewController(vc, animated: true)
+
                 }
                 
 
             }
-            else if name == kShare
+            else if name.equalsIgnoreCase(string: kShare)
             {
                 self.dismiss(animated: true) {
-                    if self.comeFrom == kVideo
+                    if self.comeFrom.equalsIgnoreCase(string: "video")
                      {
                         Indicator.sharedInstance.showIndicator()
                             let content: ShareVideoContent = ShareVideoContent()
@@ -180,21 +210,30 @@
                            
                         } else {
                             Indicator.sharedInstance.hideIndicator()
-                                    
+                            
+                            
+                            self.showFacebookInstallPopup()
+                            
+                                    /*
                                     self.openAlert(title: kAlert,message: kInstallFacebookAlert,alertStyle: .alert,actionTitles: [kOk],actionStyles: [.default],
                                                    actions: [
                                                     {_ in
                                                         
-                                                        if #available(iOS 13.0, *) {
-                                                            
-                                                            SCENEDEL?.navigateToStories()
-                                                        } else {
-                                                            // Fallback on earlier versions
-                                                            APPDEL.navigateToStories()
-                                                        }
+//                                                        if #available(iOS 13.0, *) {
+//
+//                                                            SCENEDEL?.navigateToStories()
+//                                                        } else {
+//                                                            // Fallback on earlier versions
+//                                                            APPDEL.navigateToStories()
+//                                                        }
+                                                        let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
+                                                        let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+                                                        vc.selectedIndex=1
+                                                        self.navigationController?.pushViewController(vc, animated: true)
                                                     }
                                                     
                                                    ])
+                            */
                                 }
                                         
                         }
@@ -215,22 +254,19 @@
                         if (showDialog.canShow) {
                             showDialog.show()
                         } else {
-                            
-                            
+                            self.showFacebookInstallPopup()
+                            /*
                             self.openAlert(title: kAlert,message: kInstallFacebookAlert,alertStyle: .alert,actionTitles: [kOk],actionStyles: [.default],
                                            actions: [
                                             {_ in
-                                                
-                                                if #available(iOS 13.0, *) {
-                                                    
-                                                    SCENEDEL?.navigateToStories()
-                                                } else {
-                                                    // Fallback on earlier versions
-                                                    APPDEL.navigateToStories()
-                                                }
+                                                let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
+                                                let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+                                                vc.selectedIndex=1
+                                                self.navigationController?.pushViewController(vc, animated: true)
                                             }
                                             
                                            ])
+                            */
                         }
                     }
                 }
@@ -266,6 +302,7 @@
             } else {
                 keyboardHeight = keyboardFrame.cgRectValue.height
             }
+            print(keyboardHeight)
             if self.getDeviceModel() == "iPhone 6"
             {
                 btnButtomConst.constant = keyboardHeight+26
@@ -348,7 +385,7 @@
             data[ApiKey.kPost_text] = self.txtShare.text!
             var imageData = Data()
             var imageData2 = Data()
-            if self.comeFrom == kVideo
+            if self.comeFrom.equalsIgnoreCase(string: "video")
             {
                 
                 do{
@@ -356,7 +393,41 @@
                 }catch{
                     print("Unable to load audioData: \(error)")
                 }
+             //   imageData2 = Data() //self.storyImg.image?.jpegData(compressionQuality: 1) ?? Data()
+                
+                let dataImage1 =  self.storyImg.image?.jpegData(compressionQuality: 1) ?? Data()
+                var imageSize1: Int = dataImage1.count
+                let size = Double(imageSize1) / 1000.0
+                //var  dataImage = Data()
+                if size>1500
+                {
+                    imageData2 =  self.storyImg.image?.jpegData(compressionQuality: 0.03) ?? Data()
+                }
+                else if size>1000
+                {
+                    imageData2 =  self.storyImg.image?.jpegData(compressionQuality: 0.04) ?? Data()
+                }
+                
+                else if size>500
+                {
+                    imageData2 =  self.storyImg.image?.jpegData(compressionQuality: 0.05) ?? Data()
+                }
+              else if size>100
+               {
+                imageData2 =  self.storyImg.image?.jpegData(compressionQuality: 0.2) ?? Data()
+               }
+              else if size>50
+               {
+                imageData2 =  self.storyImg.image?.jpegData(compressionQuality: 0.5) ?? Data()
+               }
+                else
+               {
                 imageData2 =  self.storyImg.image?.jpegData(compressionQuality: 0.7) ?? Data()
+               }
+                
+                
+                
+                
                 if Connectivity.isConnectedToInternet
                 {
                     
@@ -369,7 +440,38 @@
             else
             {
                 
+                imageData =  self.storyImg.image?.jpegData(compressionQuality: 1) ?? Data()
+                
+                let dataImage1 =  self.storyImg.image?.jpegData(compressionQuality: 1) ?? Data()
+                var imageSize1: Int = dataImage1.count
+                let size = Double(imageSize1) / 1000.0
+                //var  dataImage = Data()
+                if size>1500
+                {
+                    imageData =  self.storyImg.image?.jpegData(compressionQuality: 0.03) ?? Data()
+                }
+                else if size>1000
+                {
+                    imageData =  self.storyImg.image?.jpegData(compressionQuality: 0.04) ?? Data()
+                }
+                
+                else if size>500
+                {
+                    imageData =  self.storyImg.image?.jpegData(compressionQuality: 0.05) ?? Data()
+                }
+              else if size>100
+               {
+                imageData =  self.storyImg.image?.jpegData(compressionQuality: 0.2) ?? Data()
+               }
+              else if size>50
+               {
+                imageData =  self.storyImg.image?.jpegData(compressionQuality: 0.5) ?? Data()
+               }
+                else
+               {
                 imageData =  self.storyImg.image?.jpegData(compressionQuality: 0.7) ?? Data()
+               }
+                
                 if Connectivity.isConnectedToInternet
                 {
                     
@@ -392,7 +494,7 @@
                 (responseDict) in
                 print(responseDict)
                 
-                if responseDict[ApiKey.kStatus] as? String == kSucess
+                if  kSucess.equalsIgnoreCase(string: responseDict[ApiKey.kStatus] as? String ?? "")
                 {
                     let storyboard: UIStoryboard = UIStoryboard(name: "Stories", bundle: Bundle.main)
                     let destVC = storyboard.instantiateViewController(withIdentifier: "StoryDiscardVC") as!  StoryDiscardVC
@@ -538,14 +640,19 @@
                 else
                 {
                     let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+                    self.dismiss(animated: true) {
                     self.openSimpleAlert(message: message)
+                    }
                 }
                 
                 
                 
             },  failureCallback: { (errorReason, error) in
-                print(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
-                self.navigationController?.popViewController(animated: true)
+                self.dismiss(animated: true) {
+                    print(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+                    self.navigationController?.popViewController(animated: true)
+                }
+               
             })
         }
         
@@ -557,13 +664,17 @@
             print(#function)
             print(results)
             
-            if #available(iOS 13.0, *) {
-                
-                SCENEDEL?.navigateToStories()
-            } else {
-                // Fallback on earlier versions
-                APPDEL.navigateToStories()
-            }
+//            if #available(iOS 13.0, *) {
+//
+//                SCENEDEL?.navigateToStories()
+//            } else {
+//                // Fallback on earlier versions
+//                APPDEL.navigateToStories()
+//            }
+            let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
+            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+            vc.selectedIndex=1
+            self.navigationController?.pushViewController(vc, animated: true)
 
         }
         
@@ -572,26 +683,35 @@
             print(#function)
             
             print(error.localizedDescription)
-            if #available(iOS 13.0, *) {
-                
-                SCENEDEL?.navigateToStories()
-            } else {
-                // Fallback on earlier versions
-                APPDEL.navigateToStories()
-            }
+//            if #available(iOS 13.0, *) {
+//
+//                SCENEDEL?.navigateToStories()
+//            } else {
+//                // Fallback on earlier versions
+//                APPDEL.navigateToStories()
+//            }
+            
+            let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
+            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+            vc.selectedIndex=1
+            self.navigationController?.pushViewController(vc, animated: true)
         }
         
         func sharerDidCancel(_ sharer: Sharing)
         {
             print(#function)
             
-            if #available(iOS 13.0, *) {
-                
-                SCENEDEL?.navigateToStories()
-            } else {
-                // Fallback on earlier versions
-                APPDEL.navigateToStories()
-            }
+//            if #available(iOS 13.0, *) {
+//
+//                SCENEDEL?.navigateToStories()
+//            } else {
+//                // Fallback on earlier versions
+//                APPDEL.navigateToStories()
+//            }
+            let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
+            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+            vc.selectedIndex=1
+            self.navigationController?.pushViewController(vc, animated: true)
         }
         
         func createAssetURL(url: URL, completion: @escaping (String) -> Void) {
@@ -632,3 +752,17 @@
         
     }
     
+extension ShareStoryVC:FeedbackAlertDelegate
+    {
+        func FeedbackAlertOkFunc(name: String)
+        {
+         if name == kInstallFacebookAlert
+         {
+            let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
+            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+            vc.selectedIndex=1
+            self.navigationController?.pushViewController(vc, animated: true)
+         }
+        
+        }
+    }

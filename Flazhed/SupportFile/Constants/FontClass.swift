@@ -52,6 +52,7 @@ struct AppFontName {
     static let Semibold = "Averta-Semibold"
     static let bold = "Averta-Bold"
     static let italic = "Averta-RegularItalic"
+    static let Light = "Averta-Light"
 }
 
 extension UIFontDescriptor.AttributeName {

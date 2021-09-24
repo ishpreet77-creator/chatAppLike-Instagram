@@ -10,6 +10,7 @@ struct HangoutListDM
 {
     var hangout_details:HangoutDataModel?
     var is_liked_by_other_user_id:Int?
+    var hangout_like_by_self:Int?
     var is_liked_by_self_user:Int?
     var like_dislike:Like_DisLike_Model?
     var more_profile_details:MoreProfileDataModel?
@@ -26,8 +27,21 @@ struct HangoutListDM
         self.unit_settings = unitDataModel.init(detail: (detail["unit_settings"] as? JSONDictionary) ?? [:])
         self.is_liked_by_other_user_id = detail["is_liked_by_other_user_id"] as? Int
         self.is_liked_by_self_user = detail["is_liked_by_self_user"] as? Int
-        
+        self.hangout_like_by_self = detail["hangout_like_by_self"] as? Int
         self.user_id = detail["user_id"] as? String
         
     }
+}
+
+
+struct HangoutListTypeModel
+{
+    var type:CellType?
+    var hangoutData:HangoutListDM?
+}
+
+enum CellType {
+    case hangoutList
+    case storyList
+    case ads
 }

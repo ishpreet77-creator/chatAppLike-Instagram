@@ -9,6 +9,7 @@ import UIKit
 
 class MyHangoutTCell: UITableViewCell {
 
+    @IBOutlet weak var imgHeightConst: NSLayoutConstraint!
     @IBOutlet weak var lblEdit: UILabel!
     @IBOutlet weak var btnLocation: UIButton!
     @IBOutlet weak var txtDesc: UITextView!
@@ -28,11 +29,17 @@ class MyHangoutTCell: UITableViewCell {
     @IBOutlet weak var imgTraveler: UIImageView!
     @IBOutlet weak var imgSocial: UIImageView!
     @IBOutlet weak var imgSocila: UIImageView!
-    
+    @IBOutlet weak var lmgLocation: UIImageView!
+    @IBOutlet weak var imgCalender: UIImageView!
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        
+        self.lblLocation.textColor=UIColor.darkGray
+        self.lblDateTime.textColor=UIColor.darkGray
+        self.imgCalender.image = self.imgCalender.image?.tinted(color: UIColor.darkGray)
+        self.lmgLocation.image = self.lmgLocation.image?.tinted(color: UIColor.darkGray)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

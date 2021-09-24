@@ -13,11 +13,24 @@ class ASVideoContainer {
     var playOn: Bool {
         didSet {
             player.isMuted = ASVideoPlayerController.sharedVideoPlayer.mute
+            
+//            if player.isMuted
+//            {
+//                player.volume = 0.0
+//            }
+//            else
+//            {
+//                player.volume = 1.0
+//                //playOn=true
+//            }
+           
             playerItem.preferredPeakBitRate = ASVideoPlayerController.sharedVideoPlayer.preferredPeakBitRate
             if playOn && playerItem.status == .readyToPlay {
+                
                 player.play()
             }
             else{
+             
                 player.pause()
             }
         }
@@ -30,6 +43,15 @@ class ASVideoContainer {
         self.player = player
         self.playerItem = item
         self.url = url
-        playOn = false
+        playOn = true
+         
+      //  NotificationCenter.default.addObserver(self, selector: #selector(self.storyAudioStopedReceivedNotification(notification:)), name: Notification.Name("PauseVideo"), object: nil)
+        
+        player.automaticallyWaitsToMinimizeStalling = false//item.isPlaybackBufferEmpty
+    }
+    
+    @objc func storyAudioStopedReceivedNotification(notification: Notification)
+    {
+        self.player.pause()
     }
 }

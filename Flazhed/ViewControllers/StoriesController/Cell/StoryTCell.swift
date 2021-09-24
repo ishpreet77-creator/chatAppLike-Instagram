@@ -10,7 +10,13 @@ import AVKit
 import AVFoundation
 
 class StoryTCell: UITableViewCell, ASAutoPlayVideoLayerContainer {
+    
+    
+    @IBOutlet weak var btnShare: UIButton!
+    @IBOutlet weak var lblShare: UILabel!
+    @IBOutlet weak var viewShare: UIView!
     @IBOutlet weak var viewTop: UIView!
+    @IBOutlet weak var imgHeightConst: NSLayoutConstraint!
     
     @IBOutlet weak var topViewHeightConst: NSLayoutConstraint!
     
@@ -55,6 +61,8 @@ class StoryTCell: UITableViewCell, ASAutoPlayVideoLayerContainer {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+//        self.imgStory.backgroundColor = UIColor.white
+//        self.viewPlayer.backgroundColor = UIColor.white
         
 //        NotificationCenter.default.addObserver(self, selector: #selector(self.methodOfReceivedNotification(notification:)), name: Notification.Name("StopVideo"), object: nil)
 
@@ -91,11 +99,11 @@ class StoryTCell: UITableViewCell, ASAutoPlayVideoLayerContainer {
         
         // Initialization code
         
-        imgStory.layer.cornerRadius = 5
+        imgStory.layer.cornerRadius = 0
         imgStory.backgroundColor = UIColor.gray.withAlphaComponent(0.7)
         imgStory.clipsToBounds = true
-        imgStory.layer.borderColor = UIColor.gray.withAlphaComponent(0.3).cgColor
-        imgStory.layer.borderWidth = 0.5
+        imgStory.layer.borderColor = UIColor.gray.withAlphaComponent(0.2).cgColor
+        imgStory.layer.borderWidth = 0.0
         videoLayer.backgroundColor = UIColor.clear.cgColor
         videoLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
         imgStory.layer.addSublayer(videoLayer)

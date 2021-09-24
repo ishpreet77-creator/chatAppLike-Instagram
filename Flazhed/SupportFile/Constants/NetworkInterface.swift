@@ -105,6 +105,7 @@ extension APIService {
             self.jsonRequest(showIndiacter:showIndiacter,jsonSuccess: { (responseSuccess) in
                 success(responseSuccess)
             }, jsonFailure: { (errorReason, error) in
+                Indicator.sharedInstance.hideIndicator()
                 failure(errorReason, error)
             })
         }
@@ -112,6 +113,8 @@ extension APIService {
             self.requestNormal(showIndiacter:showIndiacter,normalSuccess: { (responseSuccess) in
                 success(responseSuccess)
             }, normalFailure: { (errorReason, error) in
+                Indicator.sharedInstance.hideIndicator()
+
                 failure(errorReason, error)
             })
         }
@@ -150,6 +153,8 @@ extension APIService {
                 success(responseSuccess)
             }, responseFailure: { (errorReason, error) in
                 failure(errorReason, error)
+                Indicator.sharedInstance.hideIndicator()
+
             })
         })
     }
@@ -253,6 +258,8 @@ extension APIService {
                 normalSuccess(success)
             }, responseFailure: { (errorReason, error) in
                 normalFailure(errorReason, error)
+                Indicator.sharedInstance.hideIndicator()
+
             })
         })
     }
@@ -397,11 +404,11 @@ extension APIService {
     
     func handleResponse(response: AFDataResponse<Any>, responseSuccess: @escaping APIServiceSuccessCallback, responseFailure: @escaping APIServiceFailureCallback) {
         
-        //Show Response Details
-        print("*** API RESPONSE START ***")
-        print("\(response))")
-        print("*** API RESPONSE END ***")
-        
+//        //Show Response Details
+//        print("*** API RESPONSE START ***")
+//        print("\(response))")
+//        print("*** API RESPONSE END ***")
+//
         
         let code  = response.response?.statusCode ?? 0
         print("*** API RESPONSE CODE: \(code) ***")
@@ -514,7 +521,9 @@ public class Indicator {
         self.blurImg.removeFromSuperview()
         self.indicator.removeFromSuperview()
     }
-    
+    func hideImageLoader(VC:UIViewController?){
+        VC?.dismiss(animated: true, completion: nil)
+    }
     
 }
 

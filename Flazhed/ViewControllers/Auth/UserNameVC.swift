@@ -25,7 +25,7 @@ class UserNameVC: BaseVC {
         
         // Do any additional setup after loading the view.
         setUpUI()
-        self.txtUserName.text = userName
+       
         
        // self.txtUserName.autocapitalizationType = .words
     }
@@ -33,13 +33,13 @@ class UserNameVC: BaseVC {
     func setUpUI()
     {
         let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: lblOtpSent.text ?? "")
-        attributedString.setColorForText(textForAttribute: "A real name helps other users ", withColor: UIColor.black)
-        attributedString.setColorForText(textForAttribute: "trust", withColor: TEXTCOLOR)
-        attributedString.setColorForText(textForAttribute: " you.", withColor: UIColor.black)
+        attributedString.setColorForText(textForAttribute: kARealName, withColor: UIColor.black)
+        attributedString.setColorForText(textForAttribute: kTrust, withColor: TEXTCOLOR)
+        attributedString.setColorForText(textForAttribute: kYou, withColor: UIColor.black)
 
         lblOtpSent.attributedText = attributedString
         
-        self.setCustomHeader(title: "Username", showBack: true, showMenuButton: false)
+        self.setCustomHeader(title: kUsername, showBack: true, showMenuButton: false)
         
         if self.getDeviceModel() == "iPhone 6"
         {
@@ -55,8 +55,13 @@ class UserNameVC: BaseVC {
         }
         
     
-        txtUserName.attributedPlaceholder = NSAttributedString(string:"Name", attributes:[NSAttributedString.Key.foregroundColor: PLACEHOLDERCOLOR,NSAttributedString.Key.font :UIFont(name: AppFontName.regular, size: 18)!])
+        txtUserName.attributedPlaceholder = NSAttributedString(string:kName, attributes:[NSAttributedString.Key.foregroundColor: PLACEHOLDERCOLOR,NSAttributedString.Key.font :UIFont(name: AppFontName.regular, size: 18)!])
         txtUserName.delegate=self
+        self.txtUserName.text = userName
+        if DataManager.userNameType != kEmptyString
+        {
+            self.txtUserName.text=DataManager.userNameType
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -92,6 +97,7 @@ class UserNameVC: BaseVC {
             let vc = self.storyboard?.instantiateViewController(withIdentifier: "DateOfBirthVC") as! DateOfBirthVC
             vc.imageArray1=self.imageArray1
             vc.userName=self.txtUserName.text!
+            DataManager.userNameType=self.txtUserName.text!
             
             self.navigationController?.pushViewController(vc, animated: true)
         }

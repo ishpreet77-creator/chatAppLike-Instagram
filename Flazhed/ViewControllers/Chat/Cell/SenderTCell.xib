@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -25,35 +25,42 @@
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ew1-wB-lcE">
                         <rect key="frame" x="0.0" y="0.0" width="403" height="238"/>
                         <subviews>
-                            <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="chatBG" translatesAutoresizingMaskIntoConstraints="NO" id="Aje-x1-DXs">
+                            <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Aje-x1-DXs">
                                 <rect key="frame" x="0.0" y="0.0" width="403" height="238"/>
                             </imageView>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="enr-Vr-bVH">
-                                <rect key="frame" x="280" y="8" width="115" height="222"/>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="enr-Vr-bVH" customClass="SenderBubbleView" customModule="Flazhed" customModuleProvider="target">
+                                <rect key="frame" x="273" y="2" width="122" height="234"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12123 12 424 " textAlignment="right" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y3E-De-79B">
-                                        <rect key="frame" x="8" y="8" width="91" height="199"/>
+                                        <rect key="frame" x="15" y="8" width="91" height="206"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="16"/>
                                         <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="F0i-F3-Rkj">
+                                        <rect key="frame" x="16" y="8" width="90" height="200"/>
+                                    </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="10:30 PM" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="0xm-zU-M3X">
-                                        <rect key="frame" x="8" y="209" width="99" height="10"/>
+                                        <rect key="frame" x="8" y="216" width="99" height="10"/>
                                         <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="10"/>
                                         <color key="textColor" red="0.69019607839999997" green="0.72549019609999998" blue="0.7843137255" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstItem="0xm-zU-M3X" firstAttribute="leading" secondItem="enr-Vr-bVH" secondAttribute="leading" constant="8" id="1cM-Xo-TuN"/>
                                     <constraint firstAttribute="trailing" secondItem="y3E-De-79B" secondAttribute="trailing" constant="16" id="QMi-Ea-eES"/>
-                                    <constraint firstItem="y3E-De-79B" firstAttribute="leading" secondItem="enr-Vr-bVH" secondAttribute="leading" constant="8" id="T2Z-HT-Z7J"/>
+                                    <constraint firstItem="F0i-F3-Rkj" firstAttribute="leading" secondItem="enr-Vr-bVH" secondAttribute="leading" constant="16" id="SaK-7B-IzS"/>
+                                    <constraint firstItem="y3E-De-79B" firstAttribute="leading" secondItem="enr-Vr-bVH" secondAttribute="leading" constant="15" id="T2Z-HT-Z7J"/>
                                     <constraint firstItem="y3E-De-79B" firstAttribute="top" secondItem="enr-Vr-bVH" secondAttribute="top" constant="8" id="bQb-lX-0Gu"/>
+                                    <constraint firstAttribute="trailing" secondItem="F0i-F3-Rkj" secondAttribute="trailing" constant="16" id="cme-PZ-AZg"/>
                                     <constraint firstItem="0xm-zU-M3X" firstAttribute="top" secondItem="y3E-De-79B" secondAttribute="bottom" constant="2" id="hTd-6A-Fdy"/>
-                                    <constraint firstAttribute="trailing" secondItem="0xm-zU-M3X" secondAttribute="trailing" constant="8" id="kvb-gw-28V"/>
-                                    <constraint firstAttribute="bottom" secondItem="y3E-De-79B" secondAttribute="bottom" constant="15" id="meA-Gh-cMw"/>
+                                    <constraint firstItem="0xm-zU-M3X" firstAttribute="top" secondItem="F0i-F3-Rkj" secondAttribute="bottom" constant="8" id="ikI-pX-Z37"/>
+                                    <constraint firstAttribute="trailing" secondItem="0xm-zU-M3X" secondAttribute="trailing" constant="15" id="kvb-gw-28V"/>
+                                    <constraint firstAttribute="bottom" secondItem="y3E-De-79B" secondAttribute="bottom" constant="20" id="meA-Gh-cMw"/>
+                                    <constraint firstItem="F0i-F3-Rkj" firstAttribute="top" secondItem="enr-Vr-bVH" secondAttribute="top" constant="8" id="tPF-V5-HcX"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
@@ -80,10 +87,10 @@
                             <constraint firstItem="enr-Vr-bVH" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ew1-wB-lcE" secondAttribute="leading" constant="52" id="CzG-tG-NsP"/>
                             <constraint firstAttribute="trailing" secondItem="Aje-x1-DXs" secondAttribute="trailing" id="DZI-AT-6qK"/>
                             <constraint firstAttribute="trailing" secondItem="enr-Vr-bVH" secondAttribute="trailing" constant="8" id="HYF-dS-bL1"/>
-                            <constraint firstAttribute="bottom" secondItem="enr-Vr-bVH" secondAttribute="bottom" constant="8" id="hkv-tb-eN6"/>
+                            <constraint firstAttribute="bottom" secondItem="enr-Vr-bVH" secondAttribute="bottom" constant="2" id="hkv-tb-eN6"/>
                             <constraint firstItem="Aje-x1-DXs" firstAttribute="top" secondItem="ew1-wB-lcE" secondAttribute="top" id="krj-7z-yzA"/>
                             <constraint firstAttribute="bottom" secondItem="Aje-x1-DXs" secondAttribute="bottom" id="n1J-bZ-xW5"/>
-                            <constraint firstItem="enr-Vr-bVH" firstAttribute="top" secondItem="ew1-wB-lcE" secondAttribute="top" constant="8" id="wwN-1P-wlv"/>
+                            <constraint firstItem="enr-Vr-bVH" firstAttribute="top" secondItem="ew1-wB-lcE" secondAttribute="top" constant="2" id="wwN-1P-wlv"/>
                         </constraints>
                     </view>
                 </subviews>
@@ -98,6 +105,8 @@
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
             <connections>
+                <outlet property="imgBack" destination="Aje-x1-DXs" id="oLz-T7-hTd"/>
+                <outlet property="imgGif" destination="F0i-F3-Rkj" id="xga-pI-xrC"/>
                 <outlet property="lblMessage" destination="y3E-De-79B" id="CDX-xJ-whW"/>
                 <outlet property="lbltime" destination="0xm-zU-M3X" id="oDy-HD-nxM"/>
                 <outlet property="viewBack" destination="enr-Vr-bVH" id="AZn-aH-a8x"/>
@@ -105,7 +114,4 @@
             <point key="canvasLocation" x="26.811594202898554" y="91.741071428571431"/>
         </tableViewCell>
     </objects>
-    <resources>
-        <image name="chatBG" width="318" height="50.5"/>
-    </resources>
 </document>

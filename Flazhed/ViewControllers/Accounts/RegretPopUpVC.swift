@@ -16,9 +16,10 @@ class RegretPopUpVC: BaseVC {
     var list = ["The \"Ice Breaker\"","The \"Romantique\"","The \"Connoisseur\""]
     var dayPackList = ["1 extra per day","3 extra per day","5 extra per day"]
     var monthPackList = ["1 month starter pack","6 months basic pack","12 months premium pack"]
-    var amountlistForRegret = ["20","35","50"]
-    var amountListForExtraShake = ["10","25","50"]
-    var amountListForProlongChats = ["1","4","7"]
+    var amountlistForRegret = [20,35,50]
+    var NoListForExtraShake = [1,3,5]
+    var amountListForExtraShake = [10,25,50]
+    var amountListForProlongChats = [1,4,7]
     
     
     //MARK:- variable
@@ -52,23 +53,12 @@ class RegretPopUpVC: BaseVC {
     var name=""
     var extra_shake=0
   
-    
+    var apiCalled=false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         IAPHandler.shared.getProducts()
-        
-        self.purchase = "yearly"
-    
-        IAPHandler.shared.validatePurchase { (status) in
-            
-            if status
-            {
-              print(status)
-            }
-        }
-        
-        
+
         NotificationCenter.default.addObserver(self, selector: #selector(self.methodOfReceivedPaymentDone(notification:)), name: Notification.Name("PaymentDoneNoti"), object: nil)
 
     }
@@ -83,7 +73,16 @@ class RegretPopUpVC: BaseVC {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-       
+      
+//        IAPHandler.shared.validatePurchase { (status) in
+//            print("Payment buy status = \(status)")
+//            if status
+//            {
+//
+//            }
+//        }
+        
+        self.purchase = kSixMonthly
         tableView.tableHeaderView = headerView
         tableView.roundCorners(corners: [.topLeft,.topRight], radius: 32)
         tableView.register(UINib(nibName: "FootView", bundle: nil), forCellReuseIdentifier: "FootView")
@@ -105,6 +104,41 @@ class RegretPopUpVC: BaseVC {
             lblRegret.text = "Prolong Chats"
             lblPremium.text = "Get more time to know more about the\n other person."
         }
+        
+        
+        
+        if type == .Regret
+        {
+            self.transaction_id="1000000859449277"
+            self.amount=35
+            self.subscription_type=kSwiping
+            self.name="Regret"
+            self.purchase=kSixMonthly
+        }
+        else if  type == .kExtraShakes{
+            self.transaction_id="1000000859449277"
+            self.amount=25
+            self.subscription_type=kShake
+            self.name="Shake"
+            self.extra_shake=3
+            self.purchase=kSixMonthly
+        } else if  type == .Prolong {
+            self.transaction_id="1000000859449277"
+            self.amount=35
+            self.subscription_type=kProlong
+            self.name="Prolong"
+            self.purchase=kSixMonthly
+            
+        }
+    }
+    override func viewDidDisappear(_ animated: Bool) {
+        
+            NotificationCenter.default.removeObserver(self, name: Notification.Name("PaymentDoneNoti"), object: nil)
+        
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        IAPHandler.shared.getProducts()
     }
     override func viewDidLayoutSubviews() {
            
@@ -112,6 +146,7 @@ class RegretPopUpVC: BaseVC {
         tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: -headerView.bounds.height, right: 0)
     }
     
+   
     //MARK:- Select premium action
     
     
@@ -120,12 +155,32 @@ class RegretPopUpVC: BaseVC {
     {
         selectedIndex = sender.tag
         
-        if selectedIndex == 3
+        if type == .Regret
+        {
+            
+            self.amount = amountlistForRegret[selectedIndex]
+            self.subscription_type = kSwiping
+        }
+        else if  type == .kExtraShakes
+        {
+            self.amount = amountListForExtraShake[selectedIndex]
+            self.subscription_type = kShake
+            self.extra_shake = NoListForExtraShake[selectedIndex]
+            
+        } else if  type == .Prolong {
+            self.subscription_type = kProlong
+            self.amount = amountListForProlongChats[selectedIndex]
+    
+        }
+        
+        
+        
+        if selectedIndex == 2
         {
             self.purchase=kYearly
             
         }
-        else if selectedIndex == 2
+        else if selectedIndex == 1
         {
             self.purchase=kSixMonthly
             
@@ -151,8 +206,7 @@ class RegretPopUpVC: BaseVC {
 
     @IBAction func restoreBtnAction(_ sender: UIButton) {
         IAPHandler.shared.restoreProducts()
-//        self.navigationController?.popViewController(animated: true)
-//        self.dismiss(animated: true, completion: nil)
+ 
     }
     
     
@@ -192,18 +246,19 @@ extension RegretPopUpVC: UITableViewDelegate, UITableViewDataSource {
         if type == .Regret {
             cell.lblIcebreaker.text = list[indexPath.row]
             cell.lblPack.text = monthPackList[indexPath.row]
-            cell.lblAmount.text = amountlistForRegret[indexPath.row]
+            cell.lblAmount.text = "\(amountlistForRegret[indexPath.row])"
         } else if  type == .kExtraShakes{
             cell.lblIcebreaker.text = list[indexPath.row]
             cell.lblPack.text = dayPackList[indexPath.row]
-            cell.lblAmount.text = amountListForExtraShake[indexPath.row]
+            cell.lblAmount.text = "\(amountListForExtraShake[indexPath.row])"
         } else if  type == .Prolong {
             cell.lblIcebreaker.text = list[indexPath.row]
             cell.lblPack.text = monthPackList[indexPath.row]
-            cell.lblAmount.text = amountListForProlongChats[indexPath.row]
+            cell.lblAmount.text = "\(amountListForProlongChats[indexPath.row])"
         }
         
-        if selectedIndex == indexPath.row {
+        if selectedIndex == indexPath.row
+        {
             cell.cellBG.backgroundColor = #colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1)
             cell.lblIcebreaker.textColor = .white
             cell.lblPack.textColor = .white
@@ -222,7 +277,8 @@ extension RegretPopUpVC: UITableViewDelegate, UITableViewDataSource {
         return cell
        
     }
-    func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat {
+    func tableView(_ tableView: UITableView, estimatedHeightForHeaderInSection section: Int) -> CGFloat
+    {
         221
     }
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
@@ -246,21 +302,23 @@ extension RegretPopUpVC: UITableViewDelegate, UITableViewDataSource {
         
       
     }
-    //MARK:- Buy button action  🍎
+    //MARK:- Buy button action  
     
     @objc func premiumBtnAction(sender:UIButton) {
-
+        IAPHandler.shared.getProducts()
         print("come from = \(type)")
         
         
         
         if type == .Regret
         {
-            if self.purchase == kYearly {
+            if self.purchase == kYearly
+            {
                 Indicator.sharedInstance.showIndicator()
                 IAPHandler.shared.purchase(product: .swipeYearly)
                 
-            }else if self.purchase == kSixMonthly {
+            }else if self.purchase == kSixMonthly
+            {
                 Indicator.sharedInstance.showIndicator()
                 IAPHandler.shared.purchase(product: .swipeHalfYear)
             }else{
@@ -272,7 +330,7 @@ extension RegretPopUpVC: UITableViewDelegate, UITableViewDataSource {
         {
             if self.purchase == kYearly {
                 Indicator.sharedInstance.showIndicator()
-                IAPHandler.shared.purchase(product: .shakeOne)
+                IAPHandler.shared.purchase(product: .shakeFive)
                 
             }else if self.purchase == kSixMonthly {
                 Indicator.sharedInstance.showIndicator()
@@ -286,7 +344,8 @@ extension RegretPopUpVC: UITableViewDelegate, UITableViewDataSource {
             
         }
         else if  type == .Prolong {
-            if self.purchase == kYearly {
+            if self.purchase == kYearly
+            {
                 Indicator.sharedInstance.showIndicator()
               //  IAPHandler.shared.delegate=self
                 IAPHandler.shared.purchase(product: .prolongYearly)
@@ -299,6 +358,9 @@ extension RegretPopUpVC: UITableViewDelegate, UITableViewDataSource {
                 IAPHandler.shared.purchase(product: .prolongMonthly)
             }
         }
+        
+        
+        
     
     }
     @objc func noThanksBtnAction(sender:UIButton) {
@@ -329,10 +391,52 @@ extension RegretPopUpVC
         
         print(notification)
         
-//        if let dict = notification as? [String:String]
-//        {
-//            self.transaction_id =  dict["transactionId"] as? String ?? ""
-//        }
+        if let dict = notification.userInfo as? [String:Any]
+        {
+            self.transaction_id =  dict["transactionId"] as? String ?? ""
+            
+            var data = JSONDictionary()
+            data[ApiKey.kTransaction_id] = self.transaction_id
+            data[ApiKey.kAmount] = self.amount
+            data[ApiKey.kSubscription_type] = self.subscription_type
+            
+            data[ApiKey.kSubName] = "for "+self.subscription_type
+           
+            
+            if self.subscription_type == kShake
+            {
+                data[ApiKey.kExtra_shake] = self.extra_shake
+            }
+            else
+            {
+               
+                if self.purchase == kYearly
+                {
+                    data[ApiKey.kMonth_up_to] = 12
+                    
+                }else if self.purchase == kSixMonthly
+                {
+                    data[ApiKey.kMonth_up_to] = 6
+                }else{
+                    data[ApiKey.kMonth_up_to] = 1
+                }
+                
+            }
+            
+            print("Payment para = \(data)")
+            
+            if Connectivity.isConnectedToInternet {
+                if self.apiCalled == false
+                {
+                    self.updatePaymentApi(data: data)
+                    self.apiCalled=true
+                }
+                
+            } else {
+
+                self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+            }
+        }
         
         self.dismiss(animated: true, completion: nil)
     }
@@ -347,11 +451,58 @@ extension RegretPopUpVC
             }
             else{
              
+                
+                if self.type == .Prolong
+                {
+                    self.dismiss(animated: true)
+                    {
+                        if #available(iOS 13.0, *)
+                        {
+                            SCENEDEL?.navigateToChat()
+                        } else {
+                            // Fallback on earlier versions
+                            APPDEL.navigateToChat()
+                    }
+                    }
+                }
+               else if self.type == .kExtraShakes
+                {
+                    self.dismiss(animated: true)
+                    {
+                        if #available(iOS 13.0, *)
+                        {
+                            SCENEDEL?.navigateToProfile()
+                        } else {
+                            // Fallback on earlier versions
+                            APPDEL.navigateToProfile()
+                    }
+                    }
+                }
+               else if self.type == .Regret
+                {
+                    self.dismiss(animated: true)
+                    {
+                        DataManager.HomeRefresh=true
+                        DataManager.purchasePlan=true
+                        
+                        if #available(iOS 13.0, *)
+                        {
+                            SCENEDEL?.navigateToHome()
+                        } else {
+                            // Fallback on earlier versions
+                            APPDEL.navigateToHome()
+                    }
+                    }
+                }
+                else
+                {
+                
                 let storyBoard = UIStoryboard(name: kAccount, bundle: nil)
         
                 let vc = storyBoard.instantiateViewController(withIdentifier: "AccountsVC") as! AccountsVC
                 vc.comeFromVerify=true
                 self.navigationController?.pushViewController(vc, animated: false)
+                }
 
             }
             

@@ -8,7 +8,9 @@
 import UIKit
 
 class ChatListingTVC: UITableViewCell {
-
+    @IBOutlet weak var viewLine: UIView!
+    @IBOutlet weak var menuBtn2: UIButton!
+    @IBOutlet weak var rightUnreadConst: NSLayoutConstraint!
     @IBOutlet weak var mainView: UIView!
     @IBOutlet weak var circularProgressView: CircularProgressView!
     @IBOutlet weak var userProfileIMage: UIImageView!
@@ -17,6 +19,8 @@ class ChatListingTVC: UITableViewCell {
     @IBOutlet weak var userLastMessageLabel: UILabel!
     @IBOutlet weak var pendingMessagesNumberLabel: UILabel!
     @IBOutlet weak var menuButton: UIButton!
+    @IBOutlet weak var imgRead: UIImageView!
+    @IBOutlet weak var ConstLblMessge: NSLayoutConstraint!
     
     override func awakeFromNib() {
         super.awakeFromNib()

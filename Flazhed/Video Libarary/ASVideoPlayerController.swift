@@ -152,7 +152,13 @@ class ASVideoPlayerController: NSObject, NSCacheDelegate {
         }
         if let currentItem = currentPlayer.currentItem, currentItem == playerItem {
             currentPlayer.seek(to: CMTime.zero)
-            currentPlayer.play()
+           // currentPlayer.play()
+           // currentPlayer.playImmediately(atRate: 1.0)
+            if #available(iOS 10.0, *) {
+                currentPlayer.playImmediately(atRate: 1.0)
+            } else {
+                currentPlayer.play()
+            }
         }
     }
     
@@ -277,4 +283,7 @@ class ASVideoPlayerController: NSObject, NSCacheDelegate {
     deinit {
         
     }
+    
+    
+    
 }

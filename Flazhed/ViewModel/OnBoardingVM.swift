@@ -18,6 +18,9 @@ class OnBoardingVM {
    
     var socialDetails = JSONDictionary()  //email,name,Image
     var loginUserDetail:getUserDetail?
+    var Prolong_Subsription_Data:SubscriptionModel?
+    var Swiping_Subsription_Data:SubscriptionModel?
+    var Shake_Subsription_Data:SubscriptionModel?
     
     func callApiSocialLoginAPI(data: JSONDictionary,  response: @escaping responseCallBack)
     {
@@ -146,12 +149,47 @@ extension OnBoardingVM {
         if let data = response[ApiKey.kData] as? JSONDictionary
         {
             print(data)
+            if let id = data["send_shake_id"] as? String
+            {
+                DataManager.ShakeId=id
+            }
             if let User = data[ApiKey.kUser] as? JSONDictionary
             {
              //   LoginUserData=User
                 let detail=getUserDetail(detail: User)
                self.loginUserDetail=detail
                 
+            }
+            if let user_subscription = data["user_subscription"] as? JSONDictionary
+            {
+              
+                if let User = user_subscription[ApiKey.kParlong] as? JSONDictionary
+                {
+                    let data =  SubscriptionModel(detail: User)
+                    self.Prolong_Subsription_Data = data
+                }
+                else
+                {
+                    self.Prolong_Subsription_Data = nil
+                }
+                if let User = user_subscription[ApiKey.kShake] as? JSONDictionary
+                {
+                    let data =  SubscriptionModel(detail: User)
+                    self.Shake_Subsription_Data = data
+                }
+                else
+                {
+                    self.Shake_Subsription_Data = nil
+                }
+                if let User = user_subscription[ApiKey.kSwiping] as? JSONDictionary
+                {
+                    let data =  SubscriptionModel(detail: User)
+                    self.Swiping_Subsription_Data = data
+                }
+                else
+                {
+                    self.Swiping_Subsription_Data = nil
+                }
             }
         }
     }
@@ -171,11 +209,46 @@ extension OnBoardingVM {
         if let data = response[ApiKey.kData] as? JSONDictionary
         {
             print(data)
+            if let id = data["send_shake_id"] as? String
+            {
+                DataManager.ShakeId=id
+            }
             if let kOTPDATA = data[ApiKey.kUser] as? JSONDictionary
             {
                // verifyOtpData=kOTPDATA
                 let detail=getUserDetail(detail: kOTPDATA)
                self.loginUserDetail=detail
+            }
+            if let user_subscription = data["user_subscription"] as? JSONDictionary
+            {
+              
+                if let User = user_subscription[ApiKey.kParlong] as? JSONDictionary
+                {
+                    let data =  SubscriptionModel(detail: User)
+                    self.Prolong_Subsription_Data = data
+                }
+                else
+                {
+                    self.Prolong_Subsription_Data = nil
+                }
+                if let User = user_subscription[ApiKey.kShake] as? JSONDictionary
+                {
+                    let data =  SubscriptionModel(detail: User)
+                    self.Shake_Subsription_Data = data
+                }
+                else
+                {
+                    self.Shake_Subsription_Data = nil
+                }
+                if let User = user_subscription[ApiKey.kSwiping] as? JSONDictionary
+                {
+                    let data =  SubscriptionModel(detail: User)
+                    self.Swiping_Subsription_Data = data
+                }
+                else
+                {
+                    self.Swiping_Subsription_Data = nil
+                }
             }
         }
     }
@@ -184,10 +257,16 @@ extension OnBoardingVM {
         if let data = response[ApiKey.kData] as? JSONDictionary
         {
             print(data)
+            if let id = data["send_shake_id"] as? String
+            {
+                DataManager.ShakeId=id
+            }
             if let kOTPDATA = data[ApiKey.kUser] as? JSONDictionary
             {
                 UserProfileData=kOTPDATA
-             
+                
+                let detail=getUserDetail(detail: kOTPDATA)
+               self.loginUserDetail=detail
             }
         }
     }

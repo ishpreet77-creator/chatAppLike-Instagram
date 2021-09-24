@@ -11,7 +11,7 @@ import AVKit
 import Alamofire
 import CoreLocation
 class AddVoiceVC: BaseVC {
-    //MARK:- All outlets  🍎
+    //MARK:- All outlets  
     
     @IBOutlet weak var lblOtpSent: UILabel!
     @IBOutlet weak var topConst: NSLayoutConstraint!
@@ -25,7 +25,7 @@ class AddVoiceVC: BaseVC {
     @IBOutlet weak var viewAudioWave: UIView!
     @IBOutlet weak var lblTimer: UILabel!
     
-    //MARK:- All Variable  🍎
+    //MARK:- All Variable  
     var audioPlayer : AVAudioPlayer?
     var audioRecorder : AVAudioRecorder?
     var audioData = Data()
@@ -42,7 +42,7 @@ class AddVoiceVC: BaseVC {
     var permissionLocationCheck:Bool = false
     var comeFrom = ""
     
-    //MARK:- View Lifecycle   🍎
+    //MARK:- View Lifecycle   
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -125,7 +125,7 @@ class AddVoiceVC: BaseVC {
         manager.requestAlwaysAuthorization()
         manager.delegate = self
         manager.requestLocation()
-        self.view.endEditing(true)
+       // manager.startMonitoringSignificantLocationChanges()        self.view.endEditing(true)
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -154,6 +154,15 @@ class AddVoiceVC: BaseVC {
         }
         
         
+        
+        if  self.mp4AudioUrl != nil
+        {
+            btnFinish.isEnabled = true
+            self.audioPlayer?.stop()
+            self.imgWave.isHidden=true
+            self.imagePause.isHidden=false
+        }
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -164,50 +173,25 @@ class AddVoiceVC: BaseVC {
         
     }
     
-    //MARK:-Delete audio action  🍎
+    //MARK:-Delete audio action  
     
     @IBAction func deleteAct(_ sender: UIButton)
     {
-        self.openAlert(title: kAlert,
-                       message: "Are you sure you want to delete this audio recording?",
-                       alertStyle: .alert,
-                       actionTitles: ["Cancel","Yes"],
-                       actionStyles: [.default, .default],
-                       actions: [
-                        {_ in
-                            print("cancel click")
-                            
-                        },
-                        { [self]_ in
-                            
-                            print("Yes click")
-                            
-                            
-                            self.btnPlay.isEnabled=false
-                            self.btnDelete.isEnabled=false
-                            self.imgWave.image = UIImage(named: "wavepause")
-                            self.btnFinish.isEnabled=false
-                            self.btnAudio.isEnabled=true
-                            self.btnPlay.setTitleColor(PLAYDISABLECOLOR, for: .normal)
-                            self.btnDelete.setTitleColor(PLAYDISABLECOLOR, for: .normal)
-                            
-                            
-                            self.imgWave.isHidden=true
-                            self.imagePause.isHidden=false
-                            self.mp4AudioUrl=nil
-                            
-                            self.btnPlay.isEnabled=false
-                            
-                            self.btnFinish.isEnabled=false
-                        }
-                       ])
         
         
+        let story = UIStoryboard(name: kAccount, bundle: nil)
         
+        let vc = story.instantiateViewController(withIdentifier: "DeleteAccountPopUpVC") as! DeleteAccountPopUpVC
+        vc.comeFrom = kAudio
+        vc.delegate=self
+        vc.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+        vc.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+        self.present(vc, animated: true, completion: nil)
         
+
     }
     
-    //MARK:- Record audio action  🍎
+    //MARK:- Record audio action  
     
     @IBAction func recordAct(_ sender: UIButton)
     {
@@ -241,7 +225,7 @@ class AddVoiceVC: BaseVC {
             audioRecorder?.stop()
         }
     }
-    //MARK:- Record audio action  🍎
+    //MARK:- Record audio action  
     
     @IBAction func touchDownRecordAct(_ sender: UIButton) {
         
@@ -267,7 +251,7 @@ class AddVoiceVC: BaseVC {
         }
     }
     
-    //MARK:- Stop audio action  🍎
+    //MARK:- Stop audio action  
     
     @IBAction func touchDragExitRecordAct(_ sender: UIButton) {
         print("Stop recording")
@@ -298,7 +282,7 @@ class AddVoiceVC: BaseVC {
         }
     }
     
-    //MARK:- Play audio action  🍎
+    //MARK:- Play audio action  
     @IBAction func playAct(_ sender: UIButton)
     {
        
@@ -335,12 +319,12 @@ class AddVoiceVC: BaseVC {
         }
     }
     
-    //MARK:- Call api and move other screen action  🍎
+    //MARK:- Call api and move other screen action  
     
     @IBAction func NextAct(_ sender: UIButton)
     {
         
-        if self.comeFrom==kEditProfile
+        if self.comeFrom.equalsIgnoreCase(string: kEditProfile)
         {
             if let url = self.mp4AudioUrl
             {
@@ -376,6 +360,32 @@ class AddVoiceVC: BaseVC {
                     print("Unable to load audioData: \(error)")
                 }
             }
+            
+            
+            
+            if CLLocationManager.locationServicesEnabled()
+            {
+                switch CLLocationManager.authorizationStatus() {
+                case .notDetermined, .restricted, .denied:
+                    print("No access")
+                    self.permissionLocationCheck=false
+                //self.openSettings(message: kLocation)
+                case .authorizedAlways, .authorizedWhenInUse:
+                    print("Access")
+                    self.permissionLocationCheck=true
+                @unknown default:
+                    break
+                }
+            } else {
+                print("Location services are not enabled")
+                self.permissionLocationCheck=false
+                //self.openSettings(message: kLocation)
+            }
+            
+            
+            
+            
+            
             if self.permissionLocationCheck==false
             {
                 self.openSettings(message: kLocation)
@@ -384,7 +394,7 @@ class AddVoiceVC: BaseVC {
             {
                 
                 for image in self.imageArray1 {
-                    imageDataArray.append(image.jpegData(compressionQuality: 0.9)!)
+                    imageDataArray.append(image.jpegData(compressionQuality: 0.7)!)
                 }
                 if Connectivity.isConnectedToInternet {
                     
@@ -399,7 +409,7 @@ class AddVoiceVC: BaseVC {
             }
         }
     }
-    //MARK:- Stop Recording  🍎
+    //MARK:- Stop Recording  
     
     @objc func StopRecording()
     {
@@ -455,7 +465,7 @@ class AddVoiceVC: BaseVC {
         sendButtonConst.constant = 26
     }
     
-    //MARK:- Timer show   🍎
+    //MARK:- Timer show   
     
     @objc func updateCounter() {
         
@@ -506,23 +516,23 @@ class AddVoiceVC: BaseVC {
         
     }
     
-    //MARK:- Setup UI   🍎
+    //MARK:- Setup UI   
     
     func setUpUI()
     {
         
         
-        let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: "Leave a short voice recording of your normal voice. Around 3 - 5 seconds.")
-        attributedString.setColorForText(textForAttribute: "Leave a short ", withColor: UIColor.black)
-        attributedString.setColorForText(textForAttribute: "voice recording", withColor: TEXTCOLOR)
-        attributedString.setColorForText(textForAttribute: " of your normal voice. Around 3 - 5 seconds.", withColor: UIColor.black)
+        let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: kLeaveAShortVoice)
+        attributedString.setColorForText(textForAttribute: kLeaveAShort, withColor: UIColor.black)
+        attributedString.setColorForText(textForAttribute: kVoiceRecording, withColor: TEXTCOLOR)
+        attributedString.setColorForText(textForAttribute: kVoiceAround, withColor: UIColor.black)
         
         lblOtpSent.attributedText = attributedString
         
         
         lblOtpSent.attributedText = attributedString
         
-        self.setCustomHeader(title: "Add Voice", showBack: true, showMenuButton: false)
+        self.setCustomHeader(title: kAddVoice, showBack: true, showMenuButton: false)
         
         if self.getDeviceModel() == "iPhone 6"
         {
@@ -542,7 +552,7 @@ class AddVoiceVC: BaseVC {
         
         
     }
-    //MARK:- Setup Audio   🍎
+    //MARK:- Setup Audio   
     
     func audioSetup()
     {
@@ -581,7 +591,7 @@ class AddVoiceVC: BaseVC {
             audioRecorder?.prepareToRecord()
         }
     }
-    //MARK:- Convert Audio to Mp3  🍎
+    //MARK:- Convert Audio to Mp3  
     
     func convertCafToMP3()
     {
@@ -637,9 +647,11 @@ class AddVoiceVC: BaseVC {
         }
     }
     
+    
+    
 }
 
-//MARK:- Complete profile Api Call  🍎
+//MARK:- Complete profile Api Call  
 
 extension AddVoiceVC
 {
@@ -696,12 +708,17 @@ extension AddVoiceVC
                 if let status = (resp.value as? NSDictionary)?.value(forKey: "status") as? String
                 {
                     
-                    if status == "success"
+                    if status.equalsIgnoreCase(string: "success")
                     {
                         Indicator.sharedInstance.hideIndicator()
                         let vc = self.storyboard?.instantiateViewController(withIdentifier: "GetStartedVC") as! GetStartedVC
                         OnBoardingVM.shared.parseUpdateProfileData(response: resp.value as! JSONDictionary)
-                        
+                        if OnBoardingVM.shared.loginUserDetail?.profile_data?.images?.count ?? 0>0
+                        {
+                            let img=OnBoardingVM.shared.loginUserDetail?.profile_data?.images?[0].image
+                            
+                            DataManager.userImage=img ?? ""
+                        }
                         DataManager.isProfileCompelete=true
                         
                         self.navigationController?.pushViewController(vc, animated: true)
@@ -724,10 +741,36 @@ extension AddVoiceVC
     
 }
 
+extension  AddVoiceVC:deleteAccountDelegate
+{
+    func deleteAccountFunc(name: String) {
+        
+        
+        if name.equalsIgnoreCase(string: kAudio)
+        {
+            self.btnPlay.isEnabled=false
+            self.btnDelete.isEnabled=false
+            self.imgWave.image = UIImage(named: "wavepause")
+            self.btnFinish.isEnabled=false
+            self.btnAudio.isEnabled=true
+            self.btnPlay.setTitleColor(PLAYDISABLECOLOR, for: .normal)
+            self.btnDelete.setTitleColor(PLAYDISABLECOLOR, for: .normal)
+            
+            
+            self.imgWave.isHidden=true
+            self.imagePause.isHidden=false
+            self.mp4AudioUrl=nil
+            
+            self.btnPlay.isEnabled=false
+            
+            self.btnFinish.isEnabled=false
+        }
+    }
+    
+}
 
 
-
-//MARK:- Audio record delegate method 🍎
+//MARK:- Audio record delegate method 
 
 extension AddVoiceVC:AVAudioPlayerDelegate, AVAudioRecorderDelegate
 {
@@ -763,7 +806,7 @@ extension AddVoiceVC:AVAudioPlayerDelegate, AVAudioRecorderDelegate
     }
 }
 
-//MARK:- Get current location 🍎
+//MARK:- Get current location 
 
 extension AddVoiceVC: CLLocationManagerDelegate
 {

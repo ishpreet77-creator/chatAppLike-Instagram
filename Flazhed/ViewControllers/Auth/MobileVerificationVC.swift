@@ -12,7 +12,7 @@ import CoreLocation
 
 class MobileVerificationVC: BaseVC {
     
-    //MARK:- All outlets  🍎
+    //MARK:- All outlets  
     
     @IBOutlet weak var imgCountry: UIImageView!
     @IBOutlet weak var lblOtpSent: UILabel!
@@ -21,13 +21,13 @@ class MobileVerificationVC: BaseVC {
     @IBOutlet weak var lblCountryCode: UILabel!
     @IBOutlet weak var txtPhoneNumber: UITextField!
     
-    //MARK:- All Variable  🍎
+    //MARK:- All Variable  
     
     let countryPickerView = CountryPickerView()
     var countryCode=kCurrentCountryCode
     let manager = CLLocationManager()
     var locationMenualy = false
-    //MARK:- View Lifecycle   🍎
+    //MARK:- View Lifecycle   
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,7 +41,7 @@ class MobileVerificationVC: BaseVC {
         manager.requestAlwaysAuthorization()
         manager.delegate = self
         manager.requestLocation()
-        
+       // manager.startMonitoringSignificantLocationChanges()
         if DataManager.countryPhoneCode == ""
         {
             countryCode=kCurrentCountryCode
@@ -68,7 +68,7 @@ class MobileVerificationVC: BaseVC {
         
     }
     
-    //MARK:- Select country button action 🍎
+    //MARK:- Select country button action 
     
     @IBAction func selectCountryCodeAct(_ sender: UIButton)
     {
@@ -76,7 +76,7 @@ class MobileVerificationVC: BaseVC {
         countryPickerView.showCountriesList(from: self)
     }
     
-    //MARK:- send OTP button action 🍎
+    //MARK:- send OTP button action 
     
     @IBAction func sendOTPAct(_ sender: UIButton)
     {
@@ -106,7 +106,7 @@ class MobileVerificationVC: BaseVC {
         
     }
     
-    //MARK:- Keyboard method 🍎
+    //MARK:- Keyboard method 
     
     @objc
     func keyboardWillAppear(notification: NSNotification?) {
@@ -137,18 +137,18 @@ class MobileVerificationVC: BaseVC {
         sendButtonConst.constant = 26
     }
     
-    //MARK:- Setup UI method 🍎
+    //MARK:- Setup UI method 
     
     func setUpUI()
     {
         let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: lblOtpSent.text ?? "")
-        attributedString.setColorForText(textForAttribute: "We will send you an  to this mobile to verify.", withColor: UIColor.black)
-        attributedString.setColorForText(textForAttribute: "One Time Password", withColor: TEXTCOLOR)
-        attributedString.setColorForText(textForAttribute: " to this mobile to verify.", withColor: UIColor.black)
+        attributedString.setColorForText(textForAttribute: kVerificationSend, withColor: UIColor.black)
+        attributedString.setColorForText(textForAttribute: kOneTimePassword, withColor: TEXTCOLOR)
+        attributedString.setColorForText(textForAttribute: kToVerify, withColor: UIColor.black)
         
         lblOtpSent.attributedText = attributedString
         
-        self.setCustomHeader(title: "Verification", showBack: true, showMenuButton: false)
+        self.setCustomHeader(title: kVerification, showBack: true, showMenuButton: false)
         
         if self.getDeviceModel() == "iPhone 6"
         {
@@ -165,7 +165,7 @@ class MobileVerificationVC: BaseVC {
         self.countryPickerView.delegate = self
         self.countryPickerView.dataSource = self
         
-        txtPhoneNumber.attributedPlaceholder = NSAttributedString(string:"Phone Number", attributes:[NSAttributedString.Key.foregroundColor: PLACEHOLDERCOLOR,NSAttributedString.Key.font :UIFont(name: AppFontName.regular, size: 18)!])
+        txtPhoneNumber.attributedPlaceholder = NSAttributedString(string:kPhoneNumber, attributes:[NSAttributedString.Key.foregroundColor: PLACEHOLDERCOLOR,NSAttributedString.Key.font :UIFont(name: AppFontName.regular, size: 18)!])
     }
     
     
@@ -212,7 +212,7 @@ extension MobileVerificationVC
     }
 }
 
-//MARK:- textfield delegate method 🍎
+//MARK:- textfield delegate method 
 
 extension MobileVerificationVC:UITextFieldDelegate {
     
@@ -238,7 +238,7 @@ extension MobileVerificationVC:UITextFieldDelegate {
     }
 }
 
-//MARK:- Select country method 🍎
+//MARK:- Select country method 
 
 extension MobileVerificationVC: CountryPickerViewDelegate, CountryPickerViewDataSource
 {
@@ -262,7 +262,7 @@ extension MobileVerificationVC: CountryPickerViewDelegate, CountryPickerViewData
     }
     
 }
-//MARK:- Get current location 🍎
+//MARK:- Get current location 
 
 extension MobileVerificationVC: CLLocationManagerDelegate
 {
@@ -273,15 +273,16 @@ extension MobileVerificationVC: CLLocationManagerDelegate
             CURRENTLAT=location.coordinate.latitude
             CURRENTLONG=location.coordinate.longitude
             
-            self.fetchCityAndCountry(from: location) { (city, coutry, error) in
-                let code = coutry ?? ""
+            self.fetchCityAndCountry(from: location) { (Country, PhoneCode, error) in
+                let code = PhoneCode ?? "45"
+                let country = Country ?? "Denmark"
                 let phoneCode = self.getCountryCallingCode(countryRegionCode: code)
                 
                 self.countryCode = "+"+phoneCode
                 if self.locationMenualy == false
                 {
                     DataManager.countryPhoneCode=self.countryCode
-                    DataManager.countryName = code
+                    DataManager.countryName = country
                     self.countryPickerView.setCountryByPhoneCode(self.countryCode)
                 }
                 

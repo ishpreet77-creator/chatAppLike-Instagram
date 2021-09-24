@@ -8,6 +8,15 @@
 import UIKit
 
 class HomeUserDetailsTCell: UICollectionViewCell {
+    
+    @IBOutlet weak var companyButtomConst: NSLayoutConstraint!
+    @IBOutlet weak var companyTopConst: NSLayoutConstraint!
+    
+    @IBOutlet weak var lblCompanyName: UILabel!
+    
+    @IBOutlet weak var BtnTap: UIButton!
+    @IBOutlet weak var lblAge: UILabel!
+    @IBOutlet weak var viewBack: UIView!
     @IBOutlet weak var bioTopConst: NSLayoutConstraint!
     @IBOutlet weak var attTopConst: NSLayoutConstraint!
     @IBOutlet weak var lblUserName: UILabel!
@@ -23,9 +32,12 @@ class HomeUserDetailsTCell: UICollectionViewCell {
     @IBOutlet weak var attributeCollHeightConst: NSLayoutConstraint!
     var currentUserDetails:UserListModel?
     var attCollectionHeight = 50
-    
+    let columnLayout = CustomViewFlowLayout()
     override func awakeFromNib() {
         super.awakeFromNib()
+      //  self.viewBack.applyGradient(colours: [.yellow, .blue, .red], locations: [0.0, 0.5, 1.0])
+
+        
         setupCollection()
         // Initialization code
     }
@@ -68,6 +80,8 @@ extension HomeUserDetailsTCell:UICollectionViewDelegate,UICollectionViewDataSour
 {
     func setupCollection()
     {
+        attributeCollectionView.collectionViewLayout = columnLayout
+        attributeCollectionView.contentInsetAdjustmentBehavior = .always
             self.attributeCollectionView.delegate=self
             self.attributeCollectionView.dataSource=self
            self.attributeCollectionView.register(UINib(nibName: "ProfileAttributeCCell", bundle: nil), forCellWithReuseIdentifier: "ProfileAttributeCCell")
@@ -88,15 +102,27 @@ extension HomeUserDetailsTCell:UICollectionViewDelegate,UICollectionViewDataSour
         
         if model?.type == .education{
             cell.imgIcon.image = UIImage(named: "Graduate")
-            cell.lblTitle.text = model?.education_selected?.education_name
-            cell.lblTitle.text = cell.lblTitle.text?.capitalized
+           // cell.lblTitle.text = model?.education_selected?.education_name
+            //cell.lblTitle.text = cell.lblTitle.text?.capitalized
+            var name = model?.education_selected?.education_name ?? ""
+            
+            if name.capitalized == kPhD.capitalized
+            {
+                cell.lblTitle.text = kPhD
+            }
+            else
+            {
+                cell.lblTitle.text = name.capitalizingFirstLetter()
+               // cell.lblTitle.text = cell.lblTitle.text?.capitalized
+            }
+            
         }else if model?.type == .height{
             cell.imgIcon.image = UIImage(named: "scaleIcon")
             
             let unit = DataManager.currentUnit //self.UserData?.unit_settings?.unit ?? ""
             if let height  = model?.height
             {
-            if  unit == kFeet
+                if  unit.equalsIgnoreCase(string: kFeet) 
             {
                 cell.lblTitle.text = self.showFootAndInchesFromCm(Double(height))
                 
@@ -136,7 +162,45 @@ extension HomeUserDetailsTCell:UICollectionViewDelegate,UICollectionViewDataSour
     {
         //MARK:- child changes
     
-        return CGSize(width: ((Int(self.attributeCollectionView.frame.width)/2)-4), height: 46)
+       // return CGSize(width: ((Int(self.attributeCollectionView.frame.width)/2)-4), height: 46)
+        
+        let model = self.currentUserDetails?.more_profile_details?.arrCollection[indexPath.row]
+        
+        if model?.type == .education{
+            let name = model?.education_selected?.education_name ?? ""
+                        let label = UILabel(frame: CGRect.zero)
+                                label.text = name
+                                label.sizeToFit()
+                                return CGSize(width: label.frame.width+38+8, height: 46)
+        }
+        else if model?.type == .height{
+            let name = model?.height ?? 123
+            let label = UILabel(frame: CGRect.zero)
+                    label.text = "\(name)"+" cm"
+          
+                    label.sizeToFit()
+            return CGSize(width: label.frame.width+38+8, height: 46)
+        }
+        else if model?.type == .hairColor{
+            let name = model?.hair_selected?.hair_name ?? ""
+            let label = UILabel(frame: CGRect.zero)
+                    label.text = name
+                    label.sizeToFit()
+            return CGSize(width: label.frame.width+38+16, height: 46)
+        }
+        else if model?.type == .children {
+            let name = model?.children_selected?.children_name ?? ""
+            let label = UILabel(frame: CGRect.zero)
+                    label.text = name
+                    label.sizeToFit()
+            return CGSize(width: label.frame.width+38+16, height: 46)
+        }
+        else
+        {
+            return CGSize(width: ((self.attributeCollectionView.frame.width/2)-4), height: 46)
+        }
+        
+        
             
     }
     
