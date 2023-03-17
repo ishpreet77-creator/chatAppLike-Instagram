@@ -11,6 +11,7 @@ import Photos
 import MobileCoreServices
 import CoreTelephony
 import SDWebImage
+import IQKeyboardManagerSwift
 
 @objc protocol PickerDelegate {
     @objc optional func didSelectItem(at index: Int, item: String)
@@ -41,11 +42,15 @@ enum ScreenType: String{
     case GrayOut = "User time gray out"
     case GrayOut48Hrs = "User time gray out after 48 hrs"
     case onceContinue = "One user cotinue chat"
+    case ViewProfile = "View Profile"
+    case ViewPostHangout = "View Post Hangout"
+    case ListHangout = "Hangout Listing"
+    case ViewPostStory = "View Post Story"
 }
 
 class BaseVC: UIViewController {
     
-    //MARK:- Variables
+    //MARK: - Variables
     var appDelegate = UIApplication.shared.delegate as? AppDelegate
     var pickerView = UIPickerView()
     var datePickerView = UIDatePicker()
@@ -57,18 +62,23 @@ class BaseVC: UIViewController {
     var startShaking = CFAbsoluteTimeGetCurrent()
 
 
-    //MARK:- Class Life Cycle
+    //MARK: - Class Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        SocketIOManager.shared.initializeSocket()
+        selfJoinSocketEmit()
         datePickerView.locale = Locale(identifier: "en_US_POSIX")
         self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+      //  NotificationCenter.default.removeObserver(self, name: NSNotification.Name.reachabilityChanged, object: nil)
+        
+     //   NotificationCenter.default.addObserver(self, selector:#selector(self.reachabilityChanged2), name: NSNotification.Name.reachabilityChanged, object: nil)
         
         if !DataManager.isViewProfile
         {
             DataManager.isViewProfile=true
             NotificationCenter.default.addObserver(self, selector: #selector(self.methodOfReceivedNotification(notification:)), name: Notification.Name("ViewProfileNotification"), object: nil)
         }
-        
+       // self.selfJoinSocketEmit2()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -78,7 +88,7 @@ class BaseVC: UIViewController {
         NAVIHEIGHT = naviHeight
         STATUSBARHEIGHT = getStatusBarHeight()
         self.becomeFirstResponder()
-        self.selfJoinSocketEmit2()
+        badgeCountIntervalCheckEmit()
     }
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
@@ -101,7 +111,7 @@ class BaseVC: UIViewController {
     
     func showToastMessage(_ ToastMessage:String=kSucess)
     {
-        print("Toast call  = \(ToastMessage)")
+        debugPrint("Toast call  = \(ToastMessage)")
         var style = ToastStyle()
         style.messageColor = .white
         self.view.makeToast(ToastMessage, duration: 2.0, position: .center, style: style)
@@ -117,9 +127,107 @@ class BaseVC: UIViewController {
         SDImageCache.shared.clearMemory()
         SDImageCache.shared.clearDisk()
     }
+    
+    func ClearCoreAllData()
+    {
+        
+        DispatchQueue.main.async {
+
+            for name in ApiKey.kCoreDataEnLtityArray
+            {
+                CoreDataManager.deleteRecords(entityName: name)
+            }
+        
+        }
+    }
+    
+    func enbleIQKeyboard()
+    {
+        IQKeyboardManager.shared.enableAutoToolbar = true
+       
+    }
+    func disableIQKeyboard()
+    {
+        IQKeyboardManager.shared.enableAutoToolbar = false
+    
+    }
+    
+    func goToProfile()
+    {
+        if #available(iOS 13.0, *)
+        {
+            SCENEDEL?.navigateToHome(selectedIndex: 0)
+        }
+        else
+        {
+          
+            APPDEL.navigateToHome(selectedIndex: 0)
+        }
+    }
+    func goToChat()
+    {
+        if #available(iOS 13.0, *)
+        {
+            SCENEDEL?.navigateToHome(selectedIndex: 1)
+        }
+        else
+        {
+          
+            APPDEL.navigateToHome(selectedIndex: 1)
+        }
+    }
+    func goToShake()
+    {
+        if #available(iOS 13.0, *)
+        {
+            SCENEDEL?.navigateToHome(selectedIndex: 2)
+        }
+        else
+        {
+          
+            APPDEL.navigateToHome(selectedIndex: 2)
+        }
+    }
+    func goToAnonymous()
+    {
+        if #available(iOS 13.0, *)
+        {
+            SCENEDEL?.navigateToHome(selectedIndex: 3)
+        }
+        else
+        {
+          
+            APPDEL.navigateToHome(selectedIndex: 3)
+        }
+    }
+    
+    func goToHangout()
+    {
+        if #available(iOS 13.0, *)
+        {
+            SCENEDEL?.navigateToHome(selectedIndex: 4)
+        }
+        else
+        {
+          
+            APPDEL.navigateToHome(selectedIndex: 4)
+        }
+    }
+    func goToStory()
+    {
+        if #available(iOS 13.0, *)
+        {
+            SCENEDEL?.navigateToHome(selectedIndex: 5)
+        }
+        else
+        {
+          
+            APPDEL.navigateToHome(selectedIndex: 5)
+        }
+    }
 }
 
-//MARK:- Navigation Methods
+//MARK: - Navigation Methods
 extension BaseVC {
     
     func hideNavigationBar() {
@@ -145,8 +253,8 @@ extension BaseVC {
 //         emptyview.removeFromSuperview()
 //     }
 //
-    //MARK:- Navigation Title
-    func setCustomHeader(title:String, showBack: Bool = true, showMenuButton:Bool = false)
+    //MARK: - Navigation Title
+    func setCustomHeader(title:String, showBack: Bool = true, showMenuButton:Bool = false,color:UIColor = .white)
     {
         let naviHeight = self.navigationController?.navigationBar.frame.height ?? 44
         NAVIHEIGHT = naviHeight
@@ -155,9 +263,9 @@ extension BaseVC {
         let viewHeader = UIView()
         
         viewHeader.frame = CGRect(x: 0, y: TOPSPACING, width: SCREENWIDTH, height: naviHeight)
-        viewHeader.backgroundColor = UIColor.white
-        let titleButton = UIButton(frame: CGRect(x: SCREENWIDTH/2-105, y:0, width:210, height:naviHeight))
-        titleButton.titleLabel?.textAlignment = .center
+        viewHeader.backgroundColor = color
+        let titleButton = UIButton(frame: CGRect(x: SCREENWIDTH/2-125, y:0, width:250, height:naviHeight))
+        titleButton.titleLabel?.textAlignment = .left
         titleButton.setTitle(title, for: .normal)
         titleButton.isUserInteractionEnabled = false
         titleButton.titleEdgeInsets = UIEdgeInsets(top: 3, left: 0, bottom: 7, right: 0)
@@ -255,7 +363,7 @@ self.navigationController?.navigationBar.setBackgroundImage(UIColor.clear.as1ptI
 //        UIApplication.shared.keyWindow?.rootViewController = navigationController
     }
     
-    //MARK:- Back Button
+    //MARK: - Back Button
     func setBackButton()
     {
         let backButton = UIButton()
@@ -278,7 +386,7 @@ self.navigationController?.navigationBar.setBackgroundImage(UIColor.clear.as1ptI
        
     }
     
-    //MARK:- setMenuButton Button
+    //MARK: - setMenuButton Button
     func setMenuButton(){
         let backButton = UIButton()
         let backImage = UIImageView()
@@ -356,27 +464,27 @@ self.navigationController?.navigationBar.setBackgroundImage(UIColor.clear.as1ptI
         {
             switch UIScreen.main.nativeBounds.height {
                 case 1136:
-                    print("iPhone 5 or 5S or 5C")
+                    debugPrint("iPhone 5 or 5S or 5C")
                      return "iPhone 6"
                     
                 case 1334:
-                    print("iPhone 6/6S/7/8")
+                    debugPrint("iPhone 6/6S/7/8")
                     return "iPhone 6"
                 case 1920, 2208:
-                    print("iPhone 6+/6S+/7+/8+")
+                    debugPrint("iPhone 6+/6S+/7+/8+")
                     return "iPhone 8+"
                 case 2436:
-                    print("iPhone X/XS/11 Pro")
+                    debugPrint("iPhone X/XS/11 Pro")
                     return "iPhone 10"
                 case 2688:
-                    print("iPhone XS Max/11 Pro Max")
+                    debugPrint("iPhone XS Max/11 Pro Max")
                     return "iPhone 11"
                   
                 case 1792:
-                    print("iPhone XR/ 11 ")
+                    debugPrint("iPhone XR/ 11 ")
                     return "iPhone 12"
                 default:
-                    print("Unknown")
+                    debugPrint("Unknown")
                 }
             }
         return "iPhone 8+"
@@ -391,6 +499,31 @@ self.navigationController?.navigationBar.setBackgroundImage(UIColor.clear.as1ptI
             return countryDialingCode ?? "45"
 
     }
+    
+    @objc func reachabilityChanged2(note: Notification) {
+        let reachability = note.object as! Reachability
+        switch reachability.connection {
+        case .cellular:
+            debugPrint("Message Network available via Cellular Data.")
+            self.view.makeToast(kOnlineMessage, point: CGPoint(x: SCREENWIDTH/2, y: SCREENHEIGHT/2), title: nil, image: nil) { _ in
+            }
+            break
+        case .wifi:
+            debugPrint("Message Network available via WiFi.")
+            self.view.makeToast(kOnlineMessage, point: CGPoint(x: SCREENWIDTH/2, y: SCREENHEIGHT/2), title: nil, image: nil) { _ in
+            }
+            break
+        case .unavailable:
+            debugPrint("Message Network is not available.")
+            self.view.makeToast(kOfflieMessage, point: CGPoint(x: SCREENWIDTH/2, y: SCREENHEIGHT/2), title: nil, image: nil) { _ in
+            }
+            break
+        case .none:
+            self.view.makeToast(kOfflieMessage, point: CGPoint(x: SCREENWIDTH/2, y: SCREENHEIGHT/2), title: nil, image: nil) { _ in
+            }
+            break
+        }
+      }
     
     
 //    func setTwoRightButtons(image1: UIImage? = nil, title1: String? = nil,image2: UIImage? = nil, title2: String? = nil){
@@ -442,7 +575,7 @@ self.navigationController?.navigationBar.setBackgroundImage(UIColor.clear.as1ptI
    
 }
 
-//MARK:- Custom Alert Methods
+//MARK: - Custom Alert Methods
 extension BaseVC {
 //    func showAlert(image:UIImage? = nil ,title:String? = nil, message: String?, cancelTitle: String? = nil,  cancelAction: ButtonAction? = nil, okayTitle: String = kOkay, _ okayAction: ButtonAction? = nil) {
 //
@@ -466,7 +599,7 @@ extension BaseVC {
 
 
 
-//MARK:- UIApplication
+//MARK: - UIApplication
 extension UIApplication {
     var statusBar: UIView? {
         if responds(to: Selector(("statusBar")))
@@ -480,8 +613,8 @@ extension UIApplication {
 extension BaseVC {
     
     func showImagePicker(showVideo: Bool = false, showDocument: Bool = false) {
-        let alert  = UIAlertController(title: "SELECT MEDIA", message: nil, preferredStyle: .actionSheet)
-        alert.addAction(UIAlertAction(title: "GALLERY", style: .default, handler: {action in
+        let alert  = UIAlertController(title: kSELECTMEDIA, message: nil, preferredStyle: .actionSheet)
+        alert.addAction(UIAlertAction(title: kGALLERY, style: .default, handler: {action in
             let photos = PHPhotoLibrary.authorizationStatus()
             if photos == .notDetermined || photos == .denied || photos == .restricted {
                 PHPhotoLibrary.requestAuthorization({status in
@@ -490,9 +623,9 @@ extension BaseVC {
                             CustomImagePickerView.sharedInstace.pickImageUsing(target: self, mode: .gallery, showVideo: showVideo)
                         }
                         else {
-                           // self.showAlert(message: "Please enable the library permission from the settings.", {
-                            self.openSettings(message: "Please enable the library permission from the settings.")
-                                                       // }//)
+                          
+                            self.openSettings(message: kLibraryPermission)
+                    
                             return
                         }
                     }
@@ -502,16 +635,15 @@ extension BaseVC {
                 CustomImagePickerView.sharedInstace.pickImageUsing(target: self, mode: .gallery, showVideo: showVideo)
             }
         }))
-        alert.addAction(UIAlertAction(title: "CAMERA", style: .default, handler: {action in
+        alert.addAction(UIAlertAction(title: kCAMERA, style: .default, handler: {action in
             AVCaptureDevice.requestAccess(for: AVMediaType.video) { response in
                 DispatchQueue.main.async {
                     if response {
                         CustomImagePickerView.sharedInstace.pickImageUsing(target: self, mode: .camera, showVideo: showVideo)
                     } else {
-                        //                       // self.showAlert(message: "Please enable the camera permission from the settings.", {
-                        //                            self.openSettings()
-                        self.openSettings(message: "Please enable the camera permission from the settings.")
-                        //                        })
+                        
+                        self.openSettings(message: kCameraSetting)
+                      
                         return
                     }
                 }
@@ -531,7 +663,7 @@ extension BaseVC {
                 self.present(importMenu, animated: true, completion: nil)
             }))
         }
-        alert.addAction(UIAlertAction(title: "CANCEL", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: kCANCEL, style: .cancel, handler: nil))
         
         
         if (UIDevice.current.userInterfaceIdiom == UIUserInterfaceIdiom.pad)
@@ -558,10 +690,8 @@ extension BaseVC {
                         CustomImagePickerView.sharedInstace.pickImageUsing(target: self, mode: .gallery)
                     }
                     else {
-                        //                        //self.showAlert(message: "Please enable the library permission from the settings.", {
-                        //                            self.openSettings()
-                        self.openSettings(message: "Please enable the library permission from the settings.")
-                        //                        })
+                      
+                        self.openSettings(message: kLibraryPermission)
                         return
                     }
                 }
@@ -576,13 +706,20 @@ extension BaseVC {
     {
         
         DispatchQueue.main.async {
-        let story = UIStoryboard(name: kAccount, bundle: nil)
-        
-        let vc = story.instantiateViewController(withIdentifier: "DeleteAccountPopUpVC") as! DeleteAccountPopUpVC
+            let vc = DeleteAccountPopUpVC.instantiate(fromAppStoryboard: .Account)
         vc.comeFrom = kSetting
+        vc.messageType=message
         vc.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
         vc.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
-        self.present(vc, animated: true, completion: nil)
+            if let tab = self.tabBarController
+            {
+                tab.present(vc, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(vc, animated: true, completion: nil)
+            }
+            
         }
     }
     
@@ -597,7 +734,7 @@ extension BaseVC {
             let thumbnail = UIImage(cgImage: cgImage)
             return thumbnail
         } catch let error {
-            print("*** Error generating thumbnail: \(error.localizedDescription)")
+            debugPrint("*** Error generating thumbnail: \(error.localizedDescription)")
             return #imageLiteral(resourceName: "video")
         }
     }
@@ -608,7 +745,7 @@ extension BaseVC {
         self.present(activityViewController, animated: true, completion: nil)
     }
     
-    func showErrorMessage(error: Error?) {
+    func showErrorMessage(error: Error?,comeFromScreen : ScreenType = .storiesScreen) {
         /*
          STATUS CODES:
          200: Success (If request sucessfully done and data is also come in response)
@@ -618,69 +755,58 @@ extension BaseVC {
          403: Delete (If User deleted by admin)
          406: Not Acceptable (If user is registered with the application but not verified)
          */
+       
         let message = (error! as NSError).userInfo[ApiKey.kMessage] as? String ?? kSomethingWentWrong
         
             //ok button action
             let code = (error! as NSError).code
+        debugPrint("ERROR CODE \(code)")
+        
             if  code == 401 || code == 451
             {
-//                self.openAlert(title: kAlert,
-//                                         message: message,
-//                                         alertStyle: .alert,
-//                                         actionTitles: ["Ok"],
-//                                         actionStyles: [.default, .default],
-//                                         actions: [
-//
-//                                           { [self]_ in
-//                                            DataManager.ShakeId = ""
-//                                               print("okay click")
-//                                            if #available(iOS 13.0, *) {
-//                                                DataManager.comeFrom = ""
-//                                                DataManager.isProfileCompelete = false
-//                                                 DataManager.accessToken = ""
-//                                                SCENEDEL?.navigateToLogin()
-//                                            } else {
-//                                                // Fallback on earlier versions
-//                                                DataManager.comeFrom = ""
-//                                                DataManager.isProfileCompelete = false
-//                                                 DataManager.accessToken = ""
-//                                                APPDEL.navigateToLogin()
-//                                            }
-//
-//
-//                                             }
-//                                        ])
+             
+                let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
+
                 
-                // self.appDelegate?.navigateToHome()
-                 // DataManager.userType = ""
-                 // DataManager.accessToken = ""
-                
-                let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-                let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
                 destVC.type = .BlockReportError
                 destVC.user_name=message
                 destVC.errorCode=code
+                destVC.comeFromScreen = comeFromScreen
                 destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                 destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-                self.present(destVC, animated: true, completion: nil)
-                
+                if let tab = self.tabBarController
+                {
+                    tab.present(destVC, animated: true, completion: nil)
+                }
+                else
+                {
+                    self.present(destVC, animated: true, completion: nil)
+                }
               
             }
+    
            else
             {
                 
               //  self.openSimpleAlert(message: message)
                
-                let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-                let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
+
                 destVC.type = .BlockReportError
                 destVC.user_name=message
+                destVC.comeFromScreen = comeFromScreen
                 destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                 destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-                self.present(destVC, animated: true, completion: nil)
-                
+                if let tab = self.tabBarController
+                {
+                    tab.present(destVC, animated: true, completion: nil)
+                }
+                else
+                {
+                    self.present(destVC, animated: true, completion: nil)
+                }
             }
         
     }
@@ -691,13 +817,15 @@ extension BaseVC {
         var url = String()
         if let imageData = response[ApiKey.kPicture] as? JSONDictionary {
             if let data = imageData[ApiKey.kData] as? JSONDictionary {
-                url = data[ApiKey.kURL] as? String ?? ""
+                url = data[ApiKey.kURL] as? String ?? kEmptyString
             }
         }
         dict[ApiKey.kImage] = URL(string: url)
-        dict[ApiKey.kName] = response[ApiKey.kName] as? String ?? ""
-        dict[ApiKey.kEmail] = response[ApiKey.kEmail] as? String ?? ""
-        dict[ApiKey.kId] = response[ApiKey.kId] as! String
+        dict[ApiKey.kName] = response[ApiKey.kName] as? String ?? kEmptyString
+        dict[ApiKey.kEmail] = response[ApiKey.kEmail] as? String ?? kEmptyString
+        dict[ApiKey.kId] = response[ApiKey.kId] as? String  ?? kEmptyString
+        dict[ApiKey.kBirthday] = response[ApiKey.kBirthday] as? String ?? kEmptyString
+        dict[ApiKey.kGender] = response[ApiKey.kGender] as? String ?? kEmptyString
         dict[ApiKey.kSocial_type] = kFacebook
         return dict
     }
@@ -798,12 +926,12 @@ extension BaseVC {
         return labelText
     }
     
-    //MARK:- Open on notiifcation
+    //MARK: - Open on notiifcation
     
     @objc func methodOfReceivedNotification(notification: Notification) {
         //let id =  self.HangoutListArray[sender.tag].user_id ?? ""
         var pushed = false
-        print("Pushed = \(pushed)")
+        debugPrint("Pushed = \(pushed)")
         if !pushed
         {
         if let details = notification.userInfo as? [String:Any]
@@ -811,9 +939,10 @@ extension BaseVC {
             pushed = true
             if let nav = self.navigationController
             {
-                print("Navi true")
-                let storyBoard = UIStoryboard.init(name: "Home", bundle: nil)
-                let vc = storyBoard.instantiateViewController(withIdentifier: "ViewProfileVC") as! ViewProfileVC
+                debugPrint("Navi true")
+            
+                let vc = ViewProfileVC.instantiate(fromAppStoryboard: .Home)
+
 //                    vc.view_user_id = dict["view_user_id"] as? String ?? ""
 //                    vc.likeMode=dict["likeMode"] as? String ?? ""
 //                vc.story_id=dict["story_id"] as? String ?? ""
@@ -834,7 +963,7 @@ extension BaseVC {
             }
             else
             {
-                print("Navi false")
+                debugPrint("Navi false")
                 DataManager.comeFrom = kEmptyString
                 APPDEL.openHangoutDetails(details: details)
                
@@ -1140,7 +1269,7 @@ extension UINavigationBar {
         return outputImage!
     }
 }
-//MARK:- Detect shake of device
+//MARK: - Detect shake of device
 
 extension BaseVC
 {
@@ -1151,82 +1280,92 @@ extension BaseVC
     }
     override func motionCancelled(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         let date = Date()
-      print("Device shaken, Cancel \(motion) \(date)")
-        if DataManager.isProfileCompelete
+      debugPrint("Device shaken, Cancel \(motion) \(date)")
+        debugPrint("Base vc \(DataManager.isProfileCompelete)")
+         if ((DataManager.isProfileCompelete) && (DataManager.isPrefrenceSet) && (DataManager.isEditProfile))
         {
         
         if let startDate = self.startDate {
       let timeInterval = Int(date.timeIntervalSince(startDate))
         
-            print(timeInterval)
+            debugPrint(timeInterval)
             if timeInterval>=1
             {
                 UIDevice.vibrate()
-//                if #available(iOS 13.0, *) {
-//                    SCENEDEL?.navigateToSentShake()
-//                } else {
-//                    // Fallback on earlier versions
-//                    APPDEL.navigateToSentShake()
-//                }
-                
-                let storyBoard = UIStoryboard.init(name: "Home", bundle: nil)//Main
-                let vc = storyBoard.instantiateViewController(withIdentifier: "ShakeSentVC") as! ShakeSentVC//MobileVerificationVC ProfilePicVC AddVoiceVC
-                self.present(vc, animated: false, completion: nil)
-                
+
+                let vc = ShakeSentVC.instantiate(fromAppStoryboard: .Shake)
+
+                if let tab = self.tabBarController
+                {
+                    tab.present(vc, animated: true, completion: nil)
+                }
+                else
+                {
+                    self.present(vc, animated: true, completion: nil)
+                }
             }
 
          }
         }
     }
     override func motionBegan(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
-        if motion == .motionShake
-        {
-            self.startDate = Date()
-            print("Device shaken = \(motion) \(self.startDate)")
-      
+       
+        
+        if Connectivity.isConnectedToInternet {
+            if motion == .motionShake
+            {
+                self.startDate = Date()
+                debugPrint("Device shaken = \(motion) \(self.startDate)")
+          
+            }
+         } else {
+            
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
         }
     }
 
     override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         if motion == .motionShake {
             
-            if DataManager.isProfileCompelete
+            if Connectivity.isConnectedToInternet {
+                debugPrint("Base vc \(DataManager.isProfileCompelete)")
+            if ((DataManager.isProfileCompelete) && (DataManager.isPrefrenceSet) && (DataManager.isEditProfile))
             {
             
-          
           let date = Date()
-            print("Device shake stop, shake timer stopeed = \(motion) \(date)")
+            debugPrint("Device shake stop, shake timer stopeed = \(motion) \(date)")
         
             if let startDate = self.startDate {
           let timeInterval = Int(date.timeIntervalSince(startDate))
             
-                print(timeInterval)
+                debugPrint(timeInterval)
                 if timeInterval>=1
                 {
                     UIDevice.vibrate()
-//                    if #available(iOS 13.0, *) {
-//                        SCENEDEL?.navigateToSentShake()
-//                    } else {
-//                        // Fallback on earlier versions
-//                        APPDEL.navigateToSentShake()
-//                    }
+                    let vc = ShakeSentVC.instantiate(fromAppStoryboard: .Shake)
+
+                    if let tab = self.tabBarController
+                    {
+                        tab.present(vc, animated: true, completion: nil)
+                    }
+                    else
+                    {
+                        self.present(vc, animated: true, completion: nil)
+                    }
                     
-                    let storyBoard = UIStoryboard.init(name: "Home", bundle: nil)//Main
-                    let vc = storyBoard.instantiateViewController(withIdentifier: "ShakeSentVC") as! ShakeSentVC//MobileVerificationVC ProfilePicVC AddVoiceVC
-                    self.present(vc, animated: false, completion: nil)
                 }
 
              }
-            
-            
-
-
+            }
         }
+            else {
+                        self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+                    }
         }
     }
    
 }
-//Mark:- check image
+//MARK: - check image
 
  extension BaseVC
  {
@@ -1238,14 +1377,14 @@ extension BaseVC
         APIManager.callApiForImageCheck(image1: dataImage,imageParaName1: kMedia, api: "",successCallback: {
             
             (responseDict) in
-            print(responseDict)
+            debugPrint(responseDict)
            
             if kSucess.equalsIgnoreCase(string: responseDict[ApiKey.kStatus] as? String ?? "")//responseDict[ApiKey.kStatus] as? String == kSucess
             {
               
              let data =   self.parseImageCheckData(response: responseDict)
                 
-                print(data)
+                debugPrint(data)
                 if data?.weapon ?? 0.0 > kNudityCheck
                 {
                     isAppropriate=false
@@ -1289,7 +1428,7 @@ extension BaseVC
             
         },  failureCallback: { (errorReason, error) in
             successCallback([:])
-            print(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+            debugPrint(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
             
         })
         } else {
@@ -1337,7 +1476,7 @@ extension BaseVC
     func showImageCheckLoader(vc:UIViewController)
     {
     
-    let alert = UIAlertController(title: nil, message: "Image content checking...", preferredStyle: .alert)
+    let alert = UIAlertController(title: nil, message: kImageContentChecking, preferredStyle: .alert)
     let activityIndicator = UIActivityIndicatorView(style: .gray)
     activityIndicator.translatesAutoresizingMaskIntoConstraints = false
     activityIndicator.isUserInteractionEnabled = false
@@ -1354,7 +1493,7 @@ extension BaseVC
     
  }
 
-//MARK:-Socket method
+//MARK: -Socket method
 
 extension BaseVC
 {
@@ -1372,11 +1511,111 @@ extension BaseVC
     {
         SocketIOManager.shared.socket.on("online", callback: { (data, error) in
             
-            print("online = \(data) \(error)")
+            debugPrint("online = \(data) \(error)")
         })
         
     }
+    
+    
 }
+
+// MARK: extension for image conversion from data
+extension BaseVC {
+    func dataToImage(data: Data) -> UIImage {
+        var image: UIImage?
+        image = UIImage(data: data)
+        return image ?? UIImage()
+    }
+}
+//MARK: - APi call
+
+extension BaseVC
+{
+    func updateLocationAPI()
+    {
+        var data = JSONDictionary()
+        
+        data[ApiKey.kLatitude] = CURRENTLAT
+        data[ApiKey.kLongitude] = CURRENTLONG
+        data[ApiKey.KDeviceToken] = AppDelegate.DeviceToken
+        
+        if Connectivity.isConnectedToInternet {
+            
+            self.callApiForUpdateLatLong(data: data)
+        } else {
+            
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
+        
+    }
+    func callApiForUpdateLatLong(data:JSONDictionary)
+    {
+        HomeVM.shared.callApiForUpdateUserLatLong(showIndiacter: false, data: data, response: { (message, error) in
+    })
+}
+}
+//MARK: - socket call
+extension BaseVC
+{
+    
+    func selfJoinSocketEmit()
+    {
+        
+        let JoinDict = ["selfUserId":DataManager.Id]
+        SocketIOManager.shared.selfJoinSocket(MessageChatDict: JoinDict)
+        
+    }
+    
+    func badgeCountIntervalCheckEmit()
+    {
+        
+        let JoinDict = ["userId":DataManager.Id]
+        
+        debugPrint("badgeCountIntervalCheckEmit \(JoinDict)")
+        SocketIOManager.shared.badgeCountIntervalCheckEmit(MessageChatDict: JoinDict)
+        DispatchQueue.main.async {
+            self.badgeCountIntervalCheckON()
+        }
+        
+    }
+    func badgeCountIntervalCheckON()
+    {
+        SocketIOManager.shared.socket.on("receivedBadgeCount", callback: { (data, error) in
+            debugPrint(#function)
+            debugPrint(data)
+
+    
+            if let data = data as? JSONArray
+            {
+                for dict in data
+                {
+
+                    let badgeCount =  dict["badgeCount"] as? Int ?? 0
+                    if badgeCount > 0
+                    {
+                       // self.tabBarController?.addRedDotAtTabBarItemIndex(index: 1)//.tabBar.addBadge(index: 1)
+               self.tabBarController?.tabBar.addBadge(index: 1)
+                    }
+                    else
+                    {
+                        //self.tabBarController?.tabBar.removeBadge(index: 1)
+                       // self.tabBarController?.removeDotAtTabBarItemIndex(index: 1)
+                        self.tabBarController?.tabBar.removeBadge(index: 1)
+                    }
+                }
+            }
+            else
+            {
+                //self.tabBarController?.removeDotAtTabBarItemIndex(index: 1)
+                self.tabBarController?.tabBar.removeBadge(index: 1)
+            }
+
+            //  debugPrint("receivedBadgeCount = \(data) \(error)")
+        })
+
+    }
+}
+
 //extension BaseVC
 //{
 //    func updateLocationAPI()
@@ -1399,7 +1638,7 @@ extension BaseVC
 //    func callApiForUpdateLatLong(data:JSONDictionary)
 //    {
 //        HomeVM.shared.callApiForUpdateUserLatLong(showIndiacter: false, data: data, response: { (message, error) in
-//            print("Location update api = \(message)")
+//            debugPrint("Location update api = \(message)")
 //            
 //        })
 //    }

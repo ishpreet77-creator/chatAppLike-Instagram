@@ -38,8 +38,8 @@ class MyHangoutTCell: UITableViewCell {
         
         self.lblLocation.textColor=UIColor.darkGray
         self.lblDateTime.textColor=UIColor.darkGray
-        self.imgCalender.image = self.imgCalender.image?.tinted(color: UIColor.darkGray)
-        self.lmgLocation.image = self.lmgLocation.image?.tinted(color: UIColor.darkGray)
+//        self.imgCalender.image = self.imgCalender.image?.tinted(color: UIColor.darkGray)
+//        self.lmgLocation.image = self.lmgLocation.image?.tinted(color: UIColor.darkGray)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

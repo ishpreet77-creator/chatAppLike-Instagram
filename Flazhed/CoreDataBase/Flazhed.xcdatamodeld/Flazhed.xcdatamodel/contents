@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17192" systemVersion="19H2" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="ChatData" representedClassName="ChatData" syncable="YES" codeGenerationType="class">
+        <attribute name="chatDetails" optional="YES" attributeType="Binary"/>
+    </entity>
+    <entity name="HangoutListing" representedClassName="HangoutListing" syncable="YES" codeGenerationType="class">
+        <attribute name="hangouts" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+    </entity>
+    <entity name="MyProfile" representedClassName="MyProfile" syncable="YES" codeGenerationType="class">
+        <attribute name="profileDetails" optional="YES" attributeType="Binary"/>
+    </entity>
+    <entity name="OwnProfile" representedClassName="OwnProfile" syncable="YES" codeGenerationType="class">
+        <attribute name="age" optional="YES" attributeType="String"/>
+        <attribute name="bio" optional="YES" attributeType="String"/>
+        <attribute name="city" optional="YES" attributeType="String"/>
+        <attribute name="company_name" optional="YES" attributeType="String"/>
+        <attribute name="images" optional="YES" attributeType="Binary"/>
+        <attribute name="job_title" optional="YES" attributeType="String"/>
+        <attribute name="phone_number" optional="YES" attributeType="String"/>
+        <attribute name="unit" optional="YES" attributeType="String"/>
+        <attribute name="username" optional="YES" attributeType="String"/>
+    </entity>
+    <entity name="StoryListing" representedClassName="StoryListing" syncable="YES" codeGenerationType="class">
+        <attribute name="stories" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+    </entity>
+    <elements>
+        <element name="HangoutListing" positionX="-63" positionY="-18" width="128" height="44"/>
+        <element name="MyProfile" positionX="-54" positionY="-9" width="128" height="58"/>
+        <element name="OwnProfile" positionX="-54" positionY="0" width="128" height="164"/>
+        <element name="StoryListing" positionX="-54" positionY="0" width="128" height="44"/>
+        <element name="ChatData" positionX="-54" positionY="54" width="128" height="58"/>
+    </elements>
+</model>

@@ -25,6 +25,6 @@ class HomeCardCCell: UICollectionViewCell {
         // Initialization code
     }
 //    @objc func didTapImageView(_ sender: UITapGestureRecognizer) {
-//           print("did tap image view", sender)
+//           debugPrint("did tap image view", sender)
 //       }
 }

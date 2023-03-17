@@ -52,7 +52,7 @@ class DataManager {
             UserDefaults.standard.synchronize()
         }
         get {
-            return UserDefaults.standard.bool(forKey: "Home") ?? false
+            return UserDefaults.standard.bool(forKey: "Home")
         }
     }
     static var comeFromTag:Int {
@@ -266,7 +266,7 @@ class DataManager {
         }
     }
     
-    //MARK:- Hangout sort data
+    //MARK: - Hangout sort data
     
     
     static var social:String {
@@ -395,7 +395,7 @@ class DataManager {
             return UserDefaults.standard.bool(forKey: kMen)
         }
     }
-    //MARK:- Chat sort data
+    //MARK: - Chat sort data
     
     static var chatFilter:String {
         set {
@@ -462,6 +462,26 @@ class DataManager {
             return UserDefaults.standard.string(forKey: kAudio) ?? kEmptyString
         }
     }
+    
+    static var isInternetAvailble:Bool {
+        set {
+            UserDefaults.standard.set(newValue, forKey: kInternet)
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.bool(forKey: kInternet)
+        }
+    }
+    
+    static var Language:String? {
+        set {
+            UserDefaults.standard.set(newValue, forKey: "Language")
+            UserDefaults.standard.synchronize()
+        }
+        get {
+            return UserDefaults.standard.string(forKey: "Language")
+          }
+      }
 }
 
 

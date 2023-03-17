@@ -16,9 +16,9 @@ enum APIServicesHome:APIService {
     case UpdateLatLong(data: JSONDictionary)
     case getUserDetails(data: JSONDictionary)
     case RegretShake(data: JSONDictionary)
-    
     case RemoveStoryHangout(data: JSONDictionary)
-
+    case getShakeCount
+    
     var path: String {
         var path = ""
         switch self {
@@ -38,6 +38,8 @@ enum APIServicesHome:APIService {
             path = BASE_URL.appending("regret-shake")
         case .RemoveStoryHangout:
             path = BASE_URL.appending("delete-second-table-like-dislike")
+        case .getShakeCount:
+            path = BASE_URL.appending("shakeCount")
             }
         return path
      }
@@ -66,6 +68,8 @@ enum APIServicesHome:APIService {
             resource = Resource(method: .post, parameters: data, headers:headerDict)
         case let .RemoveStoryHangout(data):
             resource = Resource(method: .post, parameters: data, headers:headerDict)
+        case .getShakeCount:
+            resource = Resource(method: .get, parameters: nil, headers:headerDict)
 
         }
         return resource

@@ -70,3 +70,78 @@ extension UIColor {
        )
    }
 }
+
+extension UIColor {
+
+    func getComponents() -> (CGFloat, CGFloat, CGFloat, CGFloat) {
+        let color = self.components
+        return (color.red, color.green, color.blue, color.alpha)
+    }
+    
+    class func colorWithHexString (hex: String) -> UIColor {
+        
+        var cString = hex.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines).uppercased()
+        
+        if cString.hasPrefix("#") {
+            cString = (cString as NSString).substring(from: 1)
+        }
+        
+        if cString.count != 6 {
+            return UIColor.gray
+        }
+        
+        let rString = (cString as NSString).substring(to: 2)
+        let gString = ((cString as NSString).substring(from: 2) as NSString).substring(to: 2)
+        let bString = ((cString as NSString).substring(from: 4) as NSString).substring(to: 2)
+        
+        var r: CUnsignedInt = 0, g: CUnsignedInt = 0, b: CUnsignedInt = 0
+        Scanner(string: rString).scanHexInt32(&r)
+        Scanner(string: gString).scanHexInt32(&g)
+        Scanner(string: bString).scanHexInt32(&b)
+        
+        return UIColor(red: CGFloat(r) / 255.0, green: CGFloat(g) / 255.0, blue: CGFloat(b) / 255.0, alpha: CGFloat(1))
+    }
+    
+    var toHexString: String {
+        var r: CGFloat = 0
+        var g: CGFloat = 0
+        var b: CGFloat = 0
+        var a: CGFloat = 0
+        
+        self.getRed(&r, green: &g, blue: &b, alpha: &a)
+        
+        return String(
+            format: "%02X%02X%02X",
+            Int(r * 0xff),
+            Int(g * 0xff),
+            Int(b * 0xff)
+        )
+    }
+    
+    static func randomColor() -> UIColor {
+        return UIColor(red: self.random(), green: self.random(), blue: self.random(), alpha: 1.0)
+    }
+    
+    private static func random() -> CGFloat {
+        return CGFloat(arc4random()) / CGFloat(UInt32.max)
+    }
+    
+    var coreImageColor: CIColor {
+        return CIColor(color: self)
+    }
+    
+    var components: (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat) {
+        let coreImageColor = self.coreImageColor
+        return (coreImageColor.red, coreImageColor.green, coreImageColor.blue, coreImageColor.alpha)
+    }
+    
+    class func color(fromDictionary dictionary: [String: Any]) -> UIColor {
+        let red = dictionary["red"] as? CGFloat ?? 0.0
+        let green = dictionary["green"] as? CGFloat ?? 0.0
+        let blue = dictionary["blue"] as? CGFloat ?? 0.0
+        let alpha = dictionary["alpha"] as? CGFloat ?? 1.0
+        return UIColor(red: red/256.0, green: green/256.0, blue: blue/256.0, alpha: alpha)
+    }
+  
+   
+}

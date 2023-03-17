@@ -14,7 +14,7 @@ class ChatMatchTCell: UITableViewCell {
     
     var viewController = UIViewController()
 
-    var MatchArray:[UserListModel] = []
+    var MatchArray:[MatchUserListModel] = []
     override func awakeFromNib() {
         super.awakeFromNib()
        
@@ -23,6 +23,11 @@ class ChatMatchTCell: UITableViewCell {
         
         self.collectiomMatch.delegate=self
         self.collectiomMatch.dataSource=self
+        
+        self.lblNewMatch.text = kNEWMATCHES.capitalized
+        self.lblNoDataFound.text = kNonewmatch
+        
+        self.lblNewMatch.textColor = PURPLECOLOR
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -30,7 +35,7 @@ class ChatMatchTCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-    func reloadCollection(userArray:[UserListModel])
+    func reloadCollection(userArray:[MatchUserListModel])
     {
         self.MatchArray = userArray
         
@@ -57,11 +62,11 @@ extension ChatMatchTCell: UICollectionViewDelegate, UICollectionViewDataSource,U
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "ActiveInactiveCCell", for: indexPath) as! ActiveInactiveCCell
         
 
-        cell.progressView.trackClr = .white
+        //cell.progressView.trackClr = .white
     
-        cell.progressView.progressClr = #colorLiteral(red: 0, green: 0.5077332854, blue: 1, alpha: 1)
+        //cell.progressView.progressClr = #colorLiteral(red: 0, green: 0.5077332854, blue: 1, alpha: 1)
 
-        var cellData:UserListModel?
+        var cellData:MatchUserListModel?
         
         if self.MatchArray.count>indexPath.row
         {
@@ -82,7 +87,7 @@ extension ChatMatchTCell: UICollectionViewDelegate, UICollectionViewDataSource,U
         
         
         let dif  = "".checkHoursLeftForRing(startTime: cellData?.like_dislikeData?.chat_start_time_active ?? "2021-05-20T04:55:50.706Z")
-        print("time check = \(dif)")
+        debugPrint("time check = \(dif)")
         
         
         let flo = Float(kTimeRing)
@@ -92,46 +97,44 @@ extension ChatMatchTCell: UICollectionViewDelegate, UICollectionViewDataSource,U
         
         if (dif > 0) && (dif <= kTimeRing)
         {
-            cell.progressView.isHidden=false
+           // cell.progressView.isHidden=false
             if dif <= 1440//24
             {
-                cell.progressView.setProgressWithAnimation(duration: 1.0, value: ring)
-                cell.progressView.progressClr = UIColor.red
+              //  cell.progressView.setProgressWithAnimation(duration: 1.0, value: ring)
+                //cell.progressView.progressClr = UIColor.red
             }
             else
             {
                 
                
-                cell.progressView.setProgressWithAnimation(duration: 1.0, value: ring)
-                cell.progressView.progressClr = LINECOLOR
+               // cell.progressView.setProgressWithAnimation(duration: 1.0, value: ring)
+               // cell.progressView.progressClr = LINECOLOR
             }
         }
         else
         {
-            cell.progressView.setProgressWithAnimation(duration: 1.0, value: 1)
-            cell.progressView.progressClr = LINECOLOR
-            cell.progressView.isHidden=true
+           // cell.progressView.setProgressWithAnimation(duration: 1.0, value: 1)
+           /// cell.progressView.progressClr = LINECOLOR
+            //cell.progressView.isHidden=true
         }
         
-        if DataManager.purchaseProlong
-        {
-            cell.progressView.isHidden=true
-        }
-        else
-        {
-            cell.progressView.isHidden=false
-        }
-        
-        if cellData?.profile_data?.images?.count ?? 0>0
-            {
-            if let img = cellData?.profile_data?.images?[0].image
+//        if DataManager.purchaseProlong
+//        {
+//            cell.progressView.isHidden=true
+//        }
+//        else
+//        {
+//            cell.progressView.isHidden=false
+//        }
+//
+   
+            if let img = cellData?.profile_data?.image
               {
                 DispatchQueue.main.async {
-                let url = URL(string: img)!
-                cell.storyImageView.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: .refreshCached, completed: nil)
-                }
+                    cell.storyImageView.setImage(imageName: img)
               }
             }
+            
         
  
         cell.userName.text = cellData?.profile_data?.username ?? ""
@@ -145,8 +148,8 @@ extension ChatMatchTCell: UICollectionViewDelegate, UICollectionViewDataSource,U
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let collectionWidth = collectiomMatch.bounds.width //collectionWidth/4 - 10   65
-        var width = collectionWidth/4 - 10
-        print("Width \(width)")
+        //var width = collectionWidth/4 - 10
+        //debugPrint("Width \(width)")
         return CGSize(width: 106, height: collectiomMatch.bounds.height)
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
@@ -203,28 +206,23 @@ extension ChatMatchTCell: UICollectionViewDelegate, UICollectionViewDataSource,U
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 
         
-        var cellData:UserListModel?
+        var cellData:MatchUserListModel?
 
         if self.MatchArray.count>indexPath.row
         {
             cellData = self.MatchArray[indexPath.row]
         }
 
-        let storyBoard = UIStoryboard.init(name: "Chat", bundle: nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "MessageVC") as! MessageVC//MessageVC
-
+        let vc = MessageVC.instantiate(fromAppStoryboard: .Chat)
 
         vc.view_user_id=cellData?.user_id ?? ""
         vc.profileName=cellData?.profile_data?.username ?? ""
 
-        if cellData?.profile_data?.images?.count ?? 0>0
-            {
-            if let img = cellData?.profile_data?.images?[0].image
+            if let img = cellData?.profile_data?.image
               {
            vc.profileImage=img
             }
-        }
-
+      
         self.viewController.navigationController?.pushViewController(vc, animated: true)
         
         

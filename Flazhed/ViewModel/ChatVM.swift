@@ -7,6 +7,7 @@
 
 
 import Foundation
+import UIKit
 
 class ChatVM {
     
@@ -15,7 +16,7 @@ class ChatVM {
     var Match_Pagination_Details:Pagination_Details_Model?
     var lastPage = 0
     var page = 0
-    var MatchUserDataArray:[UserListModel] = []
+    var MatchUserDataArray:[MatchUserListModel] = []
     var chat_room_details_Array:[chat_room_details_Model] = []
     var chat_Room_Data:chat_room_Model?
     var chat_Room_Like_Data:Like_DisLike_Model?
@@ -24,10 +25,13 @@ class ChatVM {
     var Rtm_token = ""
     var is_come_from_story_hangout = 0
     var Audio_video_calling_data:audio_video_calling_Model?
+    var Active_Chat_Count_data:Active_Chat_Count_Model?
+    var Video_Call_Count_data:Video_Call_Count_Model?
+    
+    var chatArr: JSONArray = []
+    var localChatArr: JSONArray = []
     
     private init(){}
-
-    
     
     func callApiMatchesProfile(showIndiacter:Bool,data: JSONDictionary,response: @escaping responseCallBack)
     {
@@ -71,13 +75,13 @@ class ChatVM {
         }
     }
     
-    func callApiGetInActiveChat(showIndiacter:Bool, data: JSONDictionary,response: @escaping responseCallBack)
+    func callApiGetInActiveChat(showIndiacter:Bool, data: JSONDictionary, page: Int = 0, response: @escaping responseCallBack)
     {
         APIManager.callApiInActiveChat(showIndiacter:showIndiacter,data:data,successCallback: { (responseDict) in
          
             let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
             self.chat_room_details_Array.removeAll()
-            self.parseActiveChatData(response:responseDict)
+            self.parseActiveChatData(response:responseDict, page: page)
             response(message, nil)
         }) { (errorReason, error) in
             response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
@@ -138,7 +142,7 @@ class ChatVM {
         APIManager.callApiRemoveMatch(data:data,successCallback: { (responseDict) in
          
             let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
-           
+            UNUserNotificationCenter.current().removeAllDeliveredNotifications()
             response(message, nil)
         }) { (errorReason, error) in
             response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
@@ -170,17 +174,57 @@ class ChatVM {
     }
     
     
+    func callApiSaveCallRecoard(showIndiacter:Bool,data: JSONDictionary,response: @escaping responseCallBack)
+    {
+        APIManager.callApiSaveCallRecord(showIndiacter:showIndiacter,data:data,successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+         
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    
+    func callApi_Current_Active_Chat_Count(ShowIndicator:Bool=true,data: JSONDictionary,response: @escaping responseCallBack)
+    {
+
+        APIManager.callApi_Current_Active_Chat_Count(showIndiacter:ShowIndicator,data:data,successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+            self.parseCurrentActiveChatCount(response: responseDict)
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+
+    }
+    
+    
+    func callApi_Current_Video_Call_Count(showIndiacter:Bool=true, response: @escaping responseCallBack)
+    {
+        APIManager.callApi_Current_Video_Call_Count(showIndiacter:showIndiacter, successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+            self.parseCurrentVideoCallCount(response: responseDict)
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    
+    
+    
+    
+    
 }
 extension APIManager {
-    
-    
-    
-    //MARK:- call Api Match profile
+    //MARK: - call Api Match profile
 
     class func callApiMatchProfile(showIndiacter:Bool=true,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesChat.getMatchesProfile(data: data).request(showIndiacter:showIndiacter, isJsonRequest: true,success: { (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -196,7 +240,7 @@ extension APIManager {
     class func callApiCreateRoom(showIndiacter:Bool,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesChat.createChat(data: data).request(showIndiacter:showIndiacter,isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -209,7 +253,7 @@ extension APIManager {
     class func callApiActiveChat(showIndiacter:Bool, data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesChat.activeChat(data: data).request(showIndiacter:showIndiacter, isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -222,7 +266,7 @@ extension APIManager {
     class func callApiInActiveChat(showIndiacter:Bool,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesChat.inActiveChat(data: data).request(showIndiacter: showIndiacter, isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -235,7 +279,7 @@ extension APIManager {
     {
         APIServicesChat.Report_Block_user(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -249,7 +293,7 @@ extension APIManager {
     {
         APIServicesChat.Delete_Chat(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -262,7 +306,7 @@ extension APIManager {
     {
         APIServicesChat.Continue_chats(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -275,7 +319,7 @@ extension APIManager {
     {
         APIServicesChat.Active_Inactive_chats(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -287,7 +331,7 @@ extension APIManager {
     {
         APIServicesChat.Remove_Match(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -300,7 +344,7 @@ extension APIManager {
     {
         APIServicesChat.Audio_Video_Call_Notification(data: data).request(showIndiacter: ShowIndicator, isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -313,7 +357,7 @@ extension APIManager {
     {
         APIServicesChat.Rtm_Token_Generate.request(showIndiacter:showIndiacter, isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -324,8 +368,52 @@ extension APIManager {
     
     
     
+    
+    
+    
+    class func callApiSaveCallRecord(showIndiacter:Bool,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
+        APIServicesChat.save_video_call_record(data: data).request(showIndiacter:showIndiacter,isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                debugPrint(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
+    
+    
+    class func callApi_Current_Active_Chat_Count(showIndiacter:Bool,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback)
+    {
+        APIServicesChat.Current_Chat_Count(data: data).request(showIndiacter:showIndiacter, isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                debugPrint(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
+    class func callApi_Current_Video_Call_Count(showIndiacter:Bool=true, successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback)
+    {
+        APIServicesChat.Current_Video_Call_Count.request(showIndiacter:showIndiacter, isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                debugPrint(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
+    
 }
-//MARK:- Parsing the data
+//MARK: - Parsing the data
 extension ChatVM {
     
     func parseGetMatchUserData(response: JSONDictionary){
@@ -336,7 +424,7 @@ extension ChatVM {
             {
                     for match in profile
                     {
-                    let user = UserListModel(detail: match)
+                    let user = MatchUserListModel(detail: match)
                      self.MatchUserDataArray.append(user)
                     }
             }
@@ -350,17 +438,20 @@ extension ChatVM {
     }
     
     
-    func parseActiveChatData(response: JSONDictionary){
+    func parseActiveChatData(response: JSONDictionary, page: Int = 0){
         if let data = response[ApiKey.kData] as? JSONDictionary
         {
-    
             if let profile = data[ApiKey.kChat_room_details] as? JSONArray
             {
-                    for match in profile
-                    {
+                self.chatArr = profile
+                for match in profile
+                {
                     let user = chat_room_details_Model(detail: match)
-                     self.chat_room_details_Array.append(user)
-                    }
+                    self.chat_room_details_Array.append(user)
+                }
+//                DispatchQueue.global(qos: .background).async {
+//                    self.localChatData(array: self.chatArr, page: page)
+//                }
             }
     
             if let Pagination_details = data[ApiKey.kPagination_details] as? JSONDictionary
@@ -431,4 +522,70 @@ extension ChatVM {
             self.Audio_video_calling_data = detail
            }
        }
+    
+    func localChatData(array: JSONArray, page: Int) {
+        self.localChatArr.removeAll()
+        for data in array {
+            let LocalHangout = chat_room_details_Model.init(detail: data).json()
+            self.localChatArr.append(LocalHangout)
+        }
+        self.parseLocalChatListData(page: page)
+    }
+    
+    func parseLocalChatListData(page: Int) {
+        DispatchQueue.background(background: {
+            if page == 0 {
+                CoreDataManager.deleteRecords(entityName: ApiKey.kChatData)
+                CoreDataManager.saveChatListData(array: self.localChatArr)
+            } else {
+                CoreDataManager.appendChatListData(array: self.localChatArr)
+            }
+        }, completion: {
+            self.localChatArr.removeAll()
+        })
+    }
+    
+    func parseCurrentActiveChatCount(response: JSONDictionary){
+        if let data = response[ApiKey.kData] as? JSONDictionary
+        {
+            if let data = data["find_record"] as? JSONDictionary
+            {
+            
+            let detail = Active_Chat_Count_Model(detail: data)
+         self.Active_Chat_Count_data = detail
+            }
+            else
+            {
+                self.Active_Chat_Count_data = nil
+            }
+        }
+        else
+        {
+            self.Active_Chat_Count_data = nil
+        }
+    }
+    
+    
+    func parseCurrentVideoCallCount(response: JSONDictionary){
+        if let data = response[ApiKey.kData] as? JSONDictionary
+        {
+            if let data = data["find_record_b"] as? JSONDictionary
+            {
+            let detail = Video_Call_Count_Model(detail: data)
+            self.Video_Call_Count_data = detail
+            }
+            else
+            {
+                self.Video_Call_Count_data = nil
+            }
+        }
+        else
+        {
+            self.Video_Call_Count_data = nil
+        }
+        
+        
+       
+    }
+    
 }

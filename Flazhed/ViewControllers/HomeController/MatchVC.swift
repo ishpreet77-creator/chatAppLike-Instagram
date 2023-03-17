@@ -6,11 +6,16 @@
 //
 
 import UIKit
+import SkeletonView
 
 class MatchVC: BaseVC {
     
     @IBOutlet weak var topConst: NSLayoutConstraint!
+    @IBOutlet weak var lblTitle: UILabel!
     
+    @IBOutlet weak var imgRed: UIImageView!
+    @IBOutlet weak var btnStartCharting: UIButton!
+    @IBOutlet weak var imgRound: UIImageView!
     var comeFrom = 0
     @IBOutlet weak var imgUser2: UIImageView!
     
@@ -25,59 +30,48 @@ class MatchVC: BaseVC {
     override func viewDidLoad()
     {
         super.viewDidLoad()
-        
-        // Do any additional setup after loading the view.
-        
-        //        if self.getDeviceModel() == "iPhone 6"
-        //        {
-        //            self.topConst.constant = CGFloat(STATUSBARHEIGHT+8)
-        //        }
-        //        else if self.getDeviceModel() == "iPhone 8+"
-        //        {
-        //            self.topConst.constant = TOPSPACING
-        //        }
-        //        else
-        //        {
-        //            self.topConst.constant = TOPSPACING
-        //        }
-        
+        setupUI()
         self.topConst.constant = CGFloat(STATUSBARHEIGHT)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        
+        self.tabBarController?.tabBar.isHidden = true
+
         self.navigationController?.navigationBar.isHidden=true
         self.getUserDetails()
         if DataManager.userImage != ""
         {
-            let url = URL(string: DataManager.userImage)!
-            
-            self.imgUser1.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: [], completed: nil)
-            
-        }
-        //        if user2Image != ""
-        //        {
-        //            let url = URL(string: user2Image)!
-        //
-        //            self.imgUser2.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: .refreshCached, completed: nil)
-        //
-        //        }
         
-       
-        //
+            self.imgUser1.setImage(imageName: DataManager.userImage)
+        }
+    
     }
+    override func viewWillDisappear(_ animated: Bool) {
+        self.tabBarController?.tabBar.isHidden = false
+
+    }
+    
+    
+    //MARK: - Setup UI
+    
+    func setupUI()
+    {
+      
+        self.lblTitle.text = kItAMatch
+        self.btnStartCharting.setTitle(kSTARTCHATTING, for: .normal)
+        self.btnStartCharting.setTitle(kSTARTCHATTING, for: .selected)
+
+    }
+    
+    
     @IBAction func BackAct(_ sender: UIButton)
     {
         if self.comefrom.equalsIgnoreCase(string: kAppDelegate)
         {
-//            if #available(iOS 13.0, *) {
-//                SCENEDEL?.navigateToHome()
-//            } else {
-//                APPDEL.navigateToHome()
-//            }
-            let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+    
+            let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
             vc.selectedIndex=2
             self.navigationController?.pushViewController(vc, animated: true)
         }
@@ -91,8 +85,7 @@ class MatchVC: BaseVC {
     
     @IBAction func startChatingAct(_ sender: UIButton)
     {
-        let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-        let vc = storyboard.instantiateViewController(withIdentifier: "MessageVC") as! MessageVC
+        let vc = MessageVC.instantiate(fromAppStoryboard: .Chat)
         vc.comfrom=comefrom
         vc.profileName=self.profileName
         vc.profileImage=self.user2Image
@@ -101,8 +94,43 @@ class MatchVC: BaseVC {
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
+    
+    func showLoader()
+    {
+        
+        self.imgUser1.clipsToBounds=true
+        self.imgUser2.clipsToBounds=true
+        self.imgRound.clipsToBounds=true
+        self.btnStartCharting.clipsToBounds=true
+        self.imgRed.clipsToBounds=true
+        
+        
+        
+        self.imgUser1.isSkeletonable=true
+        self.imgUser2.isSkeletonable=true
+        self.imgRound.isSkeletonable=true
+        self.btnStartCharting.isSkeletonable=true
+        self.imgRed.isSkeletonable=true
+        
+        self.imgUser1.showAnimatedGradientSkeleton()
+        self.imgUser2.showAnimatedGradientSkeleton()
+        self.imgRound.showAnimatedGradientSkeleton()
+        self.btnStartCharting.showAnimatedGradientSkeleton()
+        self.imgRed.showAnimatedGradientSkeleton()
+    }
+    func hideLoader()
+    {
+    
+        self.imgRed.hideSkeleton()
+        self.imgUser1.hideSkeleton()
+        self.imgUser2.hideSkeleton()
+        self.imgRound.hideSkeleton()
+        self.btnStartCharting.hideSkeleton()
+    
+    }
+    
 }
-//MARK:- get user data api
+//MARK: - get user data api
 
 extension MatchVC
 {
@@ -116,6 +144,7 @@ extension MatchVC
             data[ApiKey.kHangout_Id] = kEmptyString
             data[ApiKey.kUser_id] = self.view_user_id
             data[ApiKey.kTimezone] = TIMEZONE
+            self.showLoader()
             self.callApiForGetUserDetails(data: data)
         } else {
             
@@ -126,32 +155,18 @@ extension MatchVC
     
     func callApiForGetUserDetails(data:JSONDictionary)
     {
-        HomeVM.shared.callApiGetUserDetails(data: data, response: { (message, error) in
+        HomeVM.shared.callApiGetUserImageDetails(data: data, response: { (message, error) in
             
             if error != nil
             {
+                self.hideLoader()
                 self.showErrorMessage(error: error)
             }
             else{
-                
-                if let UserData = HomeVM.shared.viewProfileUserDetail
+                self.hideLoader()
+                if let UserData = HomeVM.shared.onlyProfileDetail, let img = UserData.profile_data?.image
                 {
-                    
-                    let image = UserData.profile_data?.images ?? []
-                    if image.count>0
-                    {
-                        let img = UserData.profile_data?.images?[0].image ?? ""
-                        
-                        if img != ""
-                        {
-                            let url = URL(string: img)!
-                            
-                            self.imgUser2.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: .refreshCached, completed: nil)
-                            
-                        }
-                        
-                    }
-                    
+                    self.imgUser2.setImage(imageName: img)
                 }
             }
         })

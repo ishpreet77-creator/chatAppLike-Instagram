@@ -30,7 +30,7 @@ class HomeUserDetailsTCell: UICollectionViewCell {
     @IBOutlet weak var txtBio: UILabel!
     @IBOutlet weak var attributeCollectionView: UICollectionView!
     @IBOutlet weak var attributeCollHeightConst: NSLayoutConstraint!
-    var currentUserDetails:UserListModel?
+    var currentUserDetails:HomeUserListModel?
     var attCollectionHeight = 50
     let columnLayout = CustomViewFlowLayout()
     override func awakeFromNib() {
@@ -41,7 +41,7 @@ class HomeUserDetailsTCell: UICollectionViewCell {
         setupCollection()
         // Initialization code
     }
-    func reloadCollection(userDetails:UserListModel?,isAnoModeOn:Bool)
+    func reloadCollection(userDetails:HomeUserListModel?,isAnoModeOn:Bool)
     {
         self.currentUserDetails=userDetails
         
@@ -104,7 +104,7 @@ extension HomeUserDetailsTCell:UICollectionViewDelegate,UICollectionViewDataSour
             cell.imgIcon.image = UIImage(named: "Graduate")
            // cell.lblTitle.text = model?.education_selected?.education_name
             //cell.lblTitle.text = cell.lblTitle.text?.capitalized
-            var name = model?.education_selected?.education_name ?? ""
+            let name = model?.education_selected?.education_name ?? ""
             
             if name.capitalized == kPhD.capitalized
             {
@@ -145,7 +145,8 @@ extension HomeUserDetailsTCell:UICollectionViewDelegate,UICollectionViewDataSour
                 
                 cell.imgIcon.sd_setImage(with: url, placeholderImage: UIImage(named: "toddlerIcon"), options: .refreshCached) { (img, error, type, url) in
                     
-                    cell.imgIcon.image = cell.imgIcon.image?.tinted(color:  #colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1))
+                    cell.imgIcon.image = cell.imgIcon.image?.tinted(color: PURPLECOLOR)
+
                 }
             }
             
@@ -154,13 +155,14 @@ extension HomeUserDetailsTCell:UICollectionViewDelegate,UICollectionViewDataSour
         }
 
         
-        cell.imgIcon.image = cell.imgIcon.image?.tinted(color:  #colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1))
+        cell.imgIcon.image = cell.imgIcon.image?.tinted(color: PURPLECOLOR)
+
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize
     {
-        //MARK:- child changes
+        //MARK: - child changes
     
        // return CGSize(width: ((Int(self.attributeCollectionView.frame.width)/2)-4), height: 46)
         

@@ -20,6 +20,16 @@ class AccountVM {
     var Swiping_Subsription_Data:SubscriptionModel?
     var Shake_Subsription_Data:SubscriptionModel?
     
+    
+    var Hangout_Subsription_Data:SubscriptionModel?
+    var Chating_Subsription_Data:SubscriptionModel?
+    var Story_Subsription_Data:SubscriptionModel?
+    var Post_Subsription_Data:SubscriptionModel?
+    var Post_count_Subsription_Data:Post_Data_Model?
+    var User_Profile_Update_Counter_Data:User_Profile_Update_Counter_Model?
+    
+    
+    
 
     func callApiUpdateMobile(data: JSONDictionary,response: @escaping responseCallBack)
     {
@@ -112,15 +122,58 @@ class AccountVM {
             response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
         }
     }
+    
+    
+    func callApiEndMySubscription(data: JSONDictionary,response: @escaping responseCallBack)
+    {
+        APIManager.callApiEndMySubscription(data:data,successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+            
+          // self.parseGetPreferenceData(response:responseDict)
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    
+    func callApi_check_post_limit(data: JSONDictionary,response: @escaping responseCallBack)
+    {
+        APIManager.callApi_check_post_limit(data:data,successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+            
+           self.parse_Check_post_limit(response:responseDict)
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    
+    
+    
+    func callApiProfileValidationCounter(response: @escaping responseCallBack)
+    {
+        APIManager.callApiProfileValidationCounter(successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+            
+         self.parseProfileValidationCounterData(response:responseDict)
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    
 }
 extension APIManager {
 
-    //MARK:- call Api Update Mobile
+    //MARK: - call Api Update Mobile
 
     class func callApiUpdateMobile(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesAccount.updateMobile(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -130,12 +183,12 @@ extension APIManager {
     }
     
     
-    //MARK:- call Api get unit
+    //MARK: - call Api get unit
 
     class func callApiGetUnit(successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesAccount.getUnit.request(success: { (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -145,12 +198,12 @@ extension APIManager {
         
     }
     
-    //MARK:- call Api Update Mobile
+    //MARK: - call Api Update Mobile
 
     class func callApiUpdateUnit(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesAccount.updateUnit(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -163,7 +216,7 @@ extension APIManager {
     class func callApiGetNotificationSetup(successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesAccount.getNotificationSetup.request(success: { (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -172,12 +225,12 @@ extension APIManager {
         }, failure: failureCallback)
 }
     
-    //MARK:- call Api Update notification setup
+    //MARK: - call Api Update notification setup
 
     class func callApiUpdateNotiSetup(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesAccount.updateNotificationSetup(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -191,7 +244,7 @@ extension APIManager {
     class func callApiPayment(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesAccount.updatePayment(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -203,7 +256,46 @@ extension APIManager {
     class func callApiGetMySubscription(successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesAccount.get_my_subscription.request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
+    
+    class func callApiEndMySubscription(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
+        APIServicesAccount.endSubscriptionPayment(data: data).request(isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                debugPrint(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
+    
+    class func callApi_check_post_limit(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
+        APIServicesAccount.check_post_limit(data: data).request(isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                debugPrint(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
+    
+    class func callApiProfileValidationCounter(successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
+        APIServicesAccount.get_Profile_validation_counter.request(isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -214,7 +306,7 @@ extension APIManager {
     
 }
 
-//MARK:- Parsing the data
+//MARK: - Parsing the data
 extension AccountVM {
     
 
@@ -276,14 +368,91 @@ extension AccountVM {
             {
                 self.Swiping_Subsription_Data = nil
             }
+            
+            
+            if let User = data[ApiKey.kHangout] as? JSONDictionary
+            {
+                let data =  SubscriptionModel(detail: User)
+                self.Hangout_Subsription_Data = data
+            }
+            else
+            {
+                self.Hangout_Subsription_Data = nil
+            }
+            
+            if let User = data[ApiKey.kStory] as? JSONDictionary
+            {
+                let data =  SubscriptionModel(detail: User)
+                self.Story_Subsription_Data = data
+            }
+            else
+            {
+                self.Story_Subsription_Data = nil
+            }
+            if let User = data[ApiKey.kChating] as? JSONDictionary
+            {
+                let data =  SubscriptionModel(detail: User)
+                self.Chating_Subsription_Data = data
+            }
+            else
+            {
+                self.Chating_Subsription_Data = nil
+            }
+            
+            
         }
     }
+    
+    
+    func parse_Check_post_limit(response: JSONDictionary){
+        if let data = response[ApiKey.kData] as? JSONDictionary
+        {
+            if let data = data["limit_check"] as? JSONDictionary
+            {
+          
+            if let User = data["post_data"] as? JSONDictionary
+            {
+                let data =  Post_Data_Model(detail: User)
+                self.Post_count_Subsription_Data = data
+            }
+            else
+            {
+                self.Post_count_Subsription_Data = nil
+            }
+            
+            if let User = data["story_subscription"] as? JSONDictionary
+            {
+                let data =  SubscriptionModel(detail: User)
+                self.Post_Subsription_Data = data
+            }
+            else
+            {
+                self.Post_Subsription_Data = nil
+            }
+            }
+            else
+            {
+                self.Post_Subsription_Data = nil
+                self.Post_count_Subsription_Data = nil
+            }
+            
+        }
+    }
+    
+    func parseProfileValidationCounterData(response: JSONDictionary){
+        if let data = response[ApiKey.kData] as? JSONDictionary
+        {
+            let parse = User_Profile_Update_Counter_Model(detail: data)
+            self.User_Profile_Update_Counter_Data = parse
+        }
+    }
+  
 }
 
 extension APIManager
 {
     
-    static func callApiForAudioFileUpload(image : [Data], data: JSONDictionary,AudioData:Data,audiParaName:String,imageParaName:String,api:String,imageDrag:Bool,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback)
+    static func callApiForAudioFileUpload(image : [Data], data: JSONDictionary,AudioData:Data,audiParaName:String,imageParaName:String,api:String,imageDrag:Bool,voiceUpdate:Bool=true,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback)
     {
         Indicator.sharedInstance.showIndicator()
             
@@ -316,14 +485,14 @@ extension APIManager
                             })
                         }
                     }
-                    if  !AudioData.isEmpty
+                    if voiceUpdate && !AudioData.isEmpty
                     {
                         //voice.mp3
                         multipartFormData.append(AudioData, withName: audiParaName, fileName: "voice.mp3", mimeType: "mp3/mpeg/mppeg-4")
                     }
                     if imageDrag
                     {
-                        print("image drag = \(imageDrag)")
+                        debugPrint("image drag = \(imageDrag)")
                     for img in image
                     {
                         multipartFormData.append(img, withName: imageParaName, fileName: "images.png", mimeType: "jpeg/jpg/png")
@@ -336,10 +505,10 @@ extension APIManager
                 headers: headers)
                 .responseJSON { (resp) in
                     
-                    print("resp is \(resp)")
+                    debugPrint("resp is \(resp)")
                     Indicator.sharedInstance.hideIndicator()
                     if let responseDict = resp.value as? JSONDictionary {
-                        print(responseDict)
+                        debugPrint(responseDict)
                         successCallback(responseDict)
                         
                     }
@@ -403,10 +572,10 @@ extension APIManager
                 headers: headers)
                 .responseJSON { (resp) in
                 
-                    print("resp is \(resp)")
+                    debugPrint("resp is \(resp)")
                     Indicator.sharedInstance.hideIndicator()
                     if let responseDict = resp.value as? JSONDictionary {
-                        print(responseDict)
+                        debugPrint(responseDict)
                         successCallback(responseDict)
                         
                     }
@@ -459,10 +628,10 @@ extension APIManager
                 headers: headers)
                 .responseJSON { (resp) in
                     
-                    print("resp is \(resp)")
+                    debugPrint("resp is \(resp)")
                     Indicator.sharedInstance.hideIndicator()
                     if let responseDict = resp.value as? JSONDictionary {
-                        print(responseDict)
+                        debugPrint(responseDict)
                         successCallback(responseDict)
                         
                     }
@@ -496,8 +665,11 @@ extension APIManager
             let urlString =  "https://api.sightengine.com/1.0/check.json"//BASE_URL.appending("https://api.sightengine.com/1.0/check.json")
             
            // let headers: HTTPHeaders = [kAccept:  kApplicationJson,kAuthorization: "Bearer \(DataManager.accessToken)"]
-            
-            AF.upload(
+        let manager = Alamofire.Session.default
+        manager.session.configuration.timeoutIntervalForRequest = ALAMOFIRE_TIMEOUT
+        manager.session.configuration.timeoutIntervalForResource = ALAMOFIRE_TIMEOUT
+        
+            manager.upload(
                 multipartFormData: { multipartFormData in
                   
                     for (key, value) in data {
@@ -505,6 +677,69 @@ extension APIManager
                             multipartFormData.append(temp.data(using: .utf8)!, withName: key)
                             
                         }
+                        /*
+                        
+                        if let temp = value as? Int {
+                            multipartFormData.append("(temp)".data(using: .utf8)!, withName: key)
+                            
+                        }
+                        
+                        if let temp = value as? NSArray
+                        {
+                            temp.forEach({ element in
+                                let keyObj = key + "[]"
+                                if let string = element as? String {
+                                    multipartFormData.append(string.data(using: .utf8)!, withName: keyObj)
+                                } else
+                                if let num = element as? Int {
+                                    let value = "(num)"
+                                    multipartFormData.append(value.data(using: .utf8)!, withName: keyObj)
+                                }
+                            })
+                        }
+                        */
+                    }
+                    
+                        multipartFormData.append(image1, withName: imageParaName1, fileName: "images.png", mimeType: "jpeg/jpg/png")
+            
+                },
+                to: urlString, //URL Here
+                method: .post,
+                headers: nil)
+                .responseJSON { (resp) in
+                    
+                    debugPrint("resp is \(resp)")
+                    Indicator.sharedInstance.hideIndicator()
+                    
+                    if let responseDict = resp.value as? JSONDictionary {
+                        debugPrint(responseDict)
+                        
+                        successCallback(responseDict)
+                        
+                    }
+                    else
+                    {
+                        successCallback([:])
+                    }
+                    
+                }
+    }
+    
+   
+    
+    static func callApiForUploadImages(image : [Data], data: JSONDictionary,imageParaName:String,api:String,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback)
+    {
+        Indicator.sharedInstance.showIndicator()
+            
+            let urlString =  BASE_URL.appending(api)
+            
+            let headers: HTTPHeaders = [kAccept:  kApplicationJson,kAuthorization: "Bearer \(DataManager.accessToken)"]
+            
+            AF.upload(
+                multipartFormData: { multipartFormData in
+                    for (key, value) in data {
+                        if let temp = value as? String {
+                            multipartFormData.append(temp.data(using: .utf8)!, withName: key)}
                         
                         if let temp = value as? Int {
                             multipartFormData.append("(temp)".data(using: .utf8)!, withName: key)
@@ -525,33 +760,31 @@ extension APIManager
                             })
                         }
                     }
-                    
-                        multipartFormData.append(image1, withName: imageParaName1, fileName: "images.png", mimeType: "jpeg/jpg/png")
-            
+                    for img in image
+                    {
+                        multipartFormData.append(img, withName: imageParaName, fileName: "images.png", mimeType: "jpeg/jpg/png")
+                    }
+    
                 },
                 to: urlString, //URL Here
                 method: .post,
-                headers: nil)
+                headers: headers)
                 .responseJSON { (resp) in
                     
-                    print("resp is \(resp)")
+                    debugPrint("resp is \(resp)")
                     Indicator.sharedInstance.hideIndicator()
-                    
                     if let responseDict = resp.value as? JSONDictionary {
-                        print(responseDict)
-                        
+                        debugPrint(responseDict)
                         successCallback(responseDict)
                         
                     }
-                    else
-                    {
-                        successCallback([:])
-                    }
                     
                 }
+     
     }
     
-   
+    
+    
     
     
 }

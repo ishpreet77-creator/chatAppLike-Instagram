@@ -10,7 +10,7 @@ import UIKit
 
 struct AppFontName {
     
-    //MARK:- Font name
+    //MARK: - Font name
     
 //    Averta-Black
 //    Averta-Black
@@ -53,6 +53,7 @@ struct AppFontName {
     static let bold = "Averta-Bold"
     static let italic = "Averta-RegularItalic"
     static let Light = "Averta-Light"
+    static let ExtraBold = "Averta-ExtraBold"
 }
 
 extension UIFontDescriptor.AttributeName {

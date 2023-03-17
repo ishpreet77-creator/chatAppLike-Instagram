@@ -38,16 +38,26 @@ class StoryAdsTCell: UITableViewCell {
          //
         
       //  bannerView.adUnitID = "ca-app-pub-9730116356670864~3963495235"
-        
-        bannerView.adUnitID =  "ca-app-pub-3940256099942544/2934735716"//"ca-app-pub-3940256099942544/2934735716"
+       // GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers = ["b9c134a943232ab79bdde611c1ab45f6"];
+        bannerView.adUnitID = APP_ADS_ID
+        //bannerView.adUnitID =  "ca-app-pub-3940256099942544/2934735716"//"ca-app-pub-3940256099942544/2934735716"
  //       bannerView.delegate = self
-        let adSize = GADAdSizeFromCGSize(CGSize(width: 300, height:600))
+        
+        
+        let adSize = GADAdSizeFromCGSize(CGSize(width: 300, height:ADSWIDTH)) //600
+        
+//        <Google> To get test ads on this device, set:
+        
+        GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers = [(kGADSimulatorID as! String)]
+
+        //320x480
+        
        // 300 x 600
         //336 x 280
         //300 x 250
         //bannerView.adSize = GADCurrentOrientationAnchoredAdaptiveBannerAdSizeWithWidth(SCREENWIDTH)
         DispatchQueue.main.async {
-            bannerView.adSize=adSize
+            bannerView.adSize=adSize//kGADAdSizeMediumRectangle//adSize
             bannerView.load(GADRequest())
         }
         

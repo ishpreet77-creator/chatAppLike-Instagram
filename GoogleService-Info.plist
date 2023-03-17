@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>973725628875-o1fnrqodbg148ktv2ciqdfqq8jvaf7la.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.973725628875-o1fnrqodbg148ktv2ciqdfqq8jvaf7la</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>973725628875-5loqkmtb1i3vnm8jh2e1jcb1902qn6i2.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD2OdshbPI6evXCM_fU0OrP7RcuvBFqnTo</string>
+	<key>GCM_SENDER_ID</key>
+	<string>973725628875</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.flazhed</string>
+	<key>PROJECT_ID</key>
+	<string>flazhed-1610978664058</string>
+	<key>STORAGE_BUCKET</key>
+	<string>flazhed-1610978664058.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:973725628875:ios:7a215e8bd9a51083701e4e</string>
+	<key>DATABASE_URL</key>
+	<string>https://flazhed-1610978664058-default-rtdb.firebaseio.com</string>
+	<key>ADMOB_APP_ID</key>
+	<string>ca-app-pub-9730116356670864~3963495235</string>
+</dict>
+</plist>

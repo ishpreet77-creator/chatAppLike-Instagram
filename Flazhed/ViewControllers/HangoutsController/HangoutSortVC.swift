@@ -179,11 +179,15 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
         {
            let cell = tableView.dequeueReusableCell(withIdentifier: "SortHangoutTCell") as! SortHangoutTCell
             self.HeaderTableCell=cell
-            
+            cell.lbl1.text = kHangoutSort[0]
+            cell.lbl2.text=kHangoutSort[1]
+            cell.lbl3.text=kHangoutSort[2]
+            cell.lbl4.text=kHangoutSort[3]
             if self.selectedOption.contains(0)
             {
                 cell.img1.image=UIImage(named: "SelectedCheck")
-                cell.lbl1.textColor=LINECOLOR
+               
+                cell.lbl1.textColor=PURPLECOLOR
                 self.Social="1"
                 cell.btn1.isSelected=true
             }
@@ -197,7 +201,8 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
             if self.selectedOption.contains(1)
             {
                 cell.img2.image=UIImage(named: "SelectedCheck")
-                cell.lbl2.textColor=LINECOLOR
+               
+                cell.lbl2.textColor=PURPLECOLOR
                 self.travel="1"
                 cell.btn2.isSelected=true
             }
@@ -211,8 +216,9 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
             if self.selectedOption.contains(2)
             {
                 cell.img3.image=UIImage(named: "SelectedCheck")
-                cell.lbl3.textColor=LINECOLOR
+                cell.lbl3.textColor=PURPLECOLOR
                 self.sport="1"
+               
                 cell.btn3.isSelected=true
             }
             else
@@ -224,8 +230,9 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
             }
             if self.selectedOption.contains(3)
             {
+               
                 cell.img4.image=UIImage(named: "SelectedCheck")
-                cell.lbl4.textColor=LINECOLOR
+                cell.lbl4.textColor=PURPLECOLOR
                 self.business="1"
                 cell.btn4.isSelected=true
             }
@@ -267,7 +274,7 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
                 if self.selectedOption.contains(4)
                 {
                     cell.img1.image=UIImage(named: "SelectedCheck")
-                    cell.lbl1.textColor=LINECOLOR
+                    cell.lbl1.textColor=PURPLECOLOR
                     self.women="1"
 
                 }
@@ -281,7 +288,7 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
                 if self.selectedOption.contains(5)
                 {
                     cell.img2.image=UIImage(named: "SelectedCheck")
-                    cell.lbl2.textColor=LINECOLOR
+                    cell.lbl2.textColor=PURPLECOLOR
                     self.men="1"
 
                 }
@@ -302,7 +309,7 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
             if self.selectedOption.contains(6)
             {
                 cell.img1.image=UIImage(named: "SelectedCheck")
-                cell.lbl1.textColor=LINECOLOR
+                cell.lbl1.textColor=PURPLECOLOR
                 self.latest="1"
             }
             else
@@ -315,7 +322,7 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
             if self.selectedOption.contains(7)
             {
                 cell.img2.image=UIImage(named: "SelectedCheck")
-                cell.lbl2.textColor=LINECOLOR
+                cell.lbl2.textColor=PURPLECOLOR
                 self.oldest="1"
    
             }
@@ -335,7 +342,7 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
             if self.selectedOption.contains(8)
             {
                 cell.img1.image=UIImage(named: "SelectedCheck")
-                cell.lbl1.textColor=LINECOLOR
+                cell.lbl1.textColor=PURPLECOLOR
                 self.ase="1"
 
             }
@@ -349,7 +356,7 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
             if self.selectedOption.contains(9)
             {
                 cell.img2.image=UIImage(named: "SelectedCheck")
-                cell.lbl2.textColor=LINECOLOR
+                cell.lbl2.textColor=PURPLECOLOR
                 self.desc="1"
 
             }
@@ -491,7 +498,7 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
     
     @objc func TypeAct(_ sender: UIButton)
     {
-        print(sender.tag)
+        debugPrint(sender.tag)
         self.isUpdate=true
         if sender.isSelected
         {
@@ -511,14 +518,14 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
 
             }
         }
-        print(selectedOption)
+        debugPrint(selectedOption)
         self.tableSort.reloadData()
     }
     
     
     @objc func btn1Act(_ sender: UIButton)
     {
-        print(sender.tag)
+        debugPrint(sender.tag)
         self.isUpdate=true
         let buttonPosition = sender.convert(CGPoint.zero, to: self.tableSort)
         let indexPath = self.tableSort.indexPathForRow(at:buttonPosition)
@@ -605,7 +612,7 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
                 }
             }
         }
-        print(selectedOption)
+        debugPrint(selectedOption)
         self.tableSort.reloadData()
     }
     
@@ -693,9 +700,9 @@ extension HangoutSortVC:UITableViewDelegate,UITableViewDataSource
 
             }
         }
-        print(selectedOption)
+        debugPrint(selectedOption)
         self.tableSort.reloadData()
-        print(sender.tag)
+        debugPrint(sender.tag)
 
     }
 }

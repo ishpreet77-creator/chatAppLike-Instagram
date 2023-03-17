@@ -58,6 +58,7 @@ class AudioCallingVC: BaseVC {
     var uid_subscriber = ""
     
     var agoraRtmKit: AgoraRtmKit?
+    var alreadyPop=false
     
     private var ringStatus: Operation = .off {
         didSet {
@@ -72,10 +73,14 @@ class AudioCallingVC: BaseVC {
         }
     }
     var callTimer:Timer?
-    
+    var alreadySentMessage=false
     override func viewDidLoad() {
-        print("Date \(Date())")
+        debugPrint("Date \(Date())")
         super.viewDidLoad()
+//        SocketIOManager.shared.initializeSocket()
+//        let JoinDict = ["otherName":self.userName,"room":self.chat_room_id,"selfName":DataManager.userName]
+//        SocketIOManager.shared.joinRoomForChat(joinRoomDict: JoinDict)
+//
         self.decliineButton.isEnabled=false
         self.UISetup()
          // NotificationCenter.default.addObserver(self, selector: #selector(self.methodOfReceivedCallEndNotification(notification:)), name: Notification.Name("CallEndNotificationIdentifier"), object: nil)
@@ -115,7 +120,8 @@ class AudioCallingVC: BaseVC {
                         self.totalTime = 1
                        } else {
                            // User rejected
-                        self.openSettings(message: "Please enable the microphone permission from the settings.")
+                           self.openSettings(message: PermissonType.kMicrophoneCamera)
+                        //self.openSettings(message: kMicrophonePermission)
                        }
                    })
                 }
@@ -133,18 +139,20 @@ class AudioCallingVC: BaseVC {
        // dateFromatter.locale = NSLocale(localeIdentifier: "en_US") as Locale
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            print("Date \(Date())")
+            debugPrint("Date \(Date())")
             self.decliineButton.isEnabled=true
         }
     }
     
+  
+    
     override func viewWillAppear(_ animated: Bool) {
         self.backBUtton.isHidden=false
-        
+        self.alreadySentMessage=false
         super.viewWillAppear(true)
         self.callConnected = false
         self.speakerButton.isSelected=true
-        
+        self.alreadyPop=false
         self.fromDeclienCall=false
         
        // self.decliineButton.isEnabled=true
@@ -176,10 +184,14 @@ class AudioCallingVC: BaseVC {
               
                } else {
                    // User rejected
-                self.openSettings(message: "Please enable the microphone permission from the settings.")
+                   self.openSettings(message: PermissonType.kMicrophoneCamera)
+                //self.openSettings(message: kMicrophonePermission)
                }
            })
         }
+        
+        self.tabBarController?.tabBar.isHidden = true
+
     }
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
@@ -188,15 +200,16 @@ class AudioCallingVC: BaseVC {
        // self.leaveChannel()
         
         ringStatus = .off
+        self.tabBarController?.tabBar.isHidden = false
+
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        if self.comeFrom.equalsIgnoreCase(string: kMessage)
-        {
-            ringStatus = .on
-        }
+       
+        SocketIOManager.shared.initializeSocket()
+       // self.selfJoinSocketEmit()
         
     }
     
@@ -206,8 +219,8 @@ class AudioCallingVC: BaseVC {
         self.muteButton.isSelected=true
         self.muteButton.layer.cornerRadius = self.muteButton.frame.height/2
         self.speakerButton.layer.cornerRadius = self.speakerButton.frame.height/2
-        self.muteButton.backgroundColor = LINECOLOR
-        self.speakerButton.backgroundColor = LINECOLOR
+        self.muteButton.backgroundColor = PURPLECOLOR//LINECOLOR
+        self.speakerButton.backgroundColor = PURPLECOLOR//LINECOLOR
         self.speakerButton.setImage(self.speakerButton.image(for: .normal)?.tinted(color: UIColor.white), for: .normal)
         self.muteButton.setImage(UIImage(named: "audioUnmute"), for: .normal)
         self.muteButton.setImage(self.muteButton.image(for: .normal)?.tinted(color: UIColor.white), for: .normal)
@@ -229,15 +242,15 @@ class AudioCallingVC: BaseVC {
     
     func joinChannel()
     {
-        print("Agora details = ")
-        print("AGORA_APP_ID ", AGORA_APP_ID)
-        print("AGORA_TOKEN",agoraToken)
-        print("AGORA_CHANEL_NAME",agoraChannelName)
-        print("AGORA_CHANEL_UID",agoraChannelUID)
+        debugPrint("Agora details = ")
+        debugPrint("AGORA_APP_ID ", AGORA_APP_ID)
+        debugPrint("AGORA_TOKEN",agoraToken)
+        debugPrint("AGORA_CHANEL_NAME",agoraChannelName)
+        debugPrint("AGORA_CHANEL_UID",agoraChannelUID)
         
         self.agoraKit?.joinChannel(byToken: agoraToken, channelId: agoraChannelName, info: nil, uid: UInt(agoraChannelUID) ?? 0, joinSuccess: { [weak self] (channel, uid, elapsed) in
             
-            print("Join chanel \(channel) \(uid) \(elapsed)")
+            debugPrint("Join chanel \(channel) \(uid) \(elapsed)")
             if let weakSelf = self {
                 weakSelf.agoraKit?.setEnableSpeakerphone(true)
                 UIApplication.shared.isIdleTimerDisabled = true
@@ -249,7 +262,7 @@ class AudioCallingVC: BaseVC {
     {
        
         self.totalTime = self.totalTime+1
-        print("Total time = \(self.totalTime)")
+        debugPrint("Total time = \(self.totalTime)")
         if self.comeFrom.equalsIgnoreCase(string: kMessage)
         {
             self.ringStatus = .on
@@ -323,7 +336,7 @@ class AudioCallingVC: BaseVC {
             sender.isSelected=true
 
             agoraKit?.setVolumeOfEffect(.max, withVolume: 100)
-            self.speakerButton.backgroundColor = LINECOLOR
+            self.speakerButton.backgroundColor = PURPLECOLOR//LINECOLOR
             self.speakerButton.setImage(self.speakerButton.image(for: .normal)?.tinted(color: UIColor.white), for: .normal)
             //self.speakerButton.setBackgroundImage(UIImage(named: "speaker"), for: .selected)
         }
@@ -340,7 +353,7 @@ class AudioCallingVC: BaseVC {
             }
             
         } catch {
-            print("Fail: \(error.localizedDescription)")
+            debugPrint("Fail: \(error.localizedDescription)")
         }
         
         
@@ -354,7 +367,7 @@ class AudioCallingVC: BaseVC {
         sender.isSelected = !sender.isSelected
         if sender.isSelected
         {
-            self.muteButton.backgroundColor = LINECOLOR
+            self.muteButton.backgroundColor = PURPLECOLOR//LINECOLOR
             self.muteButton.setImage(UIImage(named: "audioUnmute"), for: .normal)
             self.muteButton.setImage(self.muteButton.image(for: .normal)?.tinted(color: UIColor.white), for: .normal)
         }
@@ -415,7 +428,7 @@ class AudioCallingVC: BaseVC {
             }
             
         } catch {
-            print("Fail: \(error.localizedDescription)")
+            debugPrint("Fail: \(error.localizedDescription)")
         }
         
         
@@ -437,6 +450,10 @@ class AudioCallingVC: BaseVC {
             self.sendMessage(message: message)
             self.backAct()
         }
+            else
+            {
+                self.backAct()
+            }
         }
         else
         {
@@ -451,16 +468,30 @@ class AudioCallingVC: BaseVC {
             self.lblUserName.isHidden = true
             if self.comeFrom.equalsIgnoreCase(string: kAppDelegate) 
             {
-                
-                let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-                let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
-                vc.selectedIndex=3
+
+//                let vc = OldTapControllerVC.instantiate(fromAppStoryboard: .Main)
+//
+//                vc.selectedIndex=3
                 DataManager.comeFrom = kEmptyString
-                self.navigationController?.pushViewController(vc, animated: true)
+                self.alreadyPop=true
+               // if !self.alreadyPop
+                //{
+              
+//                    //self.navigationController?.popViewController(animated: true)
+//                self.navigationController?.pushViewController(vc, animated: false)
+//               // }
+                DataManager.comeFrom = kEmptyString
+                self.alreadyPop=true
+                self.goToChat()
             }
             else
             {
-                self.navigationController?.popViewController(animated: true)
+               // if !self.alreadyPop
+               // {
+                    self.alreadyPop=true
+                    self.navigationController?.popViewController(animated: true)
+                //}
+             
             }
             DataManager.comeFrom = kViewProfile
          
@@ -474,7 +505,7 @@ class AudioCallingVC: BaseVC {
         inviter.cancelLastOutgoingInvitation()
         inviter.refuseLastIncomingInvitation {  [weak self] (error) in
             //self?.openSimpleAlert(message: error.localizedDescription)
-            print(error.localizedDescription)
+            debugPrint(error.localizedDescription)
         }
        
         self.leaveChannel()
@@ -523,15 +554,23 @@ class AudioCallingVC: BaseVC {
         
         self.callDuration = Double(totalSecond).printSecondsToHoursMinutesSeconds()
     }
+//    func selfJoinSocketEmit()
+//    {
+//
+//        let JoinDict = ["selfUserId":DataManager.Id]
+//        SocketIOManager.shared.selfJoinSocket(MessageChatDict: JoinDict)
+//
+//    }
+    
 }
 extension AudioCallingVC: AgoraRtcEngineDelegate
 {
     
-    //MARK:- Other user join
+    //MARK: - Other user join
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didJoinedOfUid uid: UInt, elapsed: Int)
     {
-        print("didJoinedOfUid = \(uid)")
+        debugPrint("didJoinedOfUid = \(uid)")
        
         let videoCanvas = AgoraRtcVideoCanvas()
         videoCanvas.uid = uid
@@ -555,17 +594,17 @@ extension AudioCallingVC: AgoraRtcEngineDelegate
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didLeaveChannelWith stats: AgoraChannelStats) {
-        print(#function)
-        print("stat = \(stats)")
+        debugPrint(#function)
+        debugPrint("stat = \(stats)")
         
         self.lblUserName.isHidden=false
         self.imgUser.isHidden=false
         
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOfflineOfUid uid: UInt, reason: AgoraUserOfflineReason) {
-        print(#function)
-        print("\(uid) = \(reason)")
-        //        print("callConnected = \(self.callConnected)")
+        debugPrint(#function)
+        debugPrint("\(uid) = \(reason)")
+        //        debugPrint("callConnected = \(self.callConnected)")
     
         
         if self.callConnected
@@ -581,27 +620,27 @@ extension AudioCallingVC: AgoraRtcEngineDelegate
     
     
     func rtcEngineRequestToken(_ engine: AgoraRtcEngineKit) {
-        print(#function)
-        print("\(engine) = \(engine)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine)")
     }
     
     func rtcEngineTranscodingUpdated(_ engine: AgoraRtcEngineKit) {
-        print(#function)
-        print("\(engine) = \(engine)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine)")
     }
     func rtcEngineCameraDidReady(_ engine: AgoraRtcEngineKit) {
-        print(#function)
-        print("\(engine) = \(engine)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine)")
     }
     func rtcEngineVideoDidStop(_ engine: AgoraRtcEngineKit) {
-        print(#function)
-        print("\(engine) = \(engine)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine)")
     }
     
     func rtcEngineConnectionDidLost(_ engine: AgoraRtcEngineKit) {
-        print(#function)
-        print("\(engine) = \(engine)")
-        print("callConnected = \(self.callConnected)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine)")
+        debugPrint("callConnected = \(self.callConnected)")
         
         if self.callConnected == false
         {
@@ -609,15 +648,21 @@ extension AudioCallingVC: AgoraRtcEngineDelegate
             if self.comeFrom == kAppDelegate
             {
                 
-                let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-                let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
-                vc.selectedIndex=3
-                DataManager.comeFrom = kEmptyString
-                self.navigationController?.pushViewController(vc, animated: true)
+//                let vc = OldTapControllerVC.instantiate(fromAppStoryboard: .Main)
+//
+//                vc.selectedIndex=3
+//                DataManager.comeFrom = kEmptyString
+//                self.navigationController?.pushViewController(vc, animated: true)
+                self.goToChat()
             }
             else
             {
-                self.navigationController?.popViewController(animated: true)
+                if !self.alreadyPop
+                {
+                    self.alreadyPop=true
+                    self.navigationController?.popViewController(animated: true)
+                }
+               
             }
             DataManager.comeFrom = kViewProfile
             
@@ -625,61 +670,61 @@ extension AudioCallingVC: AgoraRtcEngineDelegate
         
     }
     func rtcEngineConnectionDidBanned(_ engine: AgoraRtcEngineKit) {
-        print(#function)
-        print("\(engine) = \(engine)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine)")
     }
     func rtcEngineConnectionDidInterrupted(_ engine: AgoraRtcEngineKit) {
-        print(#function)
-        print("\(engine) = \(engine)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine)")
     }
     
     func rtcEngineMediaEngineDidLoaded(_ engine: AgoraRtcEngineKit) {
-        print(#function)
-        print("\(engine) = \(engine)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine)")
     }
     
     func rtcEngineMediaEngineDidStartCall(_ engine: AgoraRtcEngineKit) {
-        print(#function)
+        debugPrint(#function)
         
-        print("\(engine) = \(engine)")
+        debugPrint("\(engine) = \(engine)")
     }
     
     func rtcEngineLocalAudioMixingDidFinish(_ engine: AgoraRtcEngineKit) {
-        print(#function)
-        print("\(engine) = \(engine)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine)")
     }
     
     func rtcEngineRemoteAudioMixingDidStart(_ engine: AgoraRtcEngineKit) {
-        print(#function)
-        print("\(engine) = \(engine)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine)")
     }
     
     func rtcEngineRemoteAudioMixingDidFinish(_ engine: AgoraRtcEngineKit) {
-        print(#function)
-        print("\(engine) = \(engine)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine)")
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, didMicrophoneEnabled enabled: Bool) {
-        print(#function)
-        print("\(engine) = \(engine) \(enabled)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine) \(enabled)")
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, activeSpeaker speakerUid: UInt) {
-        print(#function)
-        print("\(engine) = \(engine) \(speakerUid)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine) \(speakerUid)")
     }
     
     func rtcEngine(_ engine: AgoraRtcEngineKit, didOccurError errorCode: AgoraErrorCode) {
-        print(#function)
+        debugPrint(#function)
         //        self.initializeAgoraEngine()
-        print("\(engine) = \(engine) \(errorCode.rawValue)")
-        print("didOccurError error code = \(errorCode.rawValue)")
+        debugPrint("\(engine) = \(engine) \(errorCode.rawValue)")
+        debugPrint("didOccurError error code = \(errorCode.rawValue)")
 //        if errorCode.rawValue == 17
 //        {
 //            self.backAct()
 //        }
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, didVideoMuted muted: Bool, byUid uid: UInt) {
-        print(#function)
-        print("\(engine) = \(engine) \(muted) \(uid)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine) \(muted) \(uid)")
         if muted
         {
             self.lblUserName.isHidden=false
@@ -694,8 +739,8 @@ extension AudioCallingVC: AgoraRtcEngineDelegate
         }
     }
     func rtcEngine(_ engine: AgoraRtcEngineKit, didRegisteredLocalUser userAccount: String, withUid uid: UInt) {
-        print(#function)
-        print("\(engine) = \(engine) \(userAccount)")
+        debugPrint(#function)
+        debugPrint("\(engine) = \(engine) \(userAccount)")
     }
     
     // ViewController.swift
@@ -714,24 +759,24 @@ extension AudioCallingVC: AgoraRtcEngineDelegate
 extension AudioCallingVC:AgoraRtmDelegate
 {
     func rtmKit(_ kit: AgoraRtmKit, peersOnlineStatusChanged onlineStatus: [AgoraRtmPeerOnlineStatus]) {
-        print(#function)
-        print("onlineStatus = \(onlineStatus)")
+        debugPrint(#function)
+        debugPrint("onlineStatus = \(onlineStatus)")
     }
     
     func rtmKit(_ kit: AgoraRtmKit, connectionStateChanged state: AgoraRtmConnectionState, reason: AgoraRtmConnectionChangeReason) {
-        print(#function)
-        print("AgoraRtmConnectionChangeReason = \(reason.rawValue)")
+        debugPrint(#function)
+        debugPrint("AgoraRtmConnectionChangeReason = \(reason.rawValue)")
     }
     
     func rtmKitTokenDidExpire(_ kit: AgoraRtmKit)
     {
-        print(#function)
-        print("kit = \(kit)")
+        debugPrint(#function)
+        debugPrint("kit = \(kit)")
     }
     
     func rtmKit(_ kit: AgoraRtmKit, messageReceived message: AgoraRtmMessage, fromPeer peerId: String) {
-        print(#function)
-        print("message = \(message.text)")
+        debugPrint(#function)
+        debugPrint("message = \(message.text)")
     }
 }
 // MARK:- Extension Api Calls
@@ -759,18 +804,21 @@ extension AudioCallingVC
         ChatVM.shared.callApiAudioVideoCallNotification(ShowIndicator: ShowIndicator,data: data, response: { (message, error) in
             if error != nil
             {
-                self.showErrorMessage(error: error)
+                self.showErrorMessage2(error: error)
             }
             else
             {
-                
+                if self.comeFrom.equalsIgnoreCase(string: kMessage)
+                {
+                    self.ringStatus = .on
+                }
                 self.agoraToken=ChatVM.shared.Audio_video_calling_data?.rtc_token_publish ?? ""
                 self.agoraChannelName = ChatVM.shared.Audio_video_calling_data?.chanel_name ?? ""
                 self.agoraChannelUID = ChatVM.shared.Audio_video_calling_data?.uid_publish ?? "0"
                 
                 self.Agora_Rtm_Token = ChatVM.shared.Audio_video_calling_data?.rtmToken_publisher ?? ""
                 
-                print("RTM token = \(self.Agora_Rtm_Token)")
+                debugPrint("RTM token = \(self.Agora_Rtm_Token)")
 
                 self.Agora_RTM_Setup()
                 self.initializeAgoraEngine()
@@ -779,7 +827,7 @@ extension AudioCallingVC
         })
     }
 
-    //MARK:- AGORA RTM setup
+    //MARK: - AGORA RTM setup
     
     func Agora_RTM_Setup()
     {
@@ -794,9 +842,9 @@ extension AudioCallingVC
             self.openSimpleAlert(message: "AgoraRtmKit nil")
             return
         }
-        print("self.from_user_id = \(self.self_user_id)")
+        debugPrint("self.from_user_id = \(self.self_user_id)")
         kit.login(account: self.self_user_id, token: self.Agora_Rtm_Token) { [unowned self] (error) in
-            print("Rtm login error \(error)")
+            debugPrint("Rtm login error \(error)")
             
         }
         if let inviter = AgoraRtm.shared().inviter  {
@@ -877,25 +925,38 @@ extension AudioCallingVC
     {
         if Connectivity.isConnectedToInternet {
             
+            if  !self.alreadySentMessage
+             {
             let now = Date()
             let dateInString = dateFromatter.string(from: now)
            // \(Date().CurrentTimeString()
             
-            
+                self.alreadySentMessage=true
             
             let dict2 = ["timezone":TIMEZONE,"chat_room_id":self.chat_room_id,"to_user_id":self.view_user_id,"message":message,"from_user_id":self.from_user_id,"messageTime":dateInString,"message_type":kVideo]
             //,"buffer_img":gif
             SocketIOManager.shared.sendChatMessage(MessageChatDict: dict2)
+            }
+            
+//            var data = JSONDictionary()
+//            data["call_from_user_id"] = self.from_user_id
+//            data["call_to_user_id"] = self.view_user_id
+//            data["call_duration"] = self.totalSecond
+//            data["call_type"] = kAudio
+//            data[ApiKey.kTimezone] = TIMEZONE
+//
+//            self.SaveCallRecoardApi(data: data, loaderShow: false, startLoad: false)
+//
             
         }
     }
    
 }
-//MARK:- CallCenterDelegate
+//MARK: - CallCenterDelegate
 
 extension AudioCallingVC: CallCenterDelegate {
     func callCenter(_ callCenter: CallCenter, answerCall session: String) {
-        print("callCenter answerCall")
+        debugPrint("callCenter answerCall")
                 
         if let inviter = AgoraRtm.shared().inviter {
             inviter.accpetLastIncomingInvitation()
@@ -904,7 +965,7 @@ extension AudioCallingVC: CallCenterDelegate {
     }
     
     func callCenter(_ callCenter: CallCenter, declineCall session: String) {
-        print("callCenter declineCall")
+        debugPrint("callCenter declineCall")
         
         guard let inviter = AgoraRtm.shared().inviter else {
             fatalError("rtm inviter nil")
@@ -912,12 +973,12 @@ extension AudioCallingVC: CallCenterDelegate {
         
         inviter.refuseLastIncomingInvitation {  [weak self] (error) in
            // self?.openSimpleAlert(message: error.localizedDescription)
-            print(error.localizedDescription)
+            debugPrint(error.localizedDescription)
         }
     }
     
     func callCenter(_ callCenter: CallCenter, startCall session: String) {
-        print("callCenter startCall")
+        debugPrint("callCenter startCall")
         
         guard let kit = AgoraRtm.shared().kit else {
             fatalError("rtm kit nil")
@@ -927,7 +988,9 @@ extension AudioCallingVC: CallCenterDelegate {
             fatalError("rtm inviter nil")
         }
 
-        let vc = self.storyboard?.instantiateViewController(withIdentifier: "AudioCallingVC") as! AudioCallingVC
+  
+        let vc = AudioCallingVC.instantiate(fromAppStoryboard: .Chat)
+
         let remoteNumber = session
         
         // rtm query online status
@@ -969,16 +1032,16 @@ extension AudioCallingVC: CallCenterDelegate {
     }
     
     func callCenter(_ callCenter: CallCenter, muteCall muted: Bool, session: String) {
-        print("callCenter muteCall")
+        debugPrint("callCenter muteCall")
     }
     
     func callCenter(_ callCenter: CallCenter, endCall session: String) {
-        print("callCenter endCall")
+        debugPrint("callCenter endCall")
      //   self.prepareToVideoChat = nil
     }
     
     func callCenterDidActiveAudioSession(_ callCenter: CallCenter) {
-        print("callCenter didActiveAudioSession")
+        debugPrint("callCenter didActiveAudioSession")
         
         // Incoming call
 //        if let prepare = self.prepareToVideoChat {
@@ -994,14 +1057,117 @@ extension AudioCallingVC: CallCenterDelegate {
 }
 extension AudioCallingVC: AgoraRtmInvitertDelegate {
     func inviter(_ inviter: AgoraRtmCallKit, didReceivedIncoming invitation: AgoraRtmInvitation) {
-        print(#function)
-        print("didReceivedIncoming")
+        debugPrint(#function)
+        debugPrint("didReceivedIncoming")
 
     }
 
     func inviter(_ inviter: AgoraRtmCallKit, remoteDidCancelIncoming invitation: AgoraRtmInvitation) {
-        print("remoteDidCancelIncoming")
+        debugPrint("remoteDidCancelIncoming")
         APPDEL.provider?.reportCall(with: APPDEL.uuid, endedAt: Date(), reason: .remoteEnded)
 
+    }
+}
+
+extension AudioCallingVC
+{
+    func SaveCallRecoardApi(data:JSONDictionary,loaderShow:Bool,startLoad:Bool)
+    {
+        
+        debugPrint(#function)
+        
+        ChatVM.shared.callApiSaveCallRecoard(showIndiacter: loaderShow,data: data, response: { (message, error) in
+            if error != nil
+            {
+//                self.hideLoader()
+               // self.showErrorMessage(error: error)
+            }
+            else
+            {
+                
+            }
+        }
+            )
+        }
+                                        
+}
+extension AudioCallingVC:FeedbackAlertDelegate
+{
+    func FeedbackAlertOkFunc(name: String)
+    {
+        
+        debugPrint(#function)
+        debugPrint(name)
+     if name == kStory
+     {
+         if !self.alreadyPop
+         {
+             self.alreadyPop=true
+            // self.navigationController?.popViewController(animated: true)
+             
+             if #available(iOS 13.0, *) {
+                 SCENEDEL?.navigateToChat()
+             } else {
+                 // Fallback on earlier versions
+                 APPDEL.navigateToChat()
+             }
+         }
+     }
+    
+    }
+    func showErrorMessage2(error: Error?) {
+        /*
+         STATUS CODES:
+         200: Success (If request sucessfully done and data is also come in response)
+         204: No Content (If request successfully done and no data is available for response)
+         401: Unauthorized (If token got expired)
+         451: Block (If User blocked by admin)/delete by admin
+         403: Delete (If User deleted by admin)
+         406: Not Acceptable (If user is registered with the application but not verified)
+         */
+        let message = (error! as NSError).userInfo[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+        
+            //ok button action
+            let code = (error! as NSError).code
+            if  code == 401 || code == 451
+            {
+                let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
+                destVC.type = .BlockReportError
+                destVC.user_name=message
+                destVC.errorCode=code
+                destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+                destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+
+                if let tab = self.tabBarController
+                {
+                    tab.present(destVC, animated: true, completion: nil)
+                }
+                else
+                {
+                    self.present(destVC, animated: true, completion: nil)
+                }
+              
+            }
+           else
+            {
+      
+                let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
+                destVC.type = .BlockReportError
+                destVC.user_name=message
+                destVC.delegate=self
+                destVC.errorCode=1000
+                destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+                destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+
+                if let tab = self.tabBarController
+                {
+                    tab.present(destVC, animated: true, completion: nil)
+                }
+                else
+                {
+                    self.present(destVC, animated: true, completion: nil)
+                }
+            }
+        
     }
 }

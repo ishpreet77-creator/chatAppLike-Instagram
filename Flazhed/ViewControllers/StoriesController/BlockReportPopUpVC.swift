@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SkeletonView
 
 protocol BlockReportPopUpDelegate{
     func ClickNameAction(name:String)
@@ -20,7 +21,9 @@ class BlockReportPopUpVC: BaseVC {
     
     @IBOutlet weak var blurView: UIVisualEffectView!
     var type: ScreenType = .storiesScreen
-var titleArray = ["BLOCK ONLY","INAPPROPRIATE CONTENT","PERSON IS MINOR","BAD OFFLINE BEHAVIOR","FEELS LIKE SPAM","OTHER"]
+var titleArray = kBlockReportArray
+var comeFromScreen: ScreenType = .storiesScreen
+    
     var comeFrom = ""
     var fromBlock = false
     var blockReason = ""
@@ -29,7 +32,7 @@ var titleArray = ["BLOCK ONLY","INAPPROPRIATE CONTENT","PERSON IS MINOR","BAD OF
     var user_name = ""
     var from_user_id = ""
     var fromFeedback = false
-    
+   
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -65,22 +68,29 @@ var titleArray = ["BLOCK ONLY","INAPPROPRIATE CONTENT","PERSON IS MINOR","BAD OF
     }
     
     @IBAction func otherButtonAction(_ sender: UIButton) {
-//        self.dismiss(animated: true) {
-            let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-            let destVC = storyboard.instantiateViewController(withIdentifier: "SendFeedbackAlertVC") as!  SendFeedbackAlertVC
+
+        let destVC = SendFeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
+
               destVC.type = type
             destVC.user_name=self.user_name
         destVC.UserID=self.UserID
         destVC.type = self.type
+        destVC.comeFromScreen = self.comeFromScreen
             destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+        if let tab = self.tabBarController
+        {
+            tab.present(destVC, animated: true, completion: nil)
+        }
+        else
+        {
             self.present(destVC, animated: true, completion: nil)
-//        }
+        }
         
        
     }
 }
-extension BlockReportPopUpVC:UITableViewDelegate,UITableViewDataSource
+extension BlockReportPopUpVC:UITableViewDelegate,UITableViewDataSource,SkeletonTableViewDataSource
 {
    
     
@@ -95,6 +105,18 @@ extension BlockReportPopUpVC:UITableViewDelegate,UITableViewDataSource
         self.tableReport.delegate = self
         self.tableReport.dataSource = self
     }
+    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
+        
+        
+        return "BloackResonTCell"
+    }
+    
+    func collectionSkeletonView(_ skeletonView: UITableView, skeletonCellForRowAt indexPath: IndexPath) -> UITableViewCell? {
+        
+        let cell = skeletonView.dequeueReusableCell(withIdentifier: "BloackResonTCell") as! BloackResonTCell
+        return cell
+    }
+    
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
@@ -105,11 +127,14 @@ extension BlockReportPopUpVC:UITableViewDelegate,UITableViewDataSource
     {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "BloackResonTCell") as! BloackResonTCell
-        cell.lblReason.text = self.titleArray[indexPath.row]
+        
+        let reason = self.titleArray[indexPath.row]
+        
+        cell.lblReason.text = reason.description.uppercased()
         if indexPath.row == 0
         {
             cell.imgLine.isHidden=false
-            cell.lblReason.textColor = LINECOLOR
+            cell.lblReason.textColor = PURPLECOLOR
         }
         else
         {
@@ -128,6 +153,8 @@ extension BlockReportPopUpVC:UITableViewDelegate,UITableViewDataSource
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "ReportHeaderTCell") as! ReportHeaderTCell
         cell.btnBack.addTarget(self, action: #selector(goBack), for: .touchUpInside)
+       // cell.lblabout.isSkeletonable=true
+       // cell.lblabout.showAnimatedGradientSkeleton()
         return cell
         
     }
@@ -144,7 +171,7 @@ extension BlockReportPopUpVC:UITableViewDelegate,UITableViewDataSource
         {
             self.fromBlock = true
          
-            if type == .messageScreen
+            if type == .messageScreen || type == .ViewProfile
             {
                 self.call_User_Report_Block_Api(reason: self.blockReason)
             }
@@ -156,22 +183,33 @@ extension BlockReportPopUpVC:UITableViewDelegate,UITableViewDataSource
         else if indexPath.row==self.titleArray.count-1
         {
             self.fromBlock = false
-            let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-            let destVC = storyboard.instantiateViewController(withIdentifier: "SendFeedbackAlertVC") as!  SendFeedbackAlertVC
+    
+            let destVC = SendFeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
+
+            
             destVC.delegate=self
             destVC.postID=self.postID
             destVC.user_name=self.user_name
             destVC.UserID=self.UserID
             destVC.type = self.type
+            destVC.comeFromScreen = self.comeFromScreen
             destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
-            self.present(destVC, animated: true, completion: nil)
+            if let tab = self.tabBarController
+            {
+                tab.present(destVC, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(destVC, animated: true, completion: nil)
+            }
+            
         }
         else
         {
             self.fromBlock = false
            
-            if type == .messageScreen
+            if type == .messageScreen || type == .ViewProfile
             {
                 self.call_User_Report_Block_Api(reason: self.blockReason)
             }
@@ -209,7 +247,7 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
     func feedbackText(text: String)
     {
         
-        if type == .messageScreen
+        if type == .messageScreen || type == .ViewProfile
         {
             if text.equalsIgnoreCase(string: kfromBack)
             {
@@ -243,6 +281,8 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
 
     func callReportBlockApi(reason:String)
     {
+  
+        
         var data = JSONDictionary()
 
         data[ApiKey.kPost_id] = self.postID
@@ -255,46 +295,58 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
         {
             data[ApiKey.kReason_text] = reason
         }
-            
+        var urlType:PostType = .story
+        if type == .ViewPostHangout || type == .ListHangout
+        {
+            urlType = .hangout
+        }
+        else
+        {
+            urlType = .story
+        }
+        
             if Connectivity.isConnectedToInternet {
-
-                self.callApiForReportBlock(data: data)
+                self.tableReport.showAnimatedGradientSkeleton()
+              
+                    self.callApiForReportBlock(data: data,type:urlType)
              } else {
-
+                 self.tableReport.hideSkeleton()
                 self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
             }
         
     }
     
-    func callApiForReportBlock(data:JSONDictionary)
+    func callApiForReportBlock(data:JSONDictionary,type:PostType = .story)
     {
     
-        StoriesVM.shared.callApiReportBlock(data: data, response: { (message, error) in
+        StoriesVM.shared.callApiReportBlock(data: data,type:type, response: { (message, error) in
             
             if error != nil
             {
+                self.tableReport.hideSkeleton()
                 self.tableReport.reloadData()
                 if self.fromFeedback
                 {
                     self.dismiss(animated: true) {
-                        self.showErrorMessage(error: error)
+                        self.showErrorMessage(error: error,comeFromScreen:self.comeFromScreen)
                         
                     }
                 }
                 else
                 {
-                    self.showErrorMessage(error: error)
+                    self.showErrorMessage(error: error,comeFromScreen:self.comeFromScreen)
                 }
                
                
                 
             }
             else{
-             
-                    let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-                    let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                self.tableReport.hideSkeleton()
+          
+                let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
+
                     destVC.type = .sendFeedback
-              
+                destVC.comeFromScreen = self.comeFromScreen
                     destVC.user_name=self.user_name
                 if  self.fromBlock
                 {
@@ -306,8 +358,14 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
                 }
                     destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                     destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+                if let tab = self.tabBarController
+                {
+                    tab.present(destVC, animated: true, completion: nil)
+                }
+                else
+                {
                     self.present(destVC, animated: true, completion: nil)
-                
+                }
                           
             }
 
@@ -334,10 +392,11 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
         }
             
             if Connectivity.isConnectedToInternet {
-              
+                self.tableReport.showAnimatedGradientSkeleton()
                 self.call_Api_For_User_Report_Block(data: data)
              } else {
-                
+                 self.tableReport.hideSkeleton()
+                 
                 self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
             }
         
@@ -350,6 +409,7 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
             
             if error != nil
             {
+                self.tableReport.hideSkeleton()
                 self.tableReport.reloadData()
                 if self.fromFeedback
                 {
@@ -361,17 +421,17 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
                 {
                     self.showErrorMessage(error: error)
                 }
-               
-               
-                
             }
             else{
-             
-                    let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-                    let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                self.tableReport.hideSkeleton()
+                
+                let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
+
+                
                     destVC.type = .sendFeedback
-                    destVC.Alerttype = .messageScreen
+                destVC.Alerttype = self.type//.messageScreen
                     destVC.user_name=self.user_name
+                destVC.comeFromScreen = self.comeFromScreen
                 if  self.fromBlock
                 {
                 destVC.fromBlock="blocked"
@@ -384,8 +444,14 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
                 }
                     destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                     destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+                if let tab = self.tabBarController
+                {
+                    tab.present(destVC, animated: true, completion: nil)
+                }
+                else
+                {
                     self.present(destVC, animated: true, completion: nil)
-                
+                }
                           
             }
 
@@ -396,7 +462,7 @@ extension BlockReportPopUpVC:SendFeedbackDelegate
     
     func sendMatchBlockNoti_Method()
     {
-        print("sendSMS ")
+        debugPrint("sendSMS ")
     
         let dict2 = ["from_user_id":self.from_user_id,"to_user_id":self.UserID,"alert_type":"removematch"]
         SocketIOManager.shared.sendMatchBlockNoti(MessageChatDict: dict2)

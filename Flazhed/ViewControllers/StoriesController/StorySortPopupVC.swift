@@ -53,7 +53,7 @@ class StorySortPopupVC: UIViewController {
                 
                 
                 imgImage.image = UIImage(named: "SelectedCheck")
-                self.lblImage.textColor = LINECOLOR
+                self.lblImage.textColor = PURPLECOLOR
                 self.img="1"
             }
             else
@@ -67,7 +67,7 @@ class StorySortPopupVC: UIViewController {
         {
           
             imgVideo.image = UIImage(named: "SelectedCheck")
-            self.lblVideo.textColor = LINECOLOR
+            self.lblVideo.textColor = PURPLECOLOR
             self.video="1"
         }
         else
@@ -82,7 +82,7 @@ class StorySortPopupVC: UIViewController {
            
             
             imgPost.image = UIImage(named: "SelectedCheck")
-            self.lblPost.textColor = LINECOLOR
+            self.lblPost.textColor = PURPLECOLOR
             self.myPost="1"
         }
         else
@@ -98,7 +98,7 @@ class StorySortPopupVC: UIViewController {
           
             
             imgOnlyMatch.image = UIImage(named: "SelectedCheck")
-            self.lblOnlyMatch.textColor = LINECOLOR
+            self.lblOnlyMatch.textColor = PURPLECOLOR
             self.match="1"
         }
         else
@@ -113,7 +113,7 @@ class StorySortPopupVC: UIViewController {
             
             
             imgAllPost.image = UIImage(named: "SelectedCheck")
-            self.lblAllPost.textColor = LINECOLOR
+            self.lblAllPost.textColor = PURPLECOLOR
             self.allPost="1"
         }
         else
@@ -191,7 +191,7 @@ class StorySortPopupVC: UIViewController {
         
     }
     
-    //MARK:- CategoryAct
+    //MARK: - CategoryAct
     
     @IBAction func categoryAct(_ sender: UIButton)
     {
@@ -208,7 +208,7 @@ class StorySortPopupVC: UIViewController {
             else
             {
                 imgImage.image = UIImage(named: "SelectedCheck")
-                self.lblImage.textColor = LINECOLOR
+                self.lblImage.textColor = PURPLECOLOR
                 self.img="1"
                 
                 imgVideo.image = UIImage(named: "unselectedCheck")
@@ -228,7 +228,7 @@ class StorySortPopupVC: UIViewController {
             else
             {
                 imgVideo.image = UIImage(named: "SelectedCheck")
-                self.lblVideo.textColor = LINECOLOR
+                self.lblVideo.textColor = PURPLECOLOR
                 self.video="1"
                 
                 imgImage.image = UIImage(named: "unselectedCheck")
@@ -253,7 +253,7 @@ class StorySortPopupVC: UIViewController {
             else
             {
                 imgOnlyMatch.image = UIImage(named: "SelectedCheck")
-                self.lblOnlyMatch.textColor = LINECOLOR
+                self.lblOnlyMatch.textColor = PURPLECOLOR
                 self.match="1"
                 
                 imgPost.image = UIImage(named: "unselectedCheck")
@@ -279,7 +279,7 @@ class StorySortPopupVC: UIViewController {
             else
             {
                 imgPost.image = UIImage(named: "SelectedCheck")
-                self.lblPost.textColor = LINECOLOR
+                self.lblPost.textColor = PURPLECOLOR
                 self.myPost="1"
                 
                 imgOnlyMatch.image = UIImage(named: "unselectedCheck")
@@ -303,7 +303,7 @@ class StorySortPopupVC: UIViewController {
             else
             {
                 imgAllPost.image = UIImage(named: "SelectedCheck")
-                self.lblAllPost.textColor = LINECOLOR
+                self.lblAllPost.textColor = PURPLECOLOR
                 self.allPost="1"
                 
                 imgPost.image = UIImage(named: "unselectedCheck")
@@ -321,7 +321,7 @@ class StorySortPopupVC: UIViewController {
         if self.match=="0" && self.myPost=="0"
         {
             imgAllPost.image = UIImage(named: "SelectedCheck")
-            self.lblAllPost.textColor = LINECOLOR
+            self.lblAllPost.textColor = PURPLECOLOR
             
             self.allPost="1"
         }

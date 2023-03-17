@@ -17,14 +17,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
 
         UIApplication.shared.windows.forEach { window in
-                   //here you can switch between the dark and light
-            if #available(iOS 13.0, *)
-            {
-                window.overrideUserInterfaceStyle = .light
-            } else {
-                // Fallback on earlier versions
-            }
-               }
+        window.overrideUserInterfaceStyle = .light
+        }
         
         if DataManager.isProfileCompelete
         {
@@ -45,9 +39,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
         else
         {
-            //APPDEL.navigateToLogin()
+            APPDEL.navigateToLogin()
         }
         
+       
         guard let _ = (scene as? UIWindowScene) else { return }
     }
   
@@ -64,35 +59,43 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         )
     }
     
-      func navigateToHome(userId:String = "") {
-            
-            let storyBoard = UIStoryboard.storyboard(storyboard: .Main)
-            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
-        vc.selectedIndex=2
-        if userId != ""
-        {
-        DataManager.HomeRefresh=true
-        DataManager.OtherUserId = userId
-        DataManager.comeFromTag=6
-        }
-            let nav = UINavigationController(rootViewController: vc)
-            nav.navigationBar.isHidden = true
-           // UIApplication.shared.windows.first?.layer.add(self.transition, forKey: kCATransition)
-
-            UIApplication.shared.windows.first?.rootViewController = nav
-            UIApplication.shared.windows.first?.makeKeyAndVisible()
+      func navigateToHome(userId:String = "",selectedIndex:Int = 2) {
+          
+//            let storyBoard = UIStoryboard.storyboard(storyboard: .Main)
+//            let vc = storyBoard.instantiateViewController(withIdentifier: "OldTapControllerVC") as! OldTapControllerVC
+//        vc.selectedIndex=2
+//        if userId != ""
+//        {
+//        DataManager.HomeRefresh=true
+//        DataManager.OtherUserId = userId
+//        DataManager.comeFromTag=6
+//        }
+//            let nav = UINavigationController(rootViewController: vc)
+//            nav.navigationBar.isHidden = true
+//           // UIApplication.shared.windows.first?.layer.add(self.transition, forKey: kCATransition)
+//
+//            UIApplication.shared.windows.first?.rootViewController = nav
+//            UIApplication.shared.windows.first?.makeKeyAndVisible()
+          
+          
+          let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar) //TabbarWithOutStoryHangout TabbarWithStoryHangout
+          let nav = UINavigationController(rootViewController: vc)
+          nav.navigationBar.isHidden = true
+          vc.selectedIndex = selectedIndex
+          UIApplication.shared.windows.first?.rootViewController = nav
+          UIApplication.shared.windows.first?.makeKeyAndVisible()
             
         }
     
     func navigateToLogin() {
             
             let storyBoard = UIStoryboard.storyboard(storyboard: .Main)
-            let vc = storyBoard.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
-            let nav = UINavigationController(rootViewController: vc)
-            nav.navigationBar.isHidden = true
+            let vc = storyBoard.instantiateViewController(withIdentifier: "loginNav") as! UINavigationController//LoginVC
+            //let nav = UINavigationController(rootViewController: vc)
+            vc.navigationBar.isHidden = true
            // UIApplication.shared.windows.first?.layer.add(self.transition, forKey: kCATransition)
 
-            UIApplication.shared.windows.first?.rootViewController = nav
+            UIApplication.shared.windows.first?.rootViewController = vc
             UIApplication.shared.windows.first?.makeKeyAndVisible()
             
         }
@@ -100,8 +103,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func navigateToSentShake()
     {
 
-        let storyBoard = UIStoryboard.storyboard(storyboard: .Home)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "ShakeSentVC") as! ShakeSentVC
+        let vc = ShakeSentVC.instantiate(fromAppStoryboard: .Shake)
+
         let nav = UINavigationController(rootViewController: vc)
         nav.navigationBar.isHidden = true
        // UIApplication.shared.windows.first?.layer.add(self.transition, forKey: kCATransition)
@@ -113,8 +116,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func navigateToHangout()
     {
     
-        let storyBoard = UIStoryboard.storyboard(storyboard: .Main)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+        let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
         vc.selectedIndex=0
         let nav = UINavigationController(rootViewController: vc)
         nav.navigationBar.isHidden = true
@@ -129,8 +132,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func navigateToStories()
     {
     
-        let storyBoard = UIStoryboard.storyboard(storyboard: .Main)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+        let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
         vc.selectedIndex=1
         let nav = UINavigationController(rootViewController: vc)
         nav.navigationBar.isHidden = true
@@ -143,8 +146,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func navigateToChat()
     {
     
-        let storyBoard = UIStoryboard.storyboard(storyboard: .Main)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+        let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
         vc.selectedIndex=3
         let nav = UINavigationController(rootViewController: vc)
         nav.navigationBar.isHidden = true
@@ -159,8 +162,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func navigateToProfile()
     {
     
-        let storyBoard = UIStoryboard.storyboard(storyboard: .Main)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+        let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
         vc.selectedIndex=4
         let nav = UINavigationController(rootViewController: vc)
         nav.navigationBar.isHidden = true

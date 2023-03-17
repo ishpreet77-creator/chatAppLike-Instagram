@@ -21,9 +21,16 @@ class ProfileVM {
     
     var ChildrensData = Array<childrensDataModel>()
     var HairsData = Array<hairsDataModel>()
+    
+    var ChildrensDataPrefrenceData = Array<childrensDataModel>()
+    var HairsDataPrefrenceData = Array<hairsDataModel>()
     var EducationPrefrenceData = Array<educationsDataModel>()
     
     var viewProfileUserDetail:UserListModel?
+    
+    var myProfileUserDetail:MyProfileDataModel?
+    var onlyProfileDetail:onlyProfileDataModel?
+    
     var childrenDataArray:[childrensDataModel] = []
     var educationDataArray:[educationsDataModel] = []
     var hairsDataArray:[hairsDataModel] = []
@@ -52,6 +59,43 @@ class ProfileVM {
             response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
         }
     }
+    
+    func callApiEditProfile(response: @escaping responseCallBack)
+    {
+        APIManager.callApiViewProfile(successCallback: { (responseDict) in
+        
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+            
+            self.childrenDataArray.removeAll()
+            self.hairsDataArray.removeAll()
+            self.educationDataArray.removeAll()
+            self.ChildrensData.removeAll()
+            
+            
+           self.parseEditProfileData(response:responseDict)
+            
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    
+    
+    func callApiOnlyProfileDetail(response: @escaping responseCallBack)
+    {
+        APIManager.callApiViewProfile(successCallback: { (responseDict) in
+        
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+            
+            
+           self.parseGetUserOnAccountData(response:responseDict)
+            
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    
     func callApiSetPreference(data: JSONDictionary,response: @escaping responseCallBack)
     {
         APIManager.callApiSetPreference(data:data,successCallback: { (responseDict) in
@@ -69,10 +113,16 @@ class ProfileVM {
         APIManager.callApiGetPreference(successCallback: { (responseDict) in
           
             let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
-            self.ChildrensData.removeAll()
-            self.EducationsData.removeAll()
-            self.HairsData.removeAll()
-            self.PreferenceData.removeAll()
+//            self.ChildrensData.removeAll()
+//            self.EducationsData.removeAll()
+//            self.HairsData.removeAll()
+//            self.PreferenceData.removeAll()
+            
+            
+                        self.ChildrensDataPrefrenceData.removeAll()
+                        self.EducationPrefrenceData.removeAll()
+                        self.HairsDataPrefrenceData.removeAll()
+                        self.PreferenceData.removeAll()
             
            self.parseGetPreferenceData(response:responseDict)
             response(message, nil)
@@ -151,30 +201,24 @@ class ProfileVM {
 }
 extension APIManager {
     
-    
-    //MARK:- call Api View Profile
-
+    // MARK:- call Api View Profile
     class func callApiViewProfile(successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesProfile.getuserProfile.request(success: { (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
                 successCallback([:])
             }
         }, failure: failureCallback)
-        
     }
     
-    
-    
-    //MARK:- call Api set preference
-
+    // MARK:- call Api set preference
     class func callApiSetPreference(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesProfile.setPreference(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -183,13 +227,11 @@ extension APIManager {
         }, failure: failureCallback)
     }
      
-    
-    //MARK:- call Api get preference
-
+    // MARK:- call Api get preference
     class func callApiGetPreference(successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesProfile.getPreference.request(success: { (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -204,7 +246,7 @@ extension APIManager {
     class func callApiLogout(successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesProfile.logout.request(success: { (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -217,7 +259,7 @@ extension APIManager {
     class func callApiDeleteAccount(successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesProfile.deleteAccount.request(success: { (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -227,12 +269,12 @@ extension APIManager {
         
     }
     
-    //MARK:- call Api update facebook data
+    //MARK: - call Api update facebook data
 
     class func callApiUpdateFacebookData(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesProfile.updateFacebookData(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -244,7 +286,7 @@ extension APIManager {
     class func callApiUpdateInstaData(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesProfile.updateInstaData(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -257,7 +299,7 @@ extension APIManager {
     class func callApiDeleteImage(imageId:String,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesProfile.deleteImage(imageId: imageId).request(success: { (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -269,10 +311,101 @@ extension APIManager {
 }
 
 
-//MARK:- Parsing the data
+//MARK: - Parsing the data
 extension ProfileVM {
     
     func parseGetUserData(response: JSONDictionary){
+ 
+    
+            if let data = response[ApiKey.kData] as? JSONDictionary
+            {
+                
+                if let users = data[ApiKey.kUser] as? JSONDictionary
+                {
+                    let user = MyProfileDataModel(detail: users)
+                    self.myProfileUserDetail = user
+                  
+                }
+                /*
+                
+                if let childrens = data[ApiKey.kchildrens] as? JSONArray
+                {
+                    for child in childrens
+                    {
+                        let children1 = childrensDataModel(detail: child)
+                        if children1.children_name?.uppercased() != kNotImportant.uppercased()
+                        {
+                            self.childrenDataArray.append(children1)
+                        }
+
+                    }
+                }
+                if let educations = data[ApiKey.keducations] as? JSONArray
+                {
+                    for education in educations
+                    {
+                        let education1 = educationsDataModel(detail: education)
+                        if education1.education_name?.uppercased() != kNotImportant.uppercased()
+                        {
+                            self.educationDataArray.append(education1)
+                        }
+                    
+                    }
+                }
+                
+                if let hairs = data[ApiKey.khairs] as? JSONArray
+                {
+                    for hair in hairs
+                    {
+                    let hair1 = hairsDataModel(detail: hair)
+                        if hair1.hair_name?.uppercased() != kNotImportant.uppercased()
+                        {
+                        self.hairsDataArray.append(hair1)
+                        }
+                    }
+                }
+                */
+                
+                if let user_subscription = data["user_subscription"] as? JSONDictionary
+                {
+                   
+                    if let User = user_subscription[ApiKey.kParlong] as? JSONDictionary
+                    {
+                        let data =  SubscriptionModel(detail: User)
+                        self.Prolong_Subsription_Data = data
+                    }
+                    else
+                    {
+                        self.Prolong_Subsription_Data = nil
+                    }
+                    if let User = user_subscription[ApiKey.kShake] as? JSONDictionary
+                    {
+                        let data =  SubscriptionModel(detail: User)
+                        self.Shake_Subsription_Data = data
+                    }
+                    else
+                    {
+                        self.Shake_Subsription_Data = nil
+                    }
+                    if let User = user_subscription[ApiKey.kSwiping] as? JSONDictionary
+                    {
+                        let data =  SubscriptionModel(detail: User)
+                        self.Swiping_Subsription_Data = data
+                    }
+                    else
+                    {
+                        self.Swiping_Subsription_Data = nil
+                    }
+                 
+                }
+
+
+            }
+        
+    }
+    
+    
+    func parseEditProfileData(response: JSONDictionary){
  
             if let data = response[ApiKey.kData] as? JSONDictionary
             {
@@ -320,7 +453,7 @@ extension ProfileVM {
                         }
                     }
                 }
-                
+                /*
                 if let user_subscription = data["user_subscription"] as? JSONDictionary
                 {
                    
@@ -352,6 +485,7 @@ extension ProfileVM {
                         self.Swiping_Subsription_Data = nil
                     }
                 }
+                */
 
 
             }
@@ -359,7 +493,28 @@ extension ProfileVM {
     }
     
     
-    //MARK:- Prefrence Data
+    
+    
+    
+    
+    
+    func parseGetUserOnAccountData(response: JSONDictionary){
+ 
+            if let data = response[ApiKey.kData] as? JSONDictionary
+            {
+                
+                if let users = data[ApiKey.kUser] as? JSONDictionary
+                {
+                    let user = onlyProfileDataModel(detail: users)
+                    self.onlyProfileDetail = user
+                }
+            
+            }
+        
+    }
+    
+    
+    //MARK: - Prefrence Data
     
     func parseGetPreferenceData(response: JSONDictionary){
         if let data = response[ApiKey.kData] as? JSONDictionary
@@ -405,10 +560,10 @@ extension ProfileVM {
                     
                     let model = childrensDataModel.init(detail: dict)
                     
-                    ChildrensData.append(model)
+                    ChildrensDataPrefrenceData.append(model)
                     if kNotImportant.equalsIgnoreCase(string:model.children_name ?? "")//model.education_name?.equalsIgnoreCase(string: kNotImportant)
                     {
-                        ChildrensData.swapAt(0, i)
+                        ChildrensDataPrefrenceData.swapAt(0, i)
                     }
                 }
             }
@@ -416,7 +571,7 @@ extension ProfileVM {
             
             if let hairs = data[ApiKey.khairs] as? JSONArray
             {
-                HairsData.removeAll()
+                HairsDataPrefrenceData.removeAll()
                 
                 
                 for i in 0..<hairs.count{
@@ -425,10 +580,10 @@ extension ProfileVM {
                     
                     let model = hairsDataModel.init(detail: dict)
                     
-                    HairsData.append(model)
+                    HairsDataPrefrenceData.append(model)
                     if kNotImportant.equalsIgnoreCase(string:model.hair_name ?? "")//model.education_name?.equalsIgnoreCase(string: kNotImportant)
                     {
-                        HairsData.swapAt(0, i)
+                        HairsDataPrefrenceData.swapAt(0, i)
                     }
                   
                 }
@@ -437,12 +592,6 @@ extension ProfileVM {
     }
 
     
-    func parseShakeSentData(response: JSONDictionary){
-        if let data = response[ApiKey.kData] as? JSONDictionary
-        {
-          
-        }
-    }
   
 
 }

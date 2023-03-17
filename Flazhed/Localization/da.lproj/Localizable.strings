@@ -1,0 +1,533 @@
+/* 
+  Localizable.strings
+  Flazhed
+
+  Created by ios2 on 21/04/22.
+  
+*/
+
+"Please enter phone number." = "Indtast venligst telefonnummer.";
+"Your internet connection appears to be offline. Please try again." = "Din internetforbindelse ser ud til at være offline. Prøv venligst igen.";
+"Login session expire. Please login again." = "Login session expire. Please login again.";
+"Simple" = "Enkel";
+"run out" = "løbe ud";
+"Hangout Types" = "Hangout-typer";
+"Number of Interested" = "Antal interesserede";
+"Number of Stories" = "Antal historier";
+"Daily Shakes" = "Daglige shakes";
+"Basic Free" = "Grundlæggende gratis";
+"Extra Chats" = "Ekstra chats";
+"Extra Calls" = "Ekstra opkald";
+"You have run out of simultaneous chats." = "Du er løbet tør for samtidige chats.";
+"You have run out of video calls." = "Du er løbet tør for videoopkald.";
+"You have run out of story video." = "Du er løbet tør for historievideo.";
+"You have run out of story image." = "Du er løbet tør for historiebillede.";
+
+"GET MORE" = "Få flere shakes her";
+"Country Name" = "Landenavn";
+"Report Post" = "Rapportér indlæg";
+"Continue" = "Blive ved";
+"Discard" = "Kassér";
+
+"Delete Post" = "Slet indlæg";
+"Im inviting you to join Niirly, a community where you find and meet users in a short radius. Install the app with the following link: https://wfczs.app.link/efANhMRKYlb" = "Jeg inviterer dig til at være med i Niirly, et fællesskab, hvor du finder og møder brugere i en kort radius. Installer appen med følgende link: https://wfczs.app.link/efANhMRKYlb";
+
+"The dating app that gives you what you have the courage to ask for." = "Dating-appen, der giver dig det, du har mod på at bede om.";
+"Niirly Help" = "Niirly Hjælp";
+"Please share your query here with your name and phone number and we will help you to solve this issue." = "Bekriv dit problem her med dit navn og telefonnummer, så hjælper vi dig med at løse problemet.";
+"Hey check out my hangout at https://testflight.apple.com/join/12i5ZUzv" = "Hej tjek mit hangout ud på https://testflight.apple.com/join/12i5ZUzv";
+"Hey check out my app at https://testflight.apple.com/join/12i5ZUzv" = "Hej tjek min app på https://testflight.apple.com/join/12i5ZUzv";
+"Your internet connection appears to be offline. Please try again." = "Din internetforbindelse ser ud til at være offline. Prøv venligst igen.";
+"Login session expire. Please login again." = "Loginsession udløber. Log venligst på igen.";
+"Your internet connection appears to be offline. Please try again." = "Din internetforbindelse ser ud til at være offline. Prøv venligst igen.";
+"Remove" = "Fjerne";
+"block" = "blok";
+"Simple" = "Enkel";
+"run out" = "løbe ud";
+"Regret" = "Fortryde";
+"Extra Shakes" = "Ekstra shakes";
+"Parlong" = "Parkeringsplads";
+
+"Share" = "Del";
+"Image" = "Billede";
+"My post" = "Mit indlæg";
+"All Post" = "Alle indlæg";
+"Hangout create" = "Hangout opret";
+"OPEN SETTINGS" = "ÅBN INDSTILLINGER";
+"Preference" = "Preference";
+
+"Not important" = "Ikke vigtigt";
+
+"Toddler" = "Lille barn";
+"Preschool" = "Førskole";
+"Young" = "Ung";
+"Teen" = "Teen";
+"Adult" = "Voksen";
+"Black" = "Sort";
+
+
+"Brown" = "Brun";
+"Blonde" = "Blond";
+"Auburn" = "Auburn";
+"Red" = "Rød";
+"Grey" = "Grå";
+"White" = "Hvid";
+"Bold" = "Fremhævet";
+
+"Elementary" = "Elementære";
+"High School" = "Gymnasium";
+"Bachelor" = "Ungkarl";
+"Master" = "Mestre";
+"Ph. D." = "Ph. D.";
+"Feet & Inches" = "Fødder og tommer";
+"Inches" = "Tommer";
+"Centimeters" = "Centimeter";
+"Metric (meters)" = "Metrisk (meter)";
+"DELETE" = "SLET";
+
+"Cancel" = "Fortryd";
+"Yes" = "Ja";
+"Monthly" = "Månedlige";
+"Six Monthly" = "Seks månedlige";
+"Yearly" = "Årligt";
+
+"Free" = "Ledig";
+"Plus" = "Plus";
+"Gold" = "Guld";
+"Platinum" = "Platin";
+
+
+
+"Social" ="Social";
+"Travel" = "Rejse";
+"Sports" = "Sport";
+"Business" = "Forretning";
+
+"Camera" = "Kamera";
+"Hangout" = "Hænge ud";
+"FEMALE" = "KVINDE";
+"MALE" = "HAN";
+"Men" = "Mænd";
+"LATEST FIRST" = "SENESTE FØRST";
+"OLDEST FIRST" = "ÆLDSTE FØRST";
+"ASCENDING AGE" = "STIGENDE ALDER";
+"DESCENDING AGE" = "FALDENDE ALDER";
+"Create hangout" = "Opret hangout";
+"latest" = "seneste";
+"unread" = "ulæst";
+"closest" = "nærmeste";
+
+"success" = "succes";
+"Alert" = "Alert";
+"Ok" = "Okay";
+"Edit Profile" = "Rediger profil";
+"EDIT" = "REDIGERE";
+"SHARE" = "DEL";
+"Male" = "Han";
+"Female" = "Kvinde";
+
+"MESSAGE" = "BESKED";
+"DISLIKE PROFILE" = "KAN IKKE LIKE PROFIL";
+"LIKE PROFILE" = "LIKE PROFIL";
+"LIKE STORY" = "LIKE HISTORIE";
+
+"INTERESTED" = "INTERESSERET";
+"NOT INTERESTED" = "IKKE INTERESSERET";
+"Internet" = "Internet";
+"Are you sure you want to logout?" = "Er du sikker på, at du vil logge ud?";
+"Please enable the camera permission from the settings." = "Aktiver venligst kameratilladelsen fra indstillingerne.";
+"Please enable the location permission from the settings." = "Aktiver venligst placeringstilladelsen fra indstillingerne.";
+"Please enable location." = "Aktiver venligst placering.";
+
+"Please enable the camera, microphone and library permission from the settings." = "Aktiver venligst kameraet, mikrofonen og bibliotekstilladelsen fra indstillingerne.";
+
+"Please enter feedback." = "Indtast venligst feedback.";
+"Description must be at least 2 characters long." = "Beskrivelsen skal være på mindst 2 tegn.";
+"Please enter description." = "Indtast venligst beskrivelse.";
+"Please enter OTP." = "Indtast venligst OTP.";
+"Please enter valid OTP." = "Indtast venligst gyldig OTP.";
+"Please select country." = "Vælg venligst land.";
+"Please add minimum two image." = "Venligst tilføje mindst to billeder.";
+"Please add minimum one image." = "Venligst tilføje mindst ét ​​billede.";
+"Please enter name." = "Indtast venligst navn.";
+"Name must be at least 2 characters long." = "Navnet skal være mindst 2 tegn langt.";
+"Please select date of birth." = "Vælg venligst fødselsdato.";
+"Please enter day." = "Indtast venligst dag.";
+"Please enter month." = "Indtast venligst måned.";
+"Please enter year." = "Indtast venligst år.";
+"Age should be between 16 to 100 years." = "Alder bør være mellem 16 og 100 år.";
+"Please enter date of birth." = "Indtast venligst fødselsdato.";
+"Please select gender." = "Vælg venligst køn.";
+"No audio found to play." = "Ingen lyd fundet at afspille.";
+"Do you want to share this post on facebook?" = "Vil du dele dette opslag på facebook?";
+"It looks like you don't have the Facebook mobile app on your phone. Please install app to share." = "Det ser ud til, at du ikke har Facebook-mobilappen på din telefon. Installer venligst app for at dele.";
+"Bio must be at least 2 characters long." = "Bio skal være på mindst 2 tegn.";
+"Job title must be at least 2 characters long." = "Jobtitel skal være på mindst 2 tegn.";
+"Company name must be at least 2 characters long." = "Virksomhedsnavn skal være mindst 2 tegn langt.";
+"City must be at least 2 characters long." = "By skal være mindst 2 tegn lang.";
+
+"Height should not be lesser than 3 Feet 7 Inches." = "Højden bør ikke være mindre end 3 fod 7 tommer.";
+"Height should not be greater than 8 Feet 2 Inches." = "Højden bør ikke være større end 8 fod 2 tommer.";
+"Please enter height." = "Indtast venligst højde.";
+"Are you sure you want to delete this image?" = "Er du sikker på, at du vil slette dette billede?";
+"Are you sure you want to delete this post?" = "Er du sikker på, at du vil slette dette indlæg?";
+"Video must be at least 3 seconds long." = "Videoen skal være mindst 3 sekunder lang.";
+"Please select education." = "Vælg venligst uddannelse.";
+"Please select children." = "Vælg venligst børn.";
+"Please select hair color." = "Vælg venligst hårfarve.";
+"Are you sure you want to delete this audio recording?" = "Er du sikker på, at du vil slette denne lydoptagelse?";
+"Please enter bio." = "Indtast venligst bio.";
+"Please enter job title." = "Indtast venligst jobtitel.";
+"Please enter company name." = "Indtast venligst firmanavn.";
+"Please enter city." = "Venligst indtast byen.";
+"Please enter height." = "Indtast venligst højde.";
+"Please upload hangout image." = "Upload hangout-billede.";
+"Please select hangout type." = "Vælg venligst hangout-type.";
+"Please enter hangout heading." = "Angiv venligst hangout-overskriften.";
+"Please enter hangout description." = "Indtast venligst hangout beskrivelse.";
+
+
+"Hangout heading must be at least 2 characters long." = "Hangout-overskriften skal være på mindst 2 tegn.";
+"Hangout description must be at least 2 characters long." = "Hangoutbeskrivelse skal være på mindst 2 tegn.";
+"Please select hangout date." = "Vælg venligst dato for hangout.";
+"Please select hangout time." = "Vælg venligst tidspunkt for hangout.";
+"Please select hangout place." = "Vælg venligst hangout sted.";
+"Enter Additional Description (optional)" = "Indtast yderligere beskrivelse (valgfrit)";
+"Please select looking for." = "Vælg venligst på udkig efter.";
+"This image contains inappropriate content. Please upload another image." = "Dette billede indeholder upassende indhold. Upload venligst et andet billede.";
+"You can select maximum 10 images." = "Du kan maksimalt vælge 10 billeder.";
+"Shake sent." = "Shake sendt";
+"Please enter message." ="Indtast venligst besked.";
+
+"Hour" = "Time";
+"Hours" = "Timer";
+"Minute" = "Minut";
+"Minutes" = "Minutter";
+"Second" = "Anden";
+"Seconds" = "Seconds";
+
+"You tried to" = "Du prøvede at";
+"Missed" = "Savnet";
+"You had a video call with " = "Du havde et videoopkald med ";
+"You had a audio call with " = "Du havde et lydopkald med ";
+"Call connected" = "Opkald forbundet";
+"Call disconnected" = "Opkald afbrudt";
+"You are offline." = "Du er offline.";
+"You are online." = "Du er offline.";
+"Commented on " = "Kommenteret";
+"No active chat found." = "Ingen aktiv chat fundet.";
+"No inactive chat found." = "Ingen inaktiv chat fundet.";
+"You matched with " ="Du matchede med ";
+"Choose Option" = "Vælg mulighed";
+"Copy" = "Kopi";
+"Delete" = "Slet";
+"End Chat" = "Afslut chat";
+"Continue Chat" = "Fortsæt chat";
+"Welcome" = "Velkommen";
+"Dating app with actual dating :)" = "Ryst. Browse. Oplev";
+"By continuing, you agree to our " = "Ved at fortsætte accepterer du vores ";
+" & " = " & ";
+"Log In with Google" = "Log ind med Google";
+"Log In with Facebook" = "Log In with Facebook";
+"Log In with Mobile" = "Log ind med mobil";
+"PLAY" = "SPIL";
+"Press and hold to record" = "Tryk og hold for at optage";
+"FINISH" = "AFSLUT";
+"Get \n Started" = "Kom \n igang";
+"Welcome to Niirly, an awesome community of anonymous people.Try shaking your phone in the home screen for 2 seconds and your profile will be sent out to people in a 100 meter radius.You can also create a \"Hangout\" or a \"Story\" which will stay for 24 hours and wont have your profile hidden." = "Velkommen til Niirly, et fantastisk fællesskab af anonyme mennesker. Prøv at ryste din telefon på startskærmen i 2 sekunder, og din profil vil blive sendt ud til folk i en radius på 100 meter. Du kan også oprette et \"Hangout\" eller en \"Story\" som vil blive stående i 24 timer og vil ikke have din profil skjult.";
+"Set Your Match Preferences" = "Ret dine match preferencer";
+"Send a Shake to people nearby" = "Send et shake to brugere i nærheden";
+"Hangout with like minded people" = "Hangout med ligesindede";
+"Get on swiping!" = "Kom i gang med at stryge!";
+"CHECK MY PREFERENCES" = "TJEK MINE PRÆFERENCER";
+
+"PREFERENCES" = "PRÆFERENCER";
+"MY HANGOUTS" = "MIN HANGOUTS";
+"ACCOUNT" = "KONTO";
+"HELP" = "HJÆLP";
+"INVITE FRIENDS" = "INVITER VENNER";
+
+"BIO" = "BIO";
+"AGE" = "ALDER";
+"JOB TITLE" = "JOBTITEL";
+"COMPANY NAME" = "FIRMANAVN";
+"CITY" = "BY";
+"GENDER" = "KØN";
+"HEIGHT" = "HØJDE";
+"CONNECT INSTAGRAM" = "TILSLUT INSTAGRAM";
+"CONNECT FACEBOOK" = "TIL FACEBOOK";
+"CONNECTED FACEBOOK" = "TILKOBLET FACEBOOK";
+"CONNECTED INSTAGRAM" = "TILBUNDET INSTAGRAM";
+"Facebook's Post" = "Facebooks indlæg";
+"Instagram's Post" = "Instagrams indlæg";
+"In " = "I";
+"HEIGHT (In cm)" = "HØJDE (i cm)";
+"HEIGHT (In Centimeters)" = "HØJDE (i centimeter)";
+" 's Profile" =  "s profil";
+"SHOW" =  "AT VISE";
+"Facebook Photos" = "Facebook-billeder";
+"Instagram Photos" = "Instagram-billeder";
+
+"Get the most of the app. " = "Få mest muligt ud af appen.";
+"Upgrade to Premium and receive daily shakes and more..." = "Opgrader til Premium og modtag daglige shakes og mere...";
+"MOBILE NUMBER" =  "MOBILNUMMER";
+"UNITS" = "ENHEDER";
+"NOTIFICATIONS" = "MEDDELELSER";
+"Terms of Service" = "servicevilkår";
+"Privacy Policy" = "privatlivspolitik";
+"By continuing you agree to our Privacy Policy and Terms of Service." = "Ved at fortsætte accepterer du vores privatlivspolitik og servicevilkår.";
+
+"GDPR Guidelines" = "GDPR-retningslinjer";
+"CONTACT US" = "KONTAKT OS";
+"Logout" =  "Log ud";
+"Delete Account" = "Slet konto";
+"Confirm Delete" = "Bekræft sletning";
+"Are you sure you want to delete your account?" =  "Er du sikker på, at du vil slette din konto?";
+"PUSH NOTIFICATIONS" = "PUSH NOTIFIKATIONER";
+"EMAIL" = "EMAIL";
+"PROMOTIONAL" = "KREMPEL";
+"TEAM FLAZHED" = "TEAM FLAZHED";
+
+"NEW MATCHES" ="Nye chats";
+"NEW MESSAGES" = "NYE MEDDELELSER";
+"NEW LIKES" = "NYE LIKES";
+
+"COUNTRY CODE" = "LANDEKODE";
+"Verification OTP sent to"  = "Bekræftelse OTP sendt til";
+"OTP" = "OTP";
+"ENTER OTP HERE"  = "INDGIV OTP HER";
+
+"Same Hangouts" = "Samme Hangouts";
+"Days Active"  = "Dage aktive";
+"Number of Interested" = "Antal interesserede";
+"Simultaneous Chats"  = "Samtidige chats";
+
+"Video Calls per Month" = "Videoopkald pr. måned";
+"Pictures per Day"  = "Billeder pr. dag";
+"Videos per Day" = "Videoer pr. dag";
+"Video Length"  = "Videolængde";
+"GET MORE" = "Få flere shakes her";
+"Regret swipe" = "Fortryd swipe";
+"Expand Radius (m)" = "Udvid radius (m)";
+"Daily Shakes" = "Daglige shakes" ;
+"Video Length" = "Videolængde";
+"Are You Sure?" = "Er du sikker?";
+"DELETE IMAGE" = "SLET BILLEDE";
+"DELETE RECORDING" = "SLET OPTAGELSE";
+"Confirm Logout" = "Bekræft Log ud";
+
+"SORT" = "SORTER";
+"BLOCK AND REPORT USER" = "BLOKER OG RAPPORTER BRUGER";
+"END CHAT" = "SLUT CHAT";
+"REMOVE MATCH" = "FJERN MATCH";
+
+"PROLONG CHAT" = "LANG CHAT";
+"DELETE CHAT" = "SLET CHAT";
+
+"BLOCK ONLY" = "BLOKER KUN";
+"INAPPROPRIATE CONTENT" = "Upassende INDHOLD";
+"PPERSON IS MINOR" = "PERSON ER MINDRE";
+"BAD OFFLINE BEHAVIOR" = "DÅRLIG OFFLINE OPFØRSEL";
+"FEELS LIKE SPAM" = "FØLES SOM SPAM";
+"Hate speech or symbols" = "hadefulde ytringer eller symboler";
+"Violence or dangerous organisations" = "Vold eller farlige organisationer";
+"Bullying or harassment" = "Mobning eller chikane";
+"Suicide or self-injury" = "Mobning eller chikane";
+"OTHER" = "ANDET";
+"Discard Photo" = "Kassér billede";
+"Are you sure you want to discard? This photo has not been saved." = "Er du sikker på, at du vil kassere? Dette billede er ikke blevet gemt.";
+"End Chat?" = "Afslut chat?";
+"Are you sure you want to end chat? " = "Er du sikker på, at du vil afslutte chatten?";
+"YES, END" = "JA, SLUT";
+
+"Remove Match?"  ="Fjern Match?";
+
+
+"Are you sure you want to remove this user? " = "Er du sikker på, at du vil fjerne denne bruger?";
+"YES, REMOVE" = "JA, FJERN";
+"Continue Chat?" = "Fortsæt chat?";
+"Your chat with " = "Din chat med";
+" will be inactive if you end this chat." = " vil være inaktiv, hvis du afslutter denne chat.";
+"days" = "dage";
+"day" = "dag";
+
+
+" is about to run out. You have " = " er ved at løbe tør. Du har ";
+" to decide if you want to continue or not. "  = " for at beslutte, om du vil fortsætte eller ej. ";
+"Are you sure you want to delete this post? "  = "Er du sikker på, at du vil slette dette indlæg?";
+"Are you sure you want to delete this Hangout?" = "Er du sikker på, at du vil slette dette Hangout?";
+"DELETE HANGOUT"  =  "SLET Hangout";
+"Shake Sent"  =  "Shake sendt";
+"Request has been sent to the nearby users. You will be able to see the list once they like your profile. Till then, do you want to Play Anonymous?"  =  "Anmodningen er blevet sendt til de nærliggende brugere. Du vil være i stand til at se listen, når de kan lide din profil. Indtil da, vil du spille anonym?";
+"PLAY ANONYMOUS"  =  "SPIL ANONYMT";
+"Are you sure you want to delete this Story?"  =  "Er du sikker på, at du vil slette denne historie?";
+"DELETE STORY"  =  "SLET HISTORIE";
+"Are you sure you want to discard? This"  =  "Er du sikker på, at du vil kassere? Dette";
+"has not been saved." =  "er ikke blevet reddet.";
+"Post your story to Facebook"  =  "Send din historie til Facebook";
+"Do you want to share this post on facebook?"  = "Vil du dele dette opslag på facebook?";
+"SHARE POST" = "DEL OPSLAG";
+"IMAGES" = "BILLEDER";
+"VIDEOS" = "VIDEOER";
+"ONLY MATCHES" = "KUN MATCHER";
+"MY POSTS" = "MINE OPSLAG";
+"ALL POSTS" = "ALLE OPSLAG";
+"Please enable the microphone permission from the settings." = "Aktiver venligst mikrofontilladelsen fra indstillingerne.";
+"Please enable the library permission from the settings." = "Aktiver venligst bibliotekstilladelsen fra indstillingerne.";
+"Please enable the camera and microphone permission from the settings." = "Aktiver venligst kamera- og mikrofontilladelsen fra indstillingerne.";
+"UNREAD" = "ULÆST";
+"LATEST" = "SENESTE";
+"CLOSEST TO ME" = "NÆRMEST MIG";
+"APPLY" = "ANVEND";
+"Uh Oh!" = "Åh åh!";
+" hasn't accepted you request  yet." = "har ikke accepteret din anmodning endnu.";
+"Tell Us More" ="Fortæl os mere";
+"SEND FEEDBACK" = "SEND FEEDBACK";
+"OKAY" = "OKAY";
+"hasn't accepted your chat request yet." = "har ikke accepteret din chatanmodning endnu.";
+"has left the chat." = "har forladt chatten.";
+"You are still waiting on " = "Du venter stadig på";
+" to accept the chat 😊." = "at acceptere chatten 😊.";
+"Feedback Received" = "Feedback modtaget";
+"Thank you for your time." ="Tak for din tid.";
+"has been" =  "har været";
+"'s post has been" =  "s indlæg har været";
+"'s hangout has been" =  "s hangout har været";
+"BLOCK AND REPORT POST" = "BLOKER OG RAPPORTER INDSLAG";
+"BLOCK AND REPORT HANGOUT" = "BLOKER OG RAPPORTER Hangout";
+"It's A Match!" = "Det er en kamp!";
+"START CHATTING" = "START CHATTE";
+"Cancel Shake" = "Annuler shake";
+"Time and Date" = "Tid og dato";
+"Location" = "Beliggenhed";
+"Interested In?" = "Interesseret i?";
+"Between age" = "Mellem alder";
+"Nothing Here" = "Ikke noget her";
+"A Hangout is your way of creating an event and invite people to join. You set the place, date and time and type of event. It's a great way of meeting new friends and dates.A Hangout will expire after hangout created date." = "Et Hangout er din måde at oprette en begivenhed og invitere folk til at deltage på. Du indstiller sted, dato og klokkeslæt og type begivenhed. Det er en fantastisk måde at møde nye venner og datoer på. Et Hangout udløber efter oprettelsesdatoen for hangoutet." ;
+"RUNS FOR" = "KØRER FOR";
+"DATE" = "DATO";
+"TIME" = "TID";
+"PLACE" = "PLACERE";
+"ADDITIONAL DESCRIPTION"  = "YDERLIGERE BESKRIVELSE";
+"NEXT" = "NÆSTE";
+"HANGOUT IMAGE" = "HANGOUT-BILLEDE";
+"HANGOUT TYPE" = "HANGOUT TYPE";
+"HEADING" = "OVERSKRIFT";
+"DESCRIPTION" = "BESKRIVELSE";
+"Go Premium"  = "Go Premium";
+"No Thanks" = "Nej tak";
+"TODAY"   = "I DAG";
+"REMOVE MATCH" = "FJERN MATCH";
+"Verification" = "Verifikation";
+"We will send you an One Time Password to this mobile to verify." = "Vi sender dig en Engangsadgangskode til denne mobil for at bekræfte.";
+"One Time Password" = "Engangsadgangskode";
+" to this mobile to verify." = "til denne mobil for at bekræfte.";
+"Phone Number" = "Mobilnummer";
+"Change Number" = "Skift telefonnummer";
+"Enter the OTP sent to " = "Indtast OTP sendt til ";
+"Add Voice"= "Tilføj stemme";
+"Leave a short voice recording of your normal voice. Around 3 - 5 seconds." = "Efterlad en kort stemmeoptagelse af din normale stemme. Omkring 3 - 5 sekunder.";
+"Leave a short " = "Forlad en kort";
+"voice recording" = "stemmeoptagelse";
+" of your normal voice. Around 3 - 5 seconds." = " af din normale stemme. Omkring 3 - 5 sekunder.";
+"Username" = "Brugernavn";
+"A real name helps other users " = "Et rigtigt navn hjælper andre brugere";
+" you." = "dig.";
+"trust" = "tillid";
+"Name" = "Navn";
+"Profile Picture" = "Profilbillede";
+"We prefer atleast 3 pictures to increase your chances of getting a match." = "Vi foretrækker mindst 3 billeder for at øge dine chancer for at få en kamp.";
+"20x." = "20x.";
+"Gender" = "Køn";
+"Let us know your " = "Lad os vide din";
+"gender." = "køn.";
+"Date of Birth" = "Fødselsdato";
+"We will connect you with " = "Vi vil forbinde dig med ";
+"like-minded" = "ligesindede";
+" people." = "mennesker.";
+"Extra Shakes" = "Extra Shakes";
+"Don't bother about shake limits anymore." = "Gid ikke længere om shake-grænser.";
+"Regret Swiping Right?" = "Fortryder at stryge til højre?";
+"Get Premium and never regret swiping." = "Få Premium og fortryd aldrig at stryge.";
+"Prolong Chats" = "Forlænge chats";
+"Get more time to know more about the\n other person." = "Få mere tid til at vide mere om den\n anden person.";
+"You have already subscribed to this plan." = "Du har allerede abonneret på denne plan.";
+"You can not degrade your subscription." = "Du kan ikke forringe dit abonnement.";
+"Regret Action" = "Fortryd handling";
+"Ohh shoot - need to go back and redo ? Upgrade your plan." = "Åhh skyd - skal du tilbage og lave om? Opgrader din plan.";
+"Regret run out" = "Fortryder løbet tør";
+"CONTINUE" = "BLIVE VED";
+"Prolong Chat" = "Prolong Chat";
+"Prolong Chat" = "Forlænge chat";
+"Reactivate and start chatting with " = "Genaktiver og start at chatte med ";
+" again." = " en gang til.";
+"No credential was found" = "Ingen legitimationsoplysninger blev fundet";
+"The Apple ID credential is revoked" = "Apple ID-legitimationsoplysningerne er tilbagekaldt";
+"SELECT MEDIA" = "VÆLG MEDIE";
+"GALLERY" = "GALLERI";
+"CAMERA" = "KAMERA";
+"CANCEL" = "Fortryd";
+"Image content checking..." = "Billedindhold tjekker...";
+"Confirm Settings" = "Bekræft indstillinger";
+"Verify" = "Verificer";
+"New Shakes" = "Nye shakes";
+"I'm interested in" = "Jeg er interesseret i...";
+"EDUCATION" = "UDDANNELSE";
+"CHILDREN" = "BØRN";
+"Man" = "Mand";
+"Woman" = "Kvinde";
+"Women" = "Kvinder";
+"HAIR COLOR" = "Hårfarve";
+"HEIGHT (In " = "HØJDE (In ";
+"Enter Username" = "Indtast brugernavn";
+"No new match found." = "Der blev ikke fundet noget nyt match.";
+"Messages" = "Beskeder";
+"Active Chats" = "Aktive chats";
+"Inactive Chats" = "Inaktive chats";
+"Tap and Hold on profile picture to check time left." = "Tryk og hold på profilbilledet for at kontrollere den resterende tid.";
+"WOMEN" = "Kvinder";
+"MEN" = "Mænd";
+"shakes left" = "shakes tilbage";
+"Shake left" = "Ryst til venstre";
+"Shake your phone" = "Ryst din telefon";
+"Subtext" = "Undertekst";
+"Get Now" = "Får nu";
+"RESTORE" = "GENDAN";
+"No Internet" = "Intet internet";
+"Server Error" = "Server Fejl";
+"Unable to connect with server. Please try again." = "Kan ikke oprette forbindelse til serveren. Prøv venligst igen.";
+"Error" = "Fejl";
+"Something went wrong. Please try again." =  "Noget gik galt. Prøv igen.";
+"Session expired. Please login again." = "Sessionen er udløbet. Log venligst på igen.";
+"Could not connect to the server, please check your internet connection and try again." = "Kunne ikke oprette forbindelse til serveren. Tjek venligst din internetforbindelse og prøv igen.";
+"Niirly Help" = "Niirly Hjælp";
+"Im inviting you to join Niirly, a community where you find and meet users in a short radius. Install the app with the following link: https://wfczs.app.link/efANhMRKYlb" = "Jeg inviterer dig til at være med i Niirly, et fællesskab, hvor du finder og møder brugere i en kort radius. Installer appen med følgende link: https://wfczs.app.link/efANhMRKYlb";
+"DESCRIPTION" = "BESKRIVELSE";
+"HEADING" = "OVERSKRIFT";
+"HANGOUT TYPE" = "HANGOUT TYPE";
+"HANGOUT IMAGE" = "HANGOUT-BILLEDE";
+"LOOKING FOR" = "LEDER EFTER";
+"ADDITIONAL DESCRIPTION" = "YDERLIGERE BESKRIVELSE";
+"PLACE" = "PLACERE";
+"TIME" = "TID";
+"DATE" = "DATO";
+"RUNS FOR" = "KØBER FOR";
+"AGE" = "ALDER";
+"SOCIAL" = "SOCIAL";
+"TRAVEL" = "REJSE";
+"SPORTS" = "SPORT";
+"BUSINESS" = "FORRETNING";
+"Sort" = "SORTER";
+"Shake your phone for 2 seconds and reveal your profile for potential matches within a radius of 150 meters." = "Ryst telefonen i 2 sekunder, og afslør din profil for potentielle matches inden for en radius af 150 meter.";
+
+"Passed that special someone in real life? Or let others know you are HERE! Shake your phone for 2 seconds and reveal your profile for potential matches within a radius of 150 meters. Or find your true match based on personality by browsing through all profiles made anonymous." = "Passeret dén specielle person i det virkelige liv? Eller lad andre vide, at du er HER! Ryst din telefon i 2 sekunder, og afslør din profil for potentielle matches inden for en radius af 150 meter. Eller find dit rigtige match baseret på personlighed ved at se alle profiler, vist som anonyme.";
+
+"Write a message" = "Skriv en besked";
+"Yesterday" = "i går";
+
+"Your shake has been sent to potential matches nearby.Those who like your profile can be seen in Shake.Until then, do you want to browse anonymous profiles?" = "Dit shake er sendt til potentielle matches i nærheden.De der liker din profile kan ses i Shake.Indtil da, vil du browse anonyme profiler ?";
+"Add minimum 2 pictures of yourself." = "Du skal som minimum tilføje 2 billeder af dig selv.";
+"Please add minimum 2 pictures of yourself."  = "Du skal som minimum tilføje 2 billeder af dig selv.";
+"We don’t show your birthday. Only your age." = "Vi viser ikke din fødselsdag. Kun din alder.";
+
+ "Browse Anonymous" = "Browse anonyme";

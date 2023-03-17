@@ -1,0 +1,156 @@
+
+/* Class = "UILabel"; text = "Login with Facebook"; ObjectID = "1sR-7u-AwX"; */
+"1sR-7u-AwX.text" = "Log ind med Facebook";
+
+/* Class = "UIButton"; normalTitle = "NEXT"; ObjectID = "3bU-ue-7xr"; */
+"3bU-ue-7xr.normalTitle" = "NÆSTE";
+
+/* Class = "UILabel"; text = "05:00"; ObjectID = "4kR-kE-ql5"; */
+"4kR-kE-ql5.text" = "05:00";
+
+/* Class = "UITextField"; placeholder = "Enter one time password"; ObjectID = "5jg-PH-KZQ"; */
+"5jg-PH-KZQ.placeholder" = "Indtast tilsendt kode";
+
+/* Class = "UILabel"; text = "Set Your Match Preferences"; ObjectID = "6n1-7r-0VR"; */
+"6n1-7r-0VR.text" = "Ret dine match preferencer";
+
+/* Class = "UILabel"; text = "I am a..."; ObjectID = "CI1-SA-GOQ"; */
+"CI1-SA-GOQ.text" = "Jeg er...";
+
+/* Class = "UILabel"; text = "Login with Mobile"; ObjectID = "Heu-Uf-NC3"; */
+"Heu-Uf-NC3.text" = "Log ind med mobilnummer";
+
+/* Class = "UIButton"; normalTitle = "NEXT"; ObjectID = "Hyq-do-6UB"; */
+"Hyq-do-6UB.normalTitle" = "NÆSTE";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "KAQ-mC-bw4"; */
+"KAQ-mC-bw4.normalTitle" = "Knap";
+
+/* Class = "UILabel"; text = "Login with Apple ID"; ObjectID = "QCh-pC-oiu"; */
+"QCh-pC-oiu.text" = "Log ind med Apple ID";
+
+/* Class = "UILabel"; text = "Login with Google"; ObjectID = "QEw-fu-YIk"; */
+"QEw-fu-YIk.text" = "Log ind med Google";
+
+/* Class = "UILabel"; text = "Didn't receive OTP yet? "; ObjectID = "SdJ-e1-Yeo"; */
+"SdJ-e1-Yeo.text" = "Har du ikke modtaget OTP endnu?";
+
+/* Class = "UILabel"; text = "Press and hold to record"; ObjectID = "Sz4-5C-SXW"; */
+"Sz4-5C-SXW.text" = "Tryk og hold for at optage";
+
+/* Class = "UILabel"; text = "Mobile verification"; ObjectID = "TBL-pv-aX0"; */
+"TBL-pv-aX0.text" = "Verification";
+
+/* Class = "UITextField"; placeholder = "I am a..."; ObjectID = "UIc-yw-pFH"; */
+"UIc-yw-pFH.placeholder" = "Jeg er...";
+
+/* Class = "UILabel"; text = "Browse anonymous profiles"; ObjectID = "USK-rA-A6v"; */
+"USK-rA-A6v.text" = "Gennemse alle profiler, der er gjort anonyme";
+
+/* Class = "UILabel"; text = "+91 9150846506"; ObjectID = "Vce-yS-1Pg"; */
+"Vce-yS-1Pg.text" = "+91 9150846506";
+
+/* Class = "UILabel"; text = "Dating app with actual dating :)"; ObjectID = "WPY-ub-e0D"; */
+"WPY-ub-e0D.text" = "Ryst. Browse. Oplev";
+
+/* Class = "UILabel"; text = "Enter your details"; ObjectID = "XGT-R8-vr7"; */
+"XGT-R8-vr7.text" = "Indtast dine oplysninger";
+
+/* Class = "UITextField"; placeholder = "MM"; ObjectID = "YEr-a4-lL2"; */
+"YEr-a4-lL2.placeholder" = "MM";
+
+/* Class = "UITextField"; placeholder = "DD"; ObjectID = "a9D-tZ-Nif"; */
+"a9D-tZ-Nif.placeholder" = "DD";
+
+/* Class = "UITextField"; placeholder = "Phone number"; ObjectID = "adb-jQ-PcX"; */
+"adb-jQ-PcX.placeholder" = "Telefonnummer";
+
+/* Class = "UITextField"; placeholder = "Enter Username"; ObjectID = "bla-Ga-W2g"; */
+"bla-Ga-W2g.placeholder" = "Indtast brugernavn";
+
+/* Class = "UILabel"; text = "Get Started"; ObjectID = "bmX-V1-QE6"; */
+"bmX-V1-QE6.text" = "Kom igang";
+
+/* Class = "UITextView"; text = "cont"; ObjectID = "fDb-K6-3wX"; */
+"fDb-K6-3wX.text" = "forts";
+
+/* Class = "UIButton"; normalTitle = "FINISH"; ObjectID = "fUA-fu-Ipp"; */
+"fUA-fu-Ipp.normalTitle" = "AFSLUT";
+
+/* Class = "UILabel"; text = "We prefer atleast 3 pictures to increase your chances of getting a match."; ObjectID = "fki-fc-02k"; */
+"fki-fc-02k.text" = "Vi foretrækker mindst 3 billeder for at øge dine chancer for at få en kamp.";
+
+/* Class = "UILabel"; text = "You won’t be able to change your username later."; ObjectID = "gTe-3h-uiO"; */
+"gTe-3h-uiO.text" = "Du kan ikke ændre dit brugernavn senere.";
+
+/* Class = "UIButton"; normalTitle = "CONFIRM"; ObjectID = "goU-fl-LkR"; */
+"goU-fl-LkR.normalTitle" = "Bekræft";
+
+/* Class = "UITextField"; placeholder = "Looking for"; ObjectID = "hIc-ro-5Ni"; */
+"hIc-ro-5Ni.placeholder" = "Interesseret i?";
+
+/* Class = "UITextView"; text = "Welcome to Flazhed, an awesome community of anonymous people. Try shaking your phone in the home screen for 2 seconds and your profile will be sent out to people in a 100 meter radius."; ObjectID = "hav-5A-EDI"; */
+"hav-5A-EDI.text" = "Passeret dén specielle person i det virkelige liv? Eller lad andre vide, at du er HER! Ryst din telefon i 2 sekunder, og afslør din profil for potentielle matches inden for en radius af xx meter. Eller find dit rigtige match baseret på personlighed ved at se alle profiler, vist som anonyme.";
+
+/* Class = "UITextField"; placeholder = "YYYY"; ObjectID = "k8Z-Jg-qgA"; */
+"k8Z-Jg-qgA.placeholder" = "YYYY";
+
+/* Class = "UIButton"; normalTitle = "NEXT"; ObjectID = "mCL-wC-TfB"; */
+"mCL-wC-TfB.normalTitle" = "NÆSTE";
+
+/* Class = "UILabel"; text = "Your birthday"; ObjectID = "mEj-cY-iYG"; */
+"mEj-cY-iYG.text" = "Fødselsdag";
+
+/* Class = "UILabel"; text = "Looking for"; ObjectID = "o0g-qH-izV"; */
+"o0g-qH-izV.text" = "Interesseret i?";
+
+/* Class = "UILabel"; text = "OTP was successfully resent"; ObjectID = "ocV-BE-pSn"; */
+"ocV-BE-pSn.text" = "OTP blev sendt igen";
+
+/* Class = "UIButton"; normalTitle = "Change Number"; ObjectID = "pTY-F6-qoK"; */
+"pTY-F6-qoK.normalTitle" = "Skift telefonnummer";
+
+/* Class = "UIButton"; normalTitle = "RESEND"; ObjectID = "rI2-WP-lYn"; */
+"rI2-WP-lYn.normalTitle" = "Send igen";
+
+/* Class = "UIButton"; normalTitle = "NEXT"; ObjectID = "rN3-QH-vXD"; */
+"rN3-QH-vXD.normalTitle" = "NÆSTE";
+
+/* Class = "UIButton"; normalTitle = "VERIFY"; ObjectID = "s9v-VS-Jqf"; */
+"s9v-VS-Jqf.normalTitle" = "Verificer";
+
+/* Class = "UIButton"; normalTitle = "PLAY"; ObjectID = "sCK-ON-rsx"; */
+"sCK-ON-rsx.normalTitle" = "SPIL";
+
+/* Class = "UILabel"; text = "Enter your details"; ObjectID = "uU9-AZ-UrD"; */
+"uU9-AZ-UrD.text" = "Indtast dine oplysninger";
+
+/* Class = "UILabel"; text = "We will send you an One Time Password to \nthis mobile to verify."; ObjectID = "vV2-0z-WgO"; */
+"vV2-0z-WgO.text" = "Vi sender dig en engangsadgangskode til \ndenne mobil for at bekræfte.";
+
+/* Class = "UILabel"; text = "+45"; ObjectID = "vWl-OI-8Lm"; */
+"vWl-OI-8Lm.text" = "+45";
+
+/* Class = "UILabel"; text = "Let’s add some pictures"; ObjectID = "wIp-1n-i2V"; */
+"wIp-1n-i2V.text" = "Tilføj billeder";
+
+/* Class = "UILabel"; text = "Enter your details"; ObjectID = "wSp-EK-FBr"; */
+"wSp-EK-FBr.text" = "Indtast dine oplysninger";
+
+/* Class = "UILabel"; text = "Welcome"; ObjectID = "wXr-Mb-QOk"; */
+"wXr-Mb-QOk.text" = "Velkommen";
+
+/* Class = "UILabel"; text = "Send a shake to people nearby"; ObjectID = "xLt-cc-7YH"; */
+"xLt-cc-7YH.text" = "Send et shake to brugere i nærheden";
+
+/* Class = "UILabel"; text = "Username"; ObjectID = "xbC-zf-8bv"; */
+"xbC-zf-8bv.text" = "Brugernavn";
+
+/* Class = "UIButton"; normalTitle = "DELETE"; ObjectID = "yBY-au-a16"; */
+"yBY-au-a16.normalTitle" = "SLET";
+
+/* Class = "UILabel"; text = "Enter one time password"; ObjectID = "yc6-zV-75P"; */
+"yc6-zV-75P.text" = "Indtast tilsendt kode";
+
+/* Class = "UILabel"; text = "Leave a short voice recording of your voice. Around 3 - 5 seconds."; ObjectID = "yf9-TF-Lvm"; */
+"yf9-TF-Lvm.text" = "Efterlad en kort stemmeoptagelse af din stemme. Omkring 3-5 sekunder.";

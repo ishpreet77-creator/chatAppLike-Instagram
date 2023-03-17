@@ -90,7 +90,7 @@ class AgoraRtm: NSObject {
 
 extension AgoraRtmKit {
     func login(account: String, token: String?, success: Completion = nil, fail: ErrorCompletion = nil) {
-        print("rtm login account: \(account)")
+        debugPrint("rtm login account: \(account)")
         
         AgoraRtm.shared().account = account
         
@@ -105,14 +105,14 @@ extension AgoraRtmKit {
             AgoraRtm.shared().status = .online
             
             if let success = success {
-                print("Rtm login success")
+                debugPrint("Rtm login success")
                 success()
             }
         }
     }
     
     func queryPeerOnline(_ peer: String, success: ((_ status: AgoraRtmPeerOnlineState) -> Void)? = nil, fail: ErrorCompletion = nil) {
-        print("rtm query peer: \(peer)")
+        debugPrint("rtm query peer: \(peer)")
         
         queryPeersOnlineStatus([peer]) { (onlineStatusArray, errorCode) in
             guard errorCode == AgoraRtmQueryPeersOnlineErrorCode.ok else {
@@ -163,7 +163,7 @@ extension AgoraRtmCallKit {
     }
     
     func sendInvitation(peer: String, extraContent: String? = nil, accepted: Completion = nil, refused: Completion = nil, fail: ErrorCompletion = nil) {
-        print("rtm sendInvitation peer: \(peer)")
+        debugPrint("rtm sendInvitation peer: \(peer)")
         
         let rtm = AgoraRtm.shared()
         let invitation = AgoraRtmLocalInvitation(calleeId: peer)
@@ -240,7 +240,7 @@ extension AgoraRtmCallKit {
 
 extension AgoraRtm: AgoraRtmCallDelegate {
     func rtmCallKit(_ callKit: AgoraRtmCallKit, localInvitationAccepted localInvitation: AgoraRtmLocalInvitation, withResponse response: String?) {
-        print("rtmCallKit localInvitationAccepted")
+        debugPrint("rtmCallKit localInvitationAccepted")
         
         let rtm = AgoraRtm.shared()
         if let accepted = rtm.callKitAcceptedBlock {
@@ -252,7 +252,7 @@ extension AgoraRtm: AgoraRtmCallDelegate {
     }
     
     func rtmCallKit(_ callKit: AgoraRtmCallKit, localInvitationRefused localInvitation: AgoraRtmLocalInvitation, withResponse response: String?) {
-        print("rtmCallKit localInvitationRefused")
+        debugPrint("rtmCallKit localInvitationRefused")
         
         let rtm = AgoraRtm.shared()
         if let refused = rtm.callKitRefusedBlock {
@@ -266,7 +266,7 @@ extension AgoraRtm: AgoraRtmCallDelegate {
     }
     
     func rtmCallKit(_ callKit: AgoraRtmCallKit, remoteInvitationReceived remoteInvitation: AgoraRtmRemoteInvitation) {
-        print("rtmCallKit remoteInvitationReceived")
+        debugPrint("rtmCallKit remoteInvitationReceived")
         
         let rtm = AgoraRtm.shared()
         
@@ -287,7 +287,7 @@ extension AgoraRtm: AgoraRtmCallDelegate {
     
     func rtmCallKit(_ callKit: AgoraRtmCallKit, remoteInvitationCanceled remoteInvitation: AgoraRtmRemoteInvitation) {
         APPDEL.provider?.reportCall(with: APPDEL.uuid, endedAt: Date(), reason: .remoteEnded)
-        print("rtmCallKit remoteInvitationCanceled")
+        debugPrint("rtmCallKit remoteInvitationCanceled")
         let rtm = AgoraRtm.shared()
         
         guard let inviter = rtm.inviter else {
@@ -304,32 +304,32 @@ extension AgoraRtm: AgoraRtmCallDelegate {
     }
     
     func rtmCallKit(_ callKit: AgoraRtmCallKit, localInvitationReceivedByPeer localInvitation: AgoraRtmLocalInvitation) {
-        print("rtmCallKit localInvitationReceivedByPeer")
+        debugPrint("rtmCallKit localInvitationReceivedByPeer")
     }
     
     func rtmCallKit(_ callKit: AgoraRtmCallKit, localInvitationCanceled localInvitation: AgoraRtmLocalInvitation) {
-        print("rtmCallKit localInvitationCanceled")
+        debugPrint("rtmCallKit localInvitationCanceled")
         
         NotificationCenter.default.post(name: Notification.Name("CallDisconnectedNotification"), object: nil, userInfo: ["Type":"localInvitationRefused"])
     }
     
     func rtmCallKit(_ callKit: AgoraRtmCallKit, localInvitationFailure localInvitation: AgoraRtmLocalInvitation, errorCode: AgoraRtmLocalInvitationErrorCode) {
-        print("rtmCallKit localInvitationFailure: \(errorCode.rawValue)")
+        debugPrint("rtmCallKit localInvitationFailure: \(errorCode.rawValue)")
     }
     
     func rtmCallKit(_ callKit: AgoraRtmCallKit, remoteInvitationFailure remoteInvitation: AgoraRtmRemoteInvitation, errorCode: AgoraRtmRemoteInvitationErrorCode) {
-        print("rtmCallKit remoteInvitationFailure: \(errorCode.rawValue)")
+        debugPrint("rtmCallKit remoteInvitationFailure: \(errorCode.rawValue)")
         self.lastIncomingInvitation = nil
     }
     
     func rtmCallKit(_ callKit: AgoraRtmCallKit, remoteInvitationRefused remoteInvitation: AgoraRtmRemoteInvitation) {
-        print("rtmCallKit remoteInvitationRefused")
+        debugPrint("rtmCallKit remoteInvitationRefused")
         self.lastIncomingInvitation = nil
         NotificationCenter.default.post(name: Notification.Name("CallDisconnectedNotification"), object: nil, userInfo: ["Type":"localInvitationRefused"])
     }
     
     func rtmCallKit(_ callKit: AgoraRtmCallKit, remoteInvitationAccepted remoteInvitation: AgoraRtmRemoteInvitation) {
-        print("rtmCallKit remoteInvitationAccepted")
+        debugPrint("rtmCallKit remoteInvitationAccepted")
         self.lastIncomingInvitation = nil
     }
 }

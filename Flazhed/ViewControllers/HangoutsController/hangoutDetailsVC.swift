@@ -6,9 +6,14 @@
 //
 
 import UIKit
-import SDWebImage
+import SkeletonView
 
 class hangoutDetailsVC: BaseVC {
+    @IBOutlet weak var viewProfileBack: UIView!
+    
+    @IBOutlet weak var btnThreeDot: UIButton!
+    @IBOutlet weak var viewTitleBack: UIView!
+    @IBOutlet weak var viewdateTime: UIView!
     @IBOutlet weak var lineButtomConst: NSLayoutConstraint!
     @IBOutlet weak var lineTopCost: NSLayoutConstraint!
     @IBOutlet weak var imgDelete1: UIImageView!
@@ -45,7 +50,7 @@ class hangoutDetailsVC: BaseVC {
     @IBOutlet weak var lblLookingFor: UILabel!
     @IBOutlet weak var imgHangout: UIImageView!
     @IBOutlet weak var btnMessage: UIButton!
-    @IBOutlet weak var btnThreeDot: UIButton!
+   
     @IBOutlet weak var lblUsername: UILabel!
     @IBOutlet weak var imgProfile: UIImageView!
     @IBOutlet weak var imgHeightConst: NSLayoutConstraint!
@@ -54,10 +59,12 @@ class hangoutDetailsVC: BaseVC {
     var hangout_id = ""
     var isLikeUpdate=false
     var appdel = ""
-    
+    var isInternetOn = false
+    var view_user_id = "1"
     override func viewDidLoad() {
         super.viewDidLoad()
-
+       
+    
         self.toConst.constant = -getStatusBarHeight()
         
         self.viewLoc.roundCorners(corners: [.topLeft,.topRight], radius: 10)
@@ -70,7 +77,18 @@ class hangoutDetailsVC: BaseVC {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        self.callGetHangoutDetailApi(hangoutId: self.hangoutId)
+        
+        if Connectivity.isConnectedToInternet {
+            self.isInternetOn=true
+//            self.showLoader()
+            self.callGetHangoutDetailApi(hangoutId: self.hangoutId)
+        } else {
+            self.hideLoader()
+            self.isInternetOn=false
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
+        
+        
         setNeedsStatusBarAppearanceUpdate()
     }
     override var preferredStatusBarStyle: UIStatusBarStyle
@@ -84,8 +102,8 @@ class hangoutDetailsVC: BaseVC {
         
         if self.appdel.equalsIgnoreCase(string: kAppDelegate) 
         {
-            let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+            let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
             vc.selectedIndex=0
             self.navigationController?.pushViewController(vc, animated: true)
 
@@ -117,7 +135,9 @@ class hangoutDetailsVC: BaseVC {
     
     @IBAction func messgeButtonAction(_ sender: UIButton) {
         
-       if self.imgMessage1.image == UIImage(named: "interested")//(self.lblMessage1.text == kInterested)//(self.btnMessage.title(for: .normal) == kInterested) //kLikeProfile
+        if Connectivity.isConnectedToInternet {
+        
+       if self.lblMessage1.textColor ==  UIColor.black //self.imgMessage1.image == UIImage(named: "interested")//(self.lblMessage1.text == kInterested)//(self.btnMessage.title(for: .normal) == kInterested) //kLikeProfile
         {
         self.likeUnlikeAPI(hangout_id: self.hangoutId, type: "1")
         //self.btnMessage.setTitle(kNotInterested, for: .normal) //kDislikeProfile
@@ -127,7 +147,7 @@ class hangoutDetailsVC: BaseVC {
         
         
         }
-       else if  self.imgMessage1.image == UIImage(named: "notInterested")//HangoutVM.shared.hangoutDetail?.hangout_like_by_self == 0//(self.btnMessage.title(for: .normal) == kNotInterested) //kDislikeProfile
+       else if  self.lblMessage1.textColor == LIKECOLOR//self.imgMessage1.image == UIImage(named: "notInterested")//HangoutVM.shared.hangoutDetail?.hangout_like_by_self == 0//(self.btnMessage.title(for: .normal) == kNotInterested) //kDislikeProfile
         {
            // self.likeUnlikeAPI(other_user_id: self.otherUserId, action: "2", like_mode: "Shake", type: "Shake")
             self.likeUnlikeAPI(hangout_id: self.hangoutId, type: "2")
@@ -138,17 +158,16 @@ class hangoutDetailsVC: BaseVC {
         
        else if self.lblMessage1.text?.uppercased() == kEdit.uppercased()//(self.btnMessage.title(for: .normal) == kEdit)
         {
-            let storyBoard = UIStoryboard.init(name: "Hangouts", bundle: nil)
-            let vc = storyBoard.instantiateViewController(withIdentifier: "PostHangoutVC") as! PostHangoutVC
-        
-            
-            vc.HangoutDetail=HangoutVM.shared.hangoutDetail?.hangout_details
+           let vc = PostHangoutVC.instantiate(fromAppStoryboard: .Hangouts)
+
+           vc.HangoutDetail=HangoutVM.shared.hangoutDetail?.hangout_details
             vc.fromEdit=true
             self.navigationController?.pushViewController(vc, animated: true)
         }
        
         else
         {
+            debugPrint("Message else")
 //        let storyBoard = UIStoryboard.init(name: "Chat", bundle: nil)
 //        let vc = storyBoard.instantiateViewController(withIdentifier: "MessageVC") as! MessageVC
 //        self.navigationController?.pushViewController(vc, animated: true)
@@ -168,17 +187,24 @@ class hangoutDetailsVC: BaseVC {
 //            }
 //            self.navigationController?.pushViewController(vc, animated: true)
         }
+        }
+        else {
+
+                    self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+                }
     }
     @IBAction func viewProfileAct(_ sender: UIButton) {
         
         
         let userid = HangoutVM.shared.hangoutDetail?.user_id ?? ""
         
+        if Connectivity.isConnectedToInternet {
+
         if userid == DataManager.Id
         {
 
-            let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+            let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
             vc.selectedIndex=4
             self.navigationController?.pushViewController(vc, animated: false)
             
@@ -203,12 +229,13 @@ class hangoutDetailsVC: BaseVC {
             let vc = storyBoard.instantiateViewController(withIdentifier: "ViewProfileVC") as! ViewProfileVC
             vc.view_user_id = id
             vc.likeMode = kHangout
-            vc.hangout_id = HangoutVM.shared.hangoutDetail?.hangout_details?._id ?? ""
+            vc.hangout_id = HangoutVM.shared.hangoutDetail?._id ?? ""
+//            vc.hangout_id = HangoutVM.shared.hangoutDetail?.hangout_details?._id ?? ""
             DataManager.comeFrom=kEmptyString
              self.navigationController?.pushViewController(vc, animated: true)
 //
 //            let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-//            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+//            let vc = storyBoard.instantiateViewController(withIdentifier: "OldTapControllerVC") as! OldTapControllerVC
 //            DataManager.HomeRefresh="true"
 //            let id = HangoutVM.shared.hangoutDetail?.user_id ?? ""
 //
@@ -218,6 +245,10 @@ class hangoutDetailsVC: BaseVC {
 //            self.navigationController?.pushViewController(vc, animated: false)
             
         }
+        } else {
+
+           self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+       }
         
        
     }
@@ -227,7 +258,7 @@ class hangoutDetailsVC: BaseVC {
           
         if self.lblDelete1.text?.uppercased() == kShare.uppercased()//(self.btnDelete.title(for: .normal) == kSHARE)
         {
-            let text = ShareHangoutText
+            let text = APP_SHARE_LINK
             
             // set up activity view controller
             let textToShare = [text]
@@ -242,18 +273,147 @@ class hangoutDetailsVC: BaseVC {
         }
         else
          {
-            let storyboard: UIStoryboard = UIStoryboard(name: "Stories", bundle: Bundle.main)
-            let destVC = storyboard.instantiateViewController(withIdentifier: "StoryDiscardVC") as!  StoryDiscardVC
+        
+             let destVC = StoryDiscardVC.instantiate(fromAppStoryboard: .Stories)
             destVC.delegate=self
         let cellData = HangoutVM.shared.hangoutDetail
-        self.hangout_id=cellData?.hangout_details?._id ?? ""
+//        self.hangout_id=cellData?.hangout_details?._id ?? ""
+        self.hangout_id=cellData?._id ?? ""
             destVC.type = .deleteHangout
             destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-            self.present(destVC, animated: true, completion: nil)
+             if let tab = self.tabBarController
+             {
+                 tab.present(destVC, animated: true, completion: nil)
+             }
+             else
+             {
+                 self.present(destVC, animated: true, completion: nil)
+             }
+             
          }
         
+    }
+    @IBAction func ThreeDotAct(_ sender:UIButton)
+    {
+       
+          
+        let destVC = StoryMenuPopUpVC.instantiate(fromAppStoryboard: .Stories)
+
+        destVC.type = .ViewPostHangout
+        destVC.comeFromScreen = .ViewPostHangout
+        let cellData = HangoutVM.shared.hangoutDetail
+            destVC.delegate=self
+             self.hangout_id=cellData?._id ?? ""
+            self.view_user_id = cellData?.user_id ?? ""
+            destVC.post_id = self.hangout_id
+            destVC.user_name = cellData?.username?.capitalized ?? ""
+//            destVC.post_id = self.HangoutListArray[sender.tag].hangoutData?.hangout_details?._id ?? ""
+//            destVC.user_name = self.HangoutListArray[sender.tag].hangoutData?.profile_data?.username?.capitalized ?? ""
+            
+            destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+            destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+            
+        if let tab = self.tabBarController
+        {
+            tab.present(destVC, animated: true, completion: nil)
+        }
+        else
+        {
+            self.present(destVC, animated: true, completion: nil)
+        }
+        
+        
+    }
+
+    
+    
+    
+    func showLoader()
+    {
+        
+       Indicator.sharedInstance.showIndicator2()
+        /*
+        self.viewHangout.isSkeletonable=true
+        self.imgHangout.clipsToBounds=true
+        self.viewProfileBack.clipsToBounds=true
+        self.txtViewDesc.clipsToBounds=true
+        
+        self.txtViewTitle.clipsToBounds=true
+        self.viewdateTime.clipsToBounds=true
+        self.viewLoc.clipsToBounds=true
+        
+        self.viewDesc.clipsToBounds=true
+        self.viewAge.clipsToBounds=true
+        self.viewLookingFor.clipsToBounds=true
+        
+        self.viewMessage1.clipsToBounds=true
+        self.viewDelate1.clipsToBounds=true
+        self.viewTitleBack.clipsToBounds=true
+        
+        
+        
+        
+        self.imgHangout.isSkeletonable=true
+        self.viewProfileBack.isSkeletonable=true
+        self.txtViewDesc.isSkeletonable=true
+        
+        self.txtViewTitle.isSkeletonable=true
+        self.viewdateTime.isSkeletonable=true
+        self.viewLoc.isSkeletonable=true
+        
+        self.viewDesc.isSkeletonable=true
+        self.viewAge.isSkeletonable=true
+        self.viewLookingFor.isSkeletonable=true
+        
+        self.viewMessage1.isSkeletonable=true
+        self.viewDelate1.isSkeletonable=true
+        self.viewTitleBack.isSkeletonable=true
+        
+        self.imgHangout.showAnimatedGradientSkeleton()
+        self.viewProfileBack.showAnimatedGradientSkeleton()
+        self.txtViewDesc.showAnimatedGradientSkeleton()
+        
+        self.txtViewTitle.showAnimatedGradientSkeleton()
+        self.viewdateTime.showAnimatedGradientSkeleton()
+        self.viewLoc.showAnimatedGradientSkeleton()
+        
+        self.viewDesc.showAnimatedGradientSkeleton()
+        self.viewAge.showAnimatedGradientSkeleton()
+        self.viewLookingFor.showAnimatedGradientSkeleton()
+        
+        self.viewMessage1.showAnimatedGradientSkeleton()
+        self.viewDelate1.showAnimatedGradientSkeleton()
+        
+        self.viewTitleBack.showAnimatedGradientSkeleton()
+        */
+       
+    }
+    func hideLoader()
+    {
+        
+        
+        Indicator.sharedInstance.hideIndicator2()
+        
+        /*
+        self.imgHangout.hideSkeleton()
+        self.viewProfileBack.hideSkeleton()
+        self.txtViewDesc.hideSkeleton()
+
+        self.txtViewTitle.hideSkeleton()
+        self.viewdateTime.hideSkeleton()
+        self.viewLoc.hideSkeleton()
+
+        self.viewDesc.hideSkeleton()
+        self.viewAge.hideSkeleton()
+        self.viewLookingFor.hideSkeleton()
+
+        self.viewMessage1.hideSkeleton()
+        self.viewDelate1.hideSkeleton()
+        self.viewTitleBack.hideSkeleton()
+        */
+//
     }
 
     
@@ -269,10 +429,10 @@ extension hangoutDetailsVC
         data[ApiKey.kHangout_id] = hangoutId
             
             if Connectivity.isConnectedToInternet {
-              
+                self.showLoader()
                 self.callApiForHangoutDetail(data: data)
              } else {
-                
+                 self.hideLoader()
                 self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
             }
         
@@ -284,23 +444,26 @@ extension hangoutDetailsVC
             
             if error != nil
             {
-       
+                self.hideLoader()
                 self.showErrorMessage2(error: error)
             }
             else{
-                
                 self.imgHangout.contentMode = .scaleAspectFill
                 
                 self.otherUserId=HangoutVM.shared.hangoutDetail?.user_id ?? ""
                 
-                let heading = (HangoutVM.shared.hangoutDetail?.hangout_details?.heading ?? "")+" \n"
-                let desc = HangoutVM.shared.hangoutDetail?.hangout_details?.description ?? ""
+//                let heading = (HangoutVM.shared.hangoutDetail?.hangout_details?.heading ?? "")+" \n"
+//                let desc = HangoutVM.shared.hangoutDetail?.hangout_details?.description ?? ""
+                let heading = (HangoutVM.shared.hangoutDetail?.heading ?? "")+" \n"
+                let desc = HangoutVM.shared.hangoutDetail?.description ?? ""
                 self.txtViewTitle.customFontText(boldSting: heading, regularSting: desc, fontSize: 16)
                 
-                self.lblUsername.text = (HangoutVM.shared.hangoutDetail?.profile_data?.username)?.capitalized
+//                self.lblUsername.text = (HangoutVM.shared.hangoutDetail?.profile_data?.username)?.capitalized
+                self.lblUsername.text = (HangoutVM.shared.hangoutDetail?.username)?.capitalized
                 self.txtViewDesc.textColor = UIColor.darkGray
                 
-                let addDesc = HangoutVM.shared.hangoutDetail?.hangout_details?.aditional_description ?? ""
+//                let addDesc = HangoutVM.shared.hangoutDetail?.hangout_details?.aditional_description ?? ""
+                let addDesc = HangoutVM.shared.hangoutDetail?.aditional_description ?? ""
                 
                 self.txtViewDesc.text =  addDesc
                 
@@ -321,7 +484,8 @@ extension hangoutDetailsVC
 
                 
                
-                self.lblLocation.text =  HangoutVM.shared.hangoutDetail?.hangout_details?.place ?? ""
+//                self.lblLocation.text =  HangoutVM.shared.hangoutDetail?.hangout_details?.place ?? ""
+                self.lblLocation.text =  HangoutVM.shared.hangoutDetail?.place ?? ""
                
                 
                 
@@ -343,18 +507,19 @@ extension hangoutDetailsVC
                     self.viewDelate1.isHidden=false
                     self.imgMessage1.image = UIImage(named: "edit")
                     self.lblMessage1.text = kEdit.uppercased()
-                    self.lblMessage1.textColor = LINECOLOR
+                    self.lblMessage1.textColor = PURPLECOLOR//LINECOLOR
                     
                     self.viewDelate1.isHidden=false
                     self.lblDelete1.text = kDelete.uppercased()
                     self.lblDelete1.textColor = DELETECOLOR
                     self.imgDelete1.image = UIImage(named: "delete")
 
+                    self.btnThreeDot.isHidden=true
                     
                 }
                 else
                 {
-                    
+                    self.btnThreeDot.isHidden=false
                     self.viewDelate1.isHidden=false
                     self.lblDelete1.text = kShare.uppercased()
                     self.lblDelete1.textColor = UIColor.black
@@ -423,12 +588,15 @@ extension hangoutDetailsVC
                     
                      //top const = 84
                      
-                    let min = HangoutVM.shared.hangoutDetail?.hangout_details?.age_from ?? 18
-                    let max = HangoutVM.shared.hangoutDetail?.hangout_details?.age_to ?? kMaxAge
+                    let min = HangoutVM.shared.hangoutDetail?.age_from ?? 18
+                    let max = HangoutVM.shared.hangoutDetail?.age_to ?? kMaxAge
+//                    let min = HangoutVM.shared.hangoutDetail?.hangout_details?.age_from ?? 18
+//                    let max = HangoutVM.shared.hangoutDetail?.hangout_details?.age_to ?? kMaxAge
                     self.lblAgeRange.text =  "\(min)" + "-" + "\(max)"
                     
                     
-                    let looking = HangoutVM.shared.hangoutDetail?.hangout_details?.looking_for ?? ""
+//                    let looking = HangoutVM.shared.hangoutDetail?.hangout_details?.looking_for ?? ""
+                    let looking = HangoutVM.shared.hangoutDetail?.looking_for ?? ""
                     
                     if looking.equalsIgnoreCase(string: kBothGender)
                     {
@@ -436,7 +604,8 @@ extension hangoutDetailsVC
                     }
                     else
                     {
-                    self.lblLookingFor.text =  HangoutVM.shared.hangoutDetail?.hangout_details?.looking_for ?? ""
+//                        self.lblLookingFor.text =  HangoutVM.shared.hangoutDetail?.hangout_details?.looking_for ?? ""
+                        self.lblLookingFor.text =  HangoutVM.shared.hangoutDetail?.looking_for ?? ""
                     }
                     self.viewAge.isHidden=false
                     self.lblLookingFor.isHidden=false
@@ -460,15 +629,17 @@ extension hangoutDetailsVC
 
                 
                 }
-                //MARK:- Change due to client feedback
+                //MARK: - Change due to client feedback
               
-            
-                if let time = HangoutVM.shared.hangoutDetail?.hangout_details?.date
+                
+//                if let time = HangoutVM.shared.hangoutDetail?.hangout_details?.date
+                if let time = HangoutVM.shared.hangoutDetail?.date
                 {
                    // let time2 = time.dateFromString(format: .NewISO, type: .utc)
                    // let date = time2.string(format: .longdateTime2, type: .local)
                     let date = time.utcToLocalDate(dateStr: time) ?? ""
-                    if let time11 = HangoutVM.shared.hangoutDetail?.hangout_details?.time
+                    if let time11 = HangoutVM.shared.hangoutDetail?.time
+//                    if let time11 = HangoutVM.shared.hangoutDetail?.hangout_details?.time
                     {
                       //let time12 = time11.dateFromString(format: .NewISO, type: .utc)
                        // let date12 = time12.string(format: .localTime, type: .local)
@@ -481,7 +652,8 @@ extension hangoutDetailsVC
                 
                 
                 
-                let hangoutType =  HangoutVM.shared.hangoutDetail?.hangout_details?.hangout_type ?? ""
+                let hangoutType =  HangoutVM.shared.hangoutDetail?.hangout_type ?? ""
+//                let hangoutType =  HangoutVM.shared.hangoutDetail?.hangout_details?.hangout_type ?? ""
                 
                 if hangoutType.equalsIgnoreCase(string: kBusiness)
                 {
@@ -513,86 +685,111 @@ extension hangoutDetailsVC
                 self.viewHangoutType.backgroundColor = SOCAILBACK
                }
                 
-                if let img = HangoutVM.shared.hangoutDetail?.hangout_details?.image
-                {
-                  let url = URL(string: img)!
-                    /*
-                    let size = self.imgHangout.image?.getImageSizeWithURL(url: img)
-                 
-                    let height = size?.height ?? 375
-                    DispatchQueue.main.async {
-                        if height > SCREENHEIGHT
-                        {
-                            let per = (height*kLongImagePercent)/100
-                            
-                            self.imgHeightConst.constant = SCREENHEIGHT-120//height-per
-                        }
-                   else if height > 700
+//                if let img = HangoutVM.shared.hangoutDetail?.hangout_details?.image
+                if self.isInternetOn {
+                    if let img = HangoutVM.shared.hangoutDetail?.image
                     {
-                        let per = (height*kImagePercent)/100
+                        //let url = URL(string: img)!
+                        /*
+                         let size = self.imgHangout.image?.getImageSizeWithURL(url: img)
+                         
+                         let height = size?.height ?? 375
+                         DispatchQueue.main.async {
+                         if height > SCREENHEIGHT
+                         {
+                         let per = (height*kLongImagePercent)/100
+                         
+                         self.imgHeightConst.constant = SCREENHEIGHT-120//height-per
+                         }
+                         else if height > 700
+                         {
+                         let per = (height*kImagePercent)/100
+                         
+                         self.imgHeightConst.constant = height-per
+                         }
+                         else
+                         {
+                         self.imgHeightConst.constant = size?.height ?? 375
+                         }
+                         */
+                        self.imgHeightConst.constant =  kListImageHeight
+                       // var cellFrame = self.imgHangout.frame.size
+                       
+                        self.imgHangout.setImage(imageName: img,isHangout: true)//sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: [], completed: nil)
                         
-                        self.imgHeightConst.constant = height-per
+                        /*
+                         self.imgHangout.sd_setImage(with: url, placeholderImage: nil, options: [], completed: { (theImage, error, cache, url) in
+                         
+                         if theImage != nil
+                         {
+                         //                            self.imgHeightConst.constant  = self.getAspectRatioAccordingToiPhones(cellImageFrame: cellFrame,downloadedImage: theImage!)
+                         //                                debugPrint("Height = \(self.getAspectRatioAccordingToiPhones(cellImageFrame: cellFrame,downloadedImage: theImage!))")
+                         
+                         let height = self.getAspectRatioAccordingToiPhones(cellImageFrame: cellFrame,downloadedImage: theImage!)
+                         
+                         if height>500
+                         {
+                         self.imgHeightConst.constant  = 500
+                         }
+                         else
+                         {
+                         self.imgHeightConst.constant  = height
+                         }
+                         }
+                         else
+                         {
+                         self.imgHeightConst.constant  = 499
+                         }
+                         
+                         })
+                         */
+                        
+                        //self.imgHangout.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: .refreshCached, completed: nil)
+                        //}
                     }
-                    else
+                } else {
+                    let img = HangoutVM.shared.hangoutDetail?.imageData
+                    if img?.isEmpty == false
                     {
-                        self.imgHeightConst.constant = size?.height ?? 375
+                        self.imgHangout.image = self.dataToImage(data: img ?? Data())
+                    } else {
+                        self.imgHangout.image = UIImage(named: "placeholderImage")
                     }
-                        */
-                    self.imgHeightConst.constant =  390
-                        var cellFrame = self.imgHangout.frame.size
-                    self.imgHangout.sd_imageIndicator = SDWebImageActivityIndicator.gray
-                    self.imgHangout.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: [], completed: nil)
-                    
-                    /*
-                        self.imgHangout.sd_setImage(with: url, placeholderImage: nil, options: [], completed: { (theImage, error, cache, url) in
-                            
-                            if theImage != nil
-                            {
-//                            self.imgHeightConst.constant  = self.getAspectRatioAccordingToiPhones(cellImageFrame: cellFrame,downloadedImage: theImage!)
-//                                print("Height = \(self.getAspectRatioAccordingToiPhones(cellImageFrame: cellFrame,downloadedImage: theImage!))")
-                                
-                                let height = self.getAspectRatioAccordingToiPhones(cellImageFrame: cellFrame,downloadedImage: theImage!)
-                                
-                                if height>500
-                                {
-                                    self.imgHeightConst.constant  = 500
-                                }
-                            else
-                                {
-                                    self.imgHeightConst.constant  = height
-                                }
-                            }
-                            else
-                            {
-                                self.imgHeightConst.constant  = 499
-                            }
-
-                            })
-                    */
- 
-                    //self.imgHangout.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: .refreshCached, completed: nil)
-                  //}
-                    }
-                
-                
-                if HangoutVM.shared.hangoutDetail?.profile_data?.images?.count ?? 0>0
+                }
+//                if HangoutVM.shared.hangoutDetail?.profile_data?.images?.count ?? 0>0
+//                    {
+//                    if let img = HangoutVM.shared.hangoutDetail?.profile_data?.images?[0].image
+//                      {
+//                        let url = URL(string: img)!
+//                        DispatchQueue.main.async {
+//                            self.imgProfile.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: [], completed: nil)
+//                        }
+//                      }
+//                    }
+                if self.isInternetOn {
+                    if let img = HangoutVM.shared.hangoutDetail?.profileImage
                     {
-                    if let img = HangoutVM.shared.hangoutDetail?.profile_data?.images?[0].image
-                      {
-                        let url = URL(string: img)!
+                       // let url = URL(string: img)!
                         DispatchQueue.main.async {
-                            self.imgProfile.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: [], completed: nil)
+                            self.imgProfile.setImage(imageName: img)//.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: [], completed: nil)
                         }
-                      }
                     }
+                } else {
+                    let img = HangoutVM.shared.hangoutDetail?.profileImageData
+                    if img?.isEmpty == false
+                    {
+                        self.imgProfile.image = self.dataToImage(data: img ?? Data())
+                    } else {
+                        self.imgProfile.image = UIImage(named: "placeholderImage")
+                    }
+                }
                 self.viewHangout.isHidden=false
+                self.hideLoader()
             }
-
-         
         })
     }
     
-    //MARK:-  user like
+    //MARK: -  user like
     
     func likeUnlikeAPI(hangout_id:String,type:String)
     {
@@ -618,7 +815,10 @@ extension hangoutDetailsVC
             
             if error != nil
             {
-                self.showErrorMessage(error: error)
+                self.imgMessage1.image = UIImage(named: "interested") //BlackLike
+                self.lblMessage1.text = kInterested   //kLikeProfile
+                self.lblMessage1.textColor = UIColor.black
+                self.showErrorMessage2(error: error)
             }
             else{
                 
@@ -630,7 +830,7 @@ extension hangoutDetailsVC
         })
     }
     
-    //MARK:- Delete hangout  api
+    //MARK: - Delete hangout  api
     
     
     
@@ -670,8 +870,8 @@ extension hangoutDetailsVC
 //                        // Fallback on earlier versions
 //                        APPDEL.navigateToHangout()
 //                    }
-                    let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-                    let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+                    let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
                     vc.selectedIndex=0
                     self.navigationController?.pushViewController(vc, animated: true)
                 }
@@ -694,12 +894,46 @@ extension hangoutDetailsVC
     }
     
 }
-extension hangoutDetailsVC:threeDotMenuDelegate,DiscardDelegate
+extension hangoutDetailsVC:threeDotMenuDelegate,DiscardDelegate,deleteAccountDelegate
 {
     func ClickNameAction(name: String)
     {
        
-        if name.equalsIgnoreCase(string: kDelete)
+        
+        if name.equalsIgnoreCase(string: kReportPost)
+        {
+            self.dismiss(animated:true) {
+          
+                let destVC = BlockReportPopUpVC.instantiate(fromAppStoryboard: .Stories)
+
+                destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+                destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+                destVC.comeFromScreen = .ViewPostHangout
+                self.navigationController?.pushViewController(destVC, animated: false)
+                
+            }
+            
+        }
+        else  if name.equalsIgnoreCase(string: kViewProfile)
+        {
+            if Connectivity.isConnectedToInternet
+            {
+            let storyBoard = UIStoryboard.init(name: "Home", bundle: nil)
+            let vc = storyBoard.instantiateViewController(withIdentifier: "ViewProfileVC") as! ViewProfileVC
+            vc.view_user_id = self.view_user_id
+            vc.hangout_id = self.hangout_id
+            vc.likeMode=kHangout
+            DataManager.comeFrom=kStory
+            vc.comeFrom=kHangout
+            vc.isfromHangoutListing=true
+            self.navigationController?.pushViewController(vc, animated: false)
+            }
+            else {
+               self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+                     }
+            
+        }
+        else if name.equalsIgnoreCase(string: kDelete)
             {
                 self.callDeleteHangoutApi(hangout_id: self.hangout_id)
             }
@@ -721,23 +955,49 @@ extension hangoutDetailsVC:threeDotMenuDelegate,DiscardDelegate
             let code = (error! as NSError).code
             if  code == 401 || code == 451
             {
-                let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-                let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
+
                 destVC.type = .BlockReportError
                 destVC.user_name=message
                 destVC.errorCode=code
                 destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                 destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-                self.present(destVC, animated: true, completion: nil)
-                
+                if let tab = self.tabBarController
+                {
+                    tab.present(destVC, animated: true, completion: nil)
+                }
+                else
+                {
+                    self.present(destVC, animated: true, completion: nil)
+                }
               
             }
+       else if code == 408
+        {
+            let message = (error! as NSError).userInfo[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+           let vc = DeleteAccountPopUpVC.instantiate(fromAppStoryboard: .Account)
+            vc.comeFrom = kRunningOut
+            vc.message=message
+            vc.messageTitle=kNumberofInterested
+            vc.delegate=self
+            vc.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+            vc.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+           if let tab = self.tabBarController
+           {
+               tab.present(vc, animated: true, completion: nil)
+           }
+           else
+           {
+               self.present(vc, animated: true, completion: nil)
+           }
+           
+       }
            else
             {
       
-                let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-                let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
+
                 destVC.type = .BlockReportError
                 destVC.user_name=message
                 destVC.delegate=self
@@ -745,12 +1005,41 @@ extension hangoutDetailsVC:threeDotMenuDelegate,DiscardDelegate
                 destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                 destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-                self.present(destVC, animated: true, completion: nil)
-                
+                if let tab = self.tabBarController
+                {
+                    tab.present(destVC, animated: true, completion: nil)
+                }
+                else
+                {
+                    self.present(destVC, animated: true, completion: nil)
+                }
             }
         
     }
-    
+    func deleteAccountFunc(name: String) {
+        
+        
+        if name.equalsIgnoreCase(string: kRunningOut)
+        {
+           
+            let destVC = NewPremiumVC.instantiate(fromAppStoryboard: .Account)
+            destVC.type = .Hangout
+            destVC.subscription_type=kHangout
+          //  destVC.delegate=self
+            destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+            destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+            
+            if let tab = self.tabBarController
+            {
+                tab.present(destVC, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(destVC, animated: true, completion: nil)
+            }
+            
+        }
+    }
            
     
 }
@@ -759,8 +1048,8 @@ extension hangoutDetailsVC:FeedbackAlertDelegate
     func FeedbackAlertOkFunc(name: String)
     {
         
-        print(#function)
-        print(name)
+        debugPrint(#function)
+        debugPrint(name)
      if name == kStory
      {
 //         if self.appdel.equalsIgnoreCase(string: kMessage)
@@ -775,8 +1064,8 @@ extension hangoutDetailsVC:FeedbackAlertDelegate
         
         if self.appdel.equalsIgnoreCase(string: kAppDelegate)
         {
-            let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+            let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
             vc.selectedIndex=0
             self.navigationController?.pushViewController(vc, animated: true)
 
@@ -805,4 +1094,7 @@ extension hangoutDetailsVC:FeedbackAlertDelegate
      }
     
     }
+    
+
+    
 }

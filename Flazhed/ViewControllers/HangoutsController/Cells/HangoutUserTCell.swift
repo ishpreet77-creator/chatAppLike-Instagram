@@ -10,6 +10,7 @@ import UIKit
 class HangoutUserTCell: UITableViewCell {
     
 
+    @IBOutlet weak var lblHeading: UILabel!
     @IBOutlet weak var lmgLocation: UIImageView!
     @IBOutlet weak var imgCalender: UIImageView!
     @IBOutlet weak var imgDelete: UIImageView!
@@ -49,8 +50,8 @@ class HangoutUserTCell: UITableViewCell {
         self.lblLocation.textColor=UIColor.darkGray
         self.lblDateTime.textColor=UIColor.darkGray
         
-        self.imgCalender.image = self.imgCalender.image?.tinted(color: UIColor.darkGray)
-        self.lmgLocation.image = self.lmgLocation.image?.tinted(color: UIColor.darkGray)
+//        self.imgCalender.image = self.imgCalender.image?.tinted(color: UIColor.darkGray)
+//        self.lmgLocation.image = self.lmgLocation.image?.tinted(color: UIColor.darkGray)
     
     }
     

@@ -27,6 +27,9 @@
                         <subviews>
                             <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Aje-x1-DXs">
                                 <rect key="frame" x="0.0" y="0.0" width="403" height="238"/>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                </userDefinedRuntimeAttributes>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="enr-Vr-bVH" customClass="SenderBubbleView" customModule="Flazhed" customModuleProvider="target">
                                 <rect key="frame" x="273" y="2" width="122" height="234"/>
@@ -37,15 +40,24 @@
                                         <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="16"/>
                                         <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
                                     </label>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="F0i-F3-Rkj">
                                         <rect key="frame" x="16" y="8" width="90" height="200"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
                                     </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="10:30 PM" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="0xm-zU-M3X">
                                         <rect key="frame" x="8" y="216" width="99" height="10"/>
                                         <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="10"/>
                                         <color key="textColor" red="0.69019607839999997" green="0.72549019609999998" blue="0.7843137255" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
                                     </label>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -78,6 +90,7 @@
                                     <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
                                         <color key="value" red="0.0" green="0.0" blue="0.0" alpha="0.48838743870000001" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
                                 </userDefinedRuntimeAttributes>
                             </view>
                         </subviews>
@@ -92,6 +105,9 @@
                             <constraint firstAttribute="bottom" secondItem="Aje-x1-DXs" secondAttribute="bottom" id="n1J-bZ-xW5"/>
                             <constraint firstItem="enr-Vr-bVH" firstAttribute="top" secondItem="ew1-wB-lcE" secondAttribute="top" constant="2" id="wwN-1P-wlv"/>
                         </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                        </userDefinedRuntimeAttributes>
                     </view>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -101,9 +117,15 @@
                     <constraint firstAttribute="trailing" secondItem="ew1-wB-lcE" secondAttribute="trailing" id="dff-oh-Jal"/>
                     <constraint firstAttribute="bottom" secondItem="ew1-wB-lcE" secondAttribute="bottom" id="jUT-DU-2EP"/>
                 </constraints>
+                <userDefinedRuntimeAttributes>
+                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                </userDefinedRuntimeAttributes>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <userDefinedRuntimeAttributes>
+                <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+            </userDefinedRuntimeAttributes>
             <connections>
                 <outlet property="imgBack" destination="Aje-x1-DXs" id="oLz-T7-hTd"/>
                 <outlet property="imgGif" destination="F0i-F3-Rkj" id="xga-pI-xrC"/>

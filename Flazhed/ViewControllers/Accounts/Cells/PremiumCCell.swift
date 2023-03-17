@@ -9,7 +9,7 @@ import UIKit
 
 class PremiumCCell: UICollectionViewCell {
 
-    //MARK:- IBOutlets
+    //MARK: - IBOutlets
     @IBOutlet weak var discountView1: UIView!
     @IBOutlet weak var lblDollar1: UILabel!
     @IBOutlet weak var cellBG1: UIView!

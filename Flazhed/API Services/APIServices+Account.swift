@@ -16,6 +16,9 @@ enum APIServicesAccount:APIService {
     case updateNotificationSetup(data: JSONDictionary)
     case updatePayment(data: JSONDictionary)
     case get_my_subscription
+    case endSubscriptionPayment(data: JSONDictionary)  
+    case  check_post_limit(data: JSONDictionary)
+    case get_Profile_validation_counter
     
     var path: String {
         var path = ""
@@ -36,6 +39,17 @@ enum APIServicesAccount:APIService {
             path = BASE_URL.appending("payment-submit")
         case .get_my_subscription:
             path = BASE_URL.appending("get-my-subscription")
+            
+        case .endSubscriptionPayment:
+            path = BASE_URL.appending("expired-subscription")
+            
+        case .check_post_limit:
+            path = BASE_URL.appending("check-post-limit")
+          
+        case .get_Profile_validation_counter:
+            path = BASE_URL.appending("profile-validation-counter")
+           
+            
             }
         return path
      }
@@ -63,6 +77,13 @@ enum APIServicesAccount:APIService {
             
         case .get_my_subscription:
             resource = Resource(method: .get, parameters: nil, headers: headerDict)
+        case let .endSubscriptionPayment(data):
+            resource = Resource(method: .post, parameters: data, headers:headerDict)
+        case let .check_post_limit(data):
+            resource = Resource(method: .post, parameters: data, headers:headerDict)
+            
+        case .get_Profile_validation_counter:
+            resource = Resource(method: .get, parameters: nil, headers: nil)
         }
         return resource
     }

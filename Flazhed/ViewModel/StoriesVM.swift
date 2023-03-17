@@ -17,6 +17,9 @@ class StoriesVM {
     var Pagination_Details:Pagination_Details_Model?
     var singleStory:SinglePostDataModel?
     
+    var localVenueArr: JSONArray = []
+    var localStoriesData: JSONArray = []
+    var localMainStoryArr: JSONArray = []
     var page = 0
     
     private init(){}
@@ -37,9 +40,9 @@ class StoriesVM {
         }
     }
     
-    func callApiReportBlock(data: JSONDictionary,response: @escaping responseCallBack)
+    func callApiReportBlock(data: JSONDictionary,type:PostType = .story,response: @escaping responseCallBack)
     {
-        APIManager.callApiReportBlock(data:data,successCallback: { (responseDict) in
+        APIManager.callApiReportBlock(data:data,type:type,successCallback: { (responseDict) in
          
             let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
          
@@ -99,12 +102,12 @@ class StoriesVM {
 }
 extension APIManager {
 
-    //MARK:- call Api get stories
+    //MARK: - call Api get stories
 
     class func callApiGetStories(showIndiacter:Bool=true,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesStories.getStories(data: data).request(showIndiacter: showIndiacter,isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -113,10 +116,10 @@ extension APIManager {
         }, failure: failureCallback)
     }
     
-    class func callApiReportBlock(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
-        APIServicesStories.reportBlock(data: data).request(isJsonRequest: true,success:{ (response) in
+    class func callApiReportBlock(data: JSONDictionary,type:PostType = .story,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
+        APIServicesStories.reportBlock(data: data,type: type).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -129,7 +132,7 @@ extension APIManager {
     class func callApiDeletePost(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesStories.deletePost(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -142,7 +145,7 @@ extension APIManager {
     class func callApiLikeStory(showIndiacter:Bool=true,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesStories.likeStory(data: data).request(showIndiacter: showIndiacter,isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -155,7 +158,7 @@ extension APIManager {
     class func callApiSingleStory(showIndiacter:Bool=true,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesStories.storyDetails(data: data).request(showIndiacter: showIndiacter,isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -166,7 +169,7 @@ extension APIManager {
     
 }
 
-//MARK:- Parsing the data
+//MARK: - Parsing the data
 extension StoriesVM {
     
     func parseGetStoriesData(response: JSONDictionary){
@@ -177,6 +180,7 @@ extension StoriesVM {
             {
                 if let posts = Post_listing[ApiKey.kPosts] as? JSONArray
                 {
+                   // self.localStoriesData = posts
                     for post in posts
                     {
                     let post = StoriesPostDataModel(detail: post)
@@ -187,12 +191,14 @@ extension StoriesVM {
                 
                 if let Pagination_details = Post_listing[ApiKey.kPagination_details] as? JSONDictionary
                 {
-                    
                     let details = Pagination_Details_Model(detail: Pagination_details)
                     self.Pagination_Details = details
                     
      
                 }
+//                DispatchQueue.global(qos: .background).async {
+//                    self.localStoryData(array: self.localStoriesData)
+//                }
             }
         }
     }
@@ -206,4 +212,28 @@ extension StoriesVM {
         }
     }
 
+    //MARK: -LOcal DB
+    func localStoryData(array: JSONArray){
+        self.localMainStoryArr.removeAll()
+        for data in array {
+            let LocalEvent = StoriesPostDataModel.init(detail: data).json()
+            self.localMainStoryArr.append(LocalEvent)
+        }
+        self.parseLocalStoryListData()
+    }
+    func parseLocalStoryListData() {
+        DispatchQueue.background(background: {
+            CoreDataManager.deleteRecords(entityName: ApiKey.kStoryListing)
+            CoreDataManager.saveStoryListData(array: self.localMainStoryArr)
+        }, completion: {
+            self.localMainStoryArr.removeAll()
+//            self.LocalEventListingArray = CoreDataManager.fetchEventListData()
+        })
+    }
+    
+    func saveVideo(string: String) -> URL{
+        let remoteUrl : NSURL? = NSURL(string: string)
+        let videoURL = DocumentsDirectory.shared.saveVideo(videoURL: remoteUrl ?? NSURL())
+        return videoURL
+    }
 }

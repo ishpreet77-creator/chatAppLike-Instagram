@@ -5,8 +5,7 @@
 //  Created by IOS22 on 07/01/21.
 //
 
-
-import SwiftyCam
+/*
 import UIKit
 import AVFoundation
 import SDWebImage
@@ -106,7 +105,7 @@ class StoryCameraVC: SwiftyCamViewController, SwiftyCamViewControllerDelegate {
         
         
                         let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-                        let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+                        let vc = storyBoard.instantiateViewController(withIdentifier: "OldTapControllerVC") as! OldTapControllerVC
                         vc.selectedIndex=self.selectedIndex
                          DataManager.comeFromTag=5
                         self.navigationController?.pushViewController(vc, animated: true)
@@ -122,14 +121,14 @@ class StoryCameraVC: SwiftyCamViewController, SwiftyCamViewControllerDelegate {
     }
     
     func swiftyCamSessionDidStartRunning(_ swiftyCam: SwiftyCamViewController) {
-        print("Session did start running")
+        debugPrint("Session did start running")
       
        
         captureButton.buttonEnabled = true
     }
     
     func swiftyCamSessionDidStopRunning(_ swiftyCam: SwiftyCamViewController) {
-        print("Session did stop running")
+        debugPrint("Session did stop running")
         
         
         captureButton.buttonEnabled = false
@@ -154,12 +153,12 @@ class StoryCameraVC: SwiftyCamViewController, SwiftyCamViewControllerDelegate {
                 self.showImageCheckLoader(vc: self)
             var dataImage = Data()
             var image:UIImage!
-            print("Take images = \(photo)")
+            debugPrint("Take images = \(photo)")
             
             image = photo
             
             let dataImage1 =  image.jpegData(compressionQuality: 1) ?? Data()
-            var imageSize1: Int = dataImage1.count
+                let imageSize1: Int = dataImage1.count
             let size = Double(imageSize1) / 1000.0
             //var  dataImage = Data()
             if size>1500
@@ -196,13 +195,13 @@ class StoryCameraVC: SwiftyCamViewController, SwiftyCamViewControllerDelegate {
 //
 //           if image != nil
 //           {
-//            print("Image details 2: = \(image)")
+//            debugPrint("Image details 2: = \(image)")
 //             dataImage =  image.jpegData(compressionQuality: 1) ?? Data()
 //           }
 //            else
 //           {
            // dataImage =  photo.jpegData(compressionQuality: 1) ?? Data()
-//            print("Image details 3: = \(image)")
+//            debugPrint("Image details 3: = \(image)")
 //           }
             
             
@@ -220,11 +219,11 @@ class StoryCameraVC: SwiftyCamViewController, SwiftyCamViewControllerDelegate {
              APIManager.callApiForImageCheck(image1: dataImage,imageParaName1: kMedia, api: "",successCallback: {
                  
                  (responseDict) in
-                 print("responseDict = \(responseDict)")
+                 debugPrint("responseDict = \(responseDict)")
                 let data =   self.parseImageCheckData(response: responseDict)
                 if  kSucess.equalsIgnoreCase(string: responseDict[ApiKey.kStatus] as? String ?? "")
                  {
-                     print(data)
+                    // debugPrint(data)
                      if data?.weapon ?? 0.0 > kNudityCheck
                      {
 
@@ -300,7 +299,7 @@ class StoryCameraVC: SwiftyCamViewController, SwiftyCamViewControllerDelegate {
                 self.dismiss(animated: true, completion: nil)
 
                 self.openSimpleAlert(message: errorReason?.localizedDescription)
-                 print(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+                 debugPrint(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
                  
              })
       
@@ -329,13 +328,13 @@ class StoryCameraVC: SwiftyCamViewController, SwiftyCamViewControllerDelegate {
         self.lblTimer.isHidden=true
         
         self.duration=1
-        print("Did Begin Recording")
+        debugPrint("Did Begin Recording")
         captureButton.growButton()
         hideButtons()
     }
 
     func swiftyCam(_ swiftyCam: SwiftyCamViewController, didFinishRecordingVideo camera: SwiftyCamViewController.CameraSelection) {
-        print("Did finish Recording")
+        debugPrint("Did finish Recording")
         self.imgPost.isHidden=true
         circleView.removeFromSuperview()
         
@@ -373,7 +372,7 @@ class StoryCameraVC: SwiftyCamViewController, SwiftyCamViewControllerDelegate {
     }
 
     func swiftyCam(_ swiftyCam: SwiftyCamViewController, didFocusAtPoint point: CGPoint) {
-        print("Did focus at point: \(point)")
+        debugPrint("Did focus at point: \(point)")
         focusAnimationAt(point)
     }
     
@@ -385,17 +384,17 @@ class StoryCameraVC: SwiftyCamViewController, SwiftyCamViewControllerDelegate {
     }
 
     func swiftyCam(_ swiftyCam: SwiftyCamViewController, didChangeZoomLevel zoom: CGFloat) {
-        print("Zoom level did change. Level: \(zoom)")
-        print(zoom)
+        debugPrint("Zoom level did change. Level: \(zoom)")
+        debugPrint(zoom)
     }
 
     func swiftyCam(_ swiftyCam: SwiftyCamViewController, didSwitchCameras camera: SwiftyCamViewController.CameraSelection) {
-        print("Camera did change to \(camera.rawValue)")
-        print(camera)
+        debugPrint("Camera did change to \(camera.rawValue)")
+        debugPrint(camera)
     }
     
     func swiftyCam(_ swiftyCam: SwiftyCamViewController, didFailToRecordVideo error: Error) {
-        print(error)
+        debugPrint(error)
     }
 
     @IBAction func cameraSwitchTapped(_ sender: Any) {
@@ -410,7 +409,7 @@ class StoryCameraVC: SwiftyCamViewController, SwiftyCamViewControllerDelegate {
         
         //example functionality
         if counter > 0 {
-            print("\(counter) seconds to the end of the world")
+            debugPrint("\(counter) seconds to the end of the world")
             counter -= 1
             self.duration += 1
             //timer hide
@@ -429,7 +428,7 @@ class StoryCameraVC: SwiftyCamViewController, SwiftyCamViewControllerDelegate {
         }
     }
     
-    //MARK:- Back Button
+    //MARK: - Back Button
     func setBackButton()
     {
         let backButton = UIButton()
@@ -628,3 +627,4 @@ extension StoryCameraVC {
 }
 
 
+*/

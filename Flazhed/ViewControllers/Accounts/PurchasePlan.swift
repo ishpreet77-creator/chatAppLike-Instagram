@@ -10,47 +10,85 @@ import UIKit
 import StoreKit
 
 protocol NavigateToPaymentPopup{
-    func NavigateToPayment(transId:String)
+    func NavigateToPayment(name:String,transactionId:String?)
 }
 
 
 enum productIDs: String {
     
-    //    //MARK:- For regret swipe
+    //    //MARK: - For regret swipe
     //
     //    case swipeMonthly = "com.swipe.monthly"
     //    case swipeHalfYear = "com.swipe.halfyear"
     //    case swipeYearly = "com.swipe.yearly"
     //
-    //    //MARK:- For shake
+    //    //MARK: - For shake
     //    case shakeOne = "com.shake.one"
     //    case shakeThree = "com.shake.three"
     //    case shakeFive = "com.shake.five"
     //
-    //    //MARK:- For prolong chat
+    //    //MARK: - For prolong chat
     //
     //    case prolongMonthly = "com.prolong.monthly"
     //    case ProlongHalfyearly = "com.prolong.halfyearly"
     //    case prolongYearly = "com.prolong.yearly"
     
+    case kPlus =  "com.general.plus"
+    case kGold =  "com.general.gold"
+    case kPlatinum =  "com.general.platinum"
+    case kChat =  "com.prolong.chat"
     
     
-    //MARK:- For regret swipe
+    
+    /*
+     
+
+    //MARK: - For regret swipe
     
     case swipeMonthly = "com.swipe.monthly"
     case swipeHalfYear = "com.swipe.halfyear"
     case swipeYearly = "com.swipe.yearly"
     
-    //MARK:- For shake
+    //MARK: - For shake
     case shakeOne = "com.shake.1"
     case shakeThree = "com.shake.3"
     case shakeFive = "com.shake.5"
     
-    //MARK:- For prolong chat
+    //MARK: - For prolong chat
     
-    case prolongMonthly = "com.prolong.monthly"
-    case ProlongHalfyearly = "com.prolong.halfyearly"
-    case prolongYearly = "com.prolong.yearly"
+    case prolongNewChanges = "com.prolong.chat"
+    
+    case prolongMonthly = "com.prolong.icebreaker"//"com.prolong.monthly"
+    case ProlongHalfyearly = "com.prolong.romantique"//"com.prolong.halfyearly"
+    case prolongYearly = "com.prolong.connoisseur"//"com.prolong.yearly"
+    
+    
+    //MARK: - For Hangout
+    
+    case hangoutPlus = "com.hangout.plus" 
+    case hangoutGold = "com.hangout.gold"
+    case hangoutPlatinum = "com.hangout.platinum"
+    
+    //MARK: - For Chat
+    
+    case chatPlus = "com.chat.plus"
+    case chatGold = "com.chat.gold"
+    case chatPlatinum = "com.chat.platinum"
+    
+    //MARK: - For Story
+    
+    case storyPlus = "com.story.plus"
+    case storyGold = "com.story.gold"
+    case storyPlatinum = "com.story.platinum"
+    
+    //MARK: - For General
+    
+    case shakePlus = "com.general.plus"
+    case shakeGold = "com.general.gold"
+    case shakePlatinum = "com.general.platinum"
+    
+    */
+
 }
 
 class IAPHandler:BaseVC {
@@ -84,6 +122,11 @@ class IAPHandler:BaseVC {
     var extra_shake=0
     var fromScreen = kRegret
     
+    var hanoutPriceArray:[premiumModel] = []
+    var chatPriceArray:[premiumModel] = []
+    var storyPriceArray:[premiumModel] = []
+    var shakePriceArray:[premiumModel] = []
+    var prolongPriceArray:[premiumModel] = []
     
     //    private override init() {
     //           super.init()
@@ -100,7 +143,36 @@ extension IAPHandler: SKProductsRequestDelegate, SKRequestDelegate{
     
     func getProducts() {
         
-        let products : Set = [productIDs.swipeMonthly.rawValue,productIDs.swipeHalfYear.rawValue,productIDs.swipeYearly.rawValue,productIDs.shakeOne.rawValue,productIDs.shakeThree.rawValue,productIDs.shakeFive.rawValue,productIDs.prolongMonthly.rawValue,productIDs.ProlongHalfyearly.rawValue,productIDs.prolongYearly.rawValue]
+        let products : Set = [productIDs.kPlus.rawValue,productIDs.kGold.rawValue,productIDs.kPlatinum.rawValue,productIDs.kChat.rawValue]
+        
+        
+//        self.hanoutPriceArray.removeAll()
+//        self.chatPriceArray.removeAll()
+//        self.storyPriceArray.removeAll()
+//        self.shakePriceArray.removeAll()
+//        
+        /*
+        let products : Set = [productIDs.hangoutPlus.rawValue,
+                              productIDs.hangoutGold.rawValue,
+                              productIDs.hangoutPlatinum.rawValue,
+                              
+                              productIDs.chatPlus.rawValue,
+                              productIDs.chatGold.rawValue,
+                              productIDs.chatPlatinum.rawValue,
+                              
+                              productIDs.storyPlus.rawValue,
+                              productIDs.storyGold.rawValue,
+                              productIDs.storyPlatinum.rawValue,
+                              
+                              productIDs.shakePlus.rawValue,
+                              productIDs.shakeGold.rawValue,
+                              productIDs.shakePlatinum.rawValue,
+                              
+                              productIDs.swipeMonthly.rawValue,productIDs.swipeHalfYear.rawValue,productIDs.swipeYearly.rawValue,productIDs.shakeOne.rawValue,productIDs.shakeThree.rawValue,productIDs.shakeFive.rawValue,productIDs.prolongMonthly.rawValue,productIDs.ProlongHalfyearly.rawValue,productIDs.prolongYearly.rawValue,
+                              productIDs.prolongNewChanges.rawValue
+        ]
+        */
+        
         let request = SKProductsRequest(productIdentifiers: products)
         
         // Set self as the its delegate.
@@ -109,6 +181,8 @@ extension IAPHandler: SKProductsRequestDelegate, SKRequestDelegate{
         // Make the request.
         request.start()
         paymentQueue.add(self)
+        
+    
         
     }
     
@@ -119,15 +193,51 @@ extension IAPHandler: SKProductsRequestDelegate, SKRequestDelegate{
             let validProducts = response.products
             self.products = validProducts
             for p in validProducts {
-                print("Found product: \(p.productIdentifier) \(p.localizedTitle) \(p.price.floatValue)")
+                if p.productIdentifier == productIDs.kPlus.rawValue || p.productIdentifier == productIDs.kGold.rawValue || p.productIdentifier == productIDs.kPlatinum.rawValue
+                {
+                    let model = premiumModel(type: p.productIdentifier, price: self.priceOf(product: p))
+                    hanoutPriceArray.append(model)//.append(self.priceOf(product: p))
+                }
+                else if p.productIdentifier == productIDs.kChat.rawValue// || p.productIdentifier == productIDs.chatGold.rawValue || p.productIdentifier == productIDs.chatPlatinum.rawValue
+                {
+                    let model = premiumModel(type: p.productIdentifier, price: self.priceOf(product: p))
+                    prolongPriceArray.append(model)
+                }
+                /*
+                else if p.productIdentifier == productIDs.storyPlus.rawValue || p.productIdentifier == productIDs.storyGold.rawValue || p.productIdentifier == productIDs.storyPlatinum.rawValue
+                {
+                    let model = premiumModel(type: p.productIdentifier, price: self.priceOf(product: p))
+                    storyPriceArray.append(model)
+                }
+                else if p.productIdentifier == productIDs.shakePlus.rawValue || p.productIdentifier == productIDs.shakeGold.rawValue || p.productIdentifier == productIDs.shakePlatinum.rawValue
+                {
+                    let model = premiumModel(type: p.productIdentifier, price: self.priceOf(product: p))
+                    shakePriceArray.append(model)
+                }
+                
+                else if p.productIdentifier == productIDs.prolongMonthly.rawValue || p.productIdentifier == productIDs.ProlongHalfyearly.rawValue || p.productIdentifier == productIDs.prolongYearly.rawValue
+                {
+                    let model = premiumModel(type: p.productIdentifier, price: self.priceOf(product: p))
+                    prolongPriceArray.append(model)
+                }
+                */
+                
+              
+               debugPrint("Found product: \(p.productIdentifier) \(p.localizedTitle) \(p.price.floatValue)")
+                
+               
+                debugPrint("product price: \(self.priceOf(product: p))")
+                
+                
             }
+          //  debugPrint("product Count: \(self.products)")
         } else {
-            print("No products found")
+            debugPrint("No products found")
         }
     }
     
     func request(_ request: SKRequest, didFailWithError error: Error) {
-        print(error.localizedDescription)
+        debugPrint(error.localizedDescription)
     }
     
     func canMakePayments() -> Bool {
@@ -136,7 +246,7 @@ extension IAPHandler: SKProductsRequestDelegate, SKRequestDelegate{
     
     func purchase(product:productIDs,fromScreen:String=kRegret){
         self.fromScreen=fromScreen
-        print("profuct id = \(products)")
+        debugPrint("profuct id = \(products)")
         guard let productToPurchase = products.filter({$0.productIdentifier == product.rawValue}).first else {
             Indicator.sharedInstance.hideIndicator()
             return
@@ -150,14 +260,14 @@ extension IAPHandler: SKProductsRequestDelegate, SKRequestDelegate{
         Indicator.sharedInstance.showIndicator()
         if (SKPaymentQueue.canMakePayments()) {
            
-            print("restore purchase canMakePayments")
+            debugPrint("restore purchase canMakePayments")
             SKPaymentQueue.default().add(self)
             SKPaymentQueue.default().restoreCompletedTransactions()
         } else {
             // show error
             Indicator.sharedInstance.hideIndicator()
-            
-            print("restore purchase  Can not restore")
+            self.delegate?.NavigateToPayment(name: kHideIndicator, transactionId: kEmptyString)
+            debugPrint("restore purchase  Can not restore")
         }
     }
     
@@ -182,13 +292,28 @@ extension IAPHandler.IAPManagerError: LocalizedError {
 extension IAPHandler: SKPaymentTransactionObserver {
     func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
         for trans in transactions{
-            print(trans.transactionState)
-            print(trans.transactionState.transactionStatus(), trans.payment.productIdentifier)
+            debugPrint(trans.transactionState)
+            debugPrint(trans.transactionState.transactionStatus(), trans.payment.productIdentifier)
             switch trans.transactionState {
             case .purchasing, .deferred: break // do nothing
             case .restored:
-                DataManager.purchasePlan = true
+               
                 let p = trans.payment
+                
+                if p.productIdentifier == productIDs.kPlus.rawValue
+                {
+                    queue.finishTransaction(trans)
+                }
+                else if p.productIdentifier == productIDs.kGold.rawValue {
+                    queue.finishTransaction(trans)
+                }
+                else if p.productIdentifier == productIDs.kPlatinum.rawValue {
+                    queue.finishTransaction(trans)
+                }
+                else if p.productIdentifier == productIDs.kChat.rawValue {
+                    queue.finishTransaction(trans)
+                }
+                /*
                 if p.productIdentifier == productIDs.swipeMonthly.rawValue
                 {
                     // ... do stuff ...
@@ -214,9 +339,56 @@ extension IAPHandler: SKPaymentTransactionObserver {
                 } else if p.productIdentifier == productIDs.prolongYearly.rawValue {
                     queue.finishTransaction(trans)
                 }
+                
+                //MARK: - New Premium
+                
+                
+                else if p.productIdentifier == productIDs.hangoutPlus.rawValue {
+                   queue.finishTransaction(trans)
+               }
+               else if p.productIdentifier == productIDs.hangoutGold.rawValue {
+                   queue.finishTransaction(trans)
+               } else if p.productIdentifier == productIDs.hangoutPlatinum.rawValue {
+                   queue.finishTransaction(trans)
+               }
+                
+                else if p.productIdentifier == productIDs.chatPlus.rawValue {
+                   queue.finishTransaction(trans)
+               }
+               else if p.productIdentifier == productIDs.chatGold.rawValue {
+                   queue.finishTransaction(trans)
+               } else if p.productIdentifier == productIDs.chatPlatinum.rawValue {
+                   queue.finishTransaction(trans)
+               }
+                
+                else if p.productIdentifier == productIDs.storyPlus.rawValue {
+                   queue.finishTransaction(trans)
+               }
+               else if p.productIdentifier == productIDs.storyGold.rawValue {
+                   queue.finishTransaction(trans)
+               } else if p.productIdentifier == productIDs.storyPlatinum.rawValue {
+                   queue.finishTransaction(trans)
+               }
+                
+                else if p.productIdentifier == productIDs.shakePlus.rawValue {
+                   queue.finishTransaction(trans)
+               }
+               else if p.productIdentifier == productIDs.shakeGold.rawValue {
+                   queue.finishTransaction(trans)
+               } else if p.productIdentifier == productIDs.shakePlatinum.rawValue {
+                   queue.finishTransaction(trans)
+               }
+                
+                else if p.productIdentifier == productIDs.prolongNewChanges.rawValue {
+                    queue.finishTransaction(trans)
+                }
+                */
+                
+                
+                
         
                 transactionId = trans.transactionIdentifier ?? ""
-                print("Transaction id:= ",transactionId)
+                debugPrint("Transaction id:= ",transactionId)
                 
                 if self.fromScreen == kPremium
                 {
@@ -226,17 +398,31 @@ extension IAPHandler: SKPaymentTransactionObserver {
                 {
                     NotificationCenter.default.post(name: Notification.Name("PaymentDoneNoti"), object: nil, userInfo: ["transactionId":transactionId])
                 }
-               
+                self.delegate?.NavigateToPayment(name: kSucess, transactionId: transactionId)
+                //self.delegate?.NavigateToPayment(name: kHideIndicator)
                 //appDelegate.loadScanSideMenu()
                 Indicator.sharedInstance.hideIndicator()
                 
             case .purchased:
                 Indicator.sharedInstance.hideIndicator()
-                DataManager.purchasePlan = true
+              
                 let p = trans.payment
                 transactionId = trans.transactionIdentifier ?? ""
-                print("Transaction id:= ",transactionId)
-                
+                debugPrint("Transaction id:= ",transactionId)
+                if p.productIdentifier == productIDs.kPlus.rawValue
+                {
+                    queue.finishTransaction(trans)
+                }
+                else if p.productIdentifier == productIDs.kGold.rawValue {
+                    queue.finishTransaction(trans)
+                }
+                else if p.productIdentifier == productIDs.kPlatinum.rawValue {
+                    queue.finishTransaction(trans)
+                }
+                else if p.productIdentifier == productIDs.kChat.rawValue {
+                    queue.finishTransaction(trans)
+                }
+                /*
                 if p.productIdentifier == productIDs.swipeMonthly.rawValue {
                     // ... do stuff ...
                     queue.finishTransaction(trans)
@@ -262,6 +448,50 @@ extension IAPHandler: SKPaymentTransactionObserver {
                     queue.finishTransaction(trans)
                 }
                 
+                //MARK: - New Premium
+                
+                
+                else if p.productIdentifier == productIDs.hangoutPlus.rawValue {
+                   queue.finishTransaction(trans)
+               }
+               else if p.productIdentifier == productIDs.hangoutGold.rawValue {
+                   queue.finishTransaction(trans)
+               } else if p.productIdentifier == productIDs.hangoutPlatinum.rawValue {
+                   queue.finishTransaction(trans)
+               }
+                
+                else if p.productIdentifier == productIDs.chatPlus.rawValue {
+                   queue.finishTransaction(trans)
+               }
+               else if p.productIdentifier == productIDs.chatGold.rawValue {
+                   queue.finishTransaction(trans)
+               } else if p.productIdentifier == productIDs.chatPlatinum.rawValue {
+                   queue.finishTransaction(trans)
+               }
+                
+                else if p.productIdentifier == productIDs.storyPlus.rawValue {
+                   queue.finishTransaction(trans)
+               }
+               else if p.productIdentifier == productIDs.storyGold.rawValue {
+                   queue.finishTransaction(trans)
+               } else if p.productIdentifier == productIDs.storyPlatinum.rawValue {
+                   queue.finishTransaction(trans)
+               }
+                
+                else if p.productIdentifier == productIDs.shakePlus.rawValue {
+                   queue.finishTransaction(trans)
+               }
+               else if p.productIdentifier == productIDs.shakeGold.rawValue {
+                   queue.finishTransaction(trans)
+               } else if p.productIdentifier == productIDs.shakePlatinum.rawValue {
+                   queue.finishTransaction(trans)
+               }
+                
+                else if p.productIdentifier == productIDs.prolongNewChanges.rawValue {
+                    queue.finishTransaction(trans)
+                }
+                */
+                
                 transaction_id = transactionId
                 
                 if self.fromScreen == kPremium
@@ -272,6 +502,7 @@ extension IAPHandler: SKPaymentTransactionObserver {
                 {
                     NotificationCenter.default.post(name: Notification.Name("PaymentDoneNoti"), object: nil, userInfo: ["transactionId":transactionId])
                 }
+                self.delegate?.NavigateToPayment(name: kSucess, transactionId: transactionId)
                 
             //amount = p.
             
@@ -292,17 +523,26 @@ extension IAPHandler: SKPaymentTransactionObserver {
             
             //
             case .failed:
-                DataManager.purchasePlan = false
+                
                 Indicator.sharedInstance.hideIndicator()
                 queue.finishTransaction(trans)
+                self.delegate?.NavigateToPayment(name: kHideIndicator,transactionId:kEmptyString)
                 
             //
             default:
                 Indicator.sharedInstance.hideIndicator()
+                self.delegate?.NavigateToPayment(name: kHideIndicator,transactionId:kEmptyString)
                 break
             }
         }
     }
+    
+    func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
+        Indicator.sharedInstance.hideIndicator()
+        self.delegate?.NavigateToPayment(name: kHideIndicator,transactionId:kEmptyString)
+
+    }
+
     
 }
 
@@ -324,7 +564,7 @@ extension IAPHandler{
                     request.httpBody = try JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
                 }
                 catch let error {
-                    print(error.localizedDescription)
+                    debugPrint(error.localizedDescription)
                 }
                 let task = URLSession.shared.dataTask(with: request) { data, response, error in
                     if error != nil {
@@ -337,12 +577,12 @@ extension IAPHandler{
                         if let data = data {
                             do {
                                 if let responseDict = try JSONSerialization.jsonObject(with: data, options : .allowFragments) as? JSONDictionary {
-                                    print(responseDict)
+                                    debugPrint(responseDict)
                                     if let receiptArray = responseDict[self.kLatestReceiptInfo] as? JSONArray {
                                         
                                         if let receiptDict = receiptArray.last {
                                             
-                                            print("Payment receipt = \(receiptDict)")
+                                            debugPrint("Payment receipt = \(receiptDict)")
                                             
                                             let expirationDateMS = receiptDict[self.kExpirationDateMS] as? String ?? "0.0"
                                             if Int64(Double(expirationDateMS)!) >= Date().millisecondsSince1970
@@ -372,7 +612,7 @@ extension IAPHandler{
                                         Indicator.sharedInstance.hideIndicator()
                                         success(false)
                                     }
-                                    print("bad json")
+                                    debugPrint("bad json")
                                 }
                             }
                             catch let error as NSError {
@@ -380,7 +620,7 @@ extension IAPHandler{
                                     Indicator.sharedInstance.hideIndicator()
                                     success(false)
                                 }
-                                print(error)
+                                debugPrint(error)
                             }
                             
                         }
@@ -421,7 +661,7 @@ extension IAPHandler
                     request.httpBody = try JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
                 }
                 catch let error {
-                    print(error.localizedDescription)
+                    debugPrint(error.localizedDescription)
                 }
                 let task = URLSession.shared.dataTask(with: request) { data, response, error in
                     if error != nil {
@@ -434,7 +674,7 @@ extension IAPHandler
                         if let data = data {
                             do {
                                 if let responseDict = try JSONSerialization.jsonObject(with: data, options : .allowFragments) as? JSONDictionary {
-                                    print(responseDict)
+                                    debugPrint(responseDict)
                                     if let receiptArray = responseDict[self.kLatestReceiptInfo] as? JSONArray {
                                         for dataArray in receiptArray
                                         {
@@ -449,7 +689,7 @@ extension IAPHandler
                                             })
                                         }
                                         if let receiptDict = self.sortedArray.first {
-                                            print("latest receiptDict = \(receiptDict)")
+                                            debugPrint("latest receiptDict = \(receiptDict)")
                                             
                                             let expirationDateMS = receiptDict[self.kExpirationDateMS] as? String ?? "0.0"
                                             
@@ -483,7 +723,7 @@ extension IAPHandler
                                         Indicator.sharedInstance.hideIndicator()
                                         success(false, kEmptyString)
                                     }
-                                    print("bad json")
+                                    debugPrint("bad json")
                                 }
                             }
                             catch let error as NSError {
@@ -491,7 +731,7 @@ extension IAPHandler
                                     Indicator.sharedInstance.hideIndicator()
                                     success(false, kEmptyString)
                                 }
-                                print(error)
+                                debugPrint(error)
                             }
                         }
                     }
@@ -544,6 +784,14 @@ extension IAPHandler {
         alert.addAction(UIAlertAction(title: cancelTitle, style: .default, handler: cancelAction))
         //  UIApplication.topViewController()?.present(alert, animated: true, completion: nil)
     }
+    
+    func priceOf(product: SKProduct) -> String {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.formatterBehavior = .behavior10_4
+       numberFormatter.numberStyle = .currency
+        numberFormatter.locale = product.priceLocale
+        return numberFormatter.string(from: product.price) ?? kEmptyString
+    }
 }
 
 //MARK: Date
@@ -555,6 +803,8 @@ extension Date {
     func dateByAddingDays(inDays:NSInteger)->Date {
         return Calendar.current.date(byAdding: .day, value: inDays, to: self)!
     }
+    
+    
 }
 
 // MARK:- Extension Api Calls
@@ -585,4 +835,12 @@ extension IAPHandler
             
         })
     }
+}
+
+
+struct premiumModel
+{
+    var type:String?
+    var price:String?
+    
 }

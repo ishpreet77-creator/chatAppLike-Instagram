@@ -11,7 +11,7 @@ import UIKit
 class PremiumVC: BaseVC {
     
     
-    //MARK:- Variables
+    //MARK: - Variables
     var selectedIndex = 1
     var comeFrom2 = ""
     var list = ["The \"Ice Breaker\"","The \"Romantique\"","The \"Connoisseur\""]
@@ -23,7 +23,7 @@ class PremiumVC: BaseVC {
     var amountListForProlongChats = [1,4,7]
     
     
-    //MARK:- variable
+    //MARK: - variable
     var validatePurchase:Bool!
     var comeform3:String!
     var image:UIImage?
@@ -35,7 +35,7 @@ class PremiumVC: BaseVC {
     var subscription_id = "601bd7697e02cb0f3ce6b087"
 
     
-    //MARK:-  IBOutlets
+    //MARK: -  IBOutlets
     @IBOutlet weak var pageControlle: UIPageControl!
     @IBOutlet weak var headerView: UIView!
     @IBOutlet weak var tableView: UITableView!
@@ -45,7 +45,7 @@ class PremiumVC: BaseVC {
     @IBOutlet weak var premCollection: UICollectionView!
     @IBOutlet weak var btnRestore: UIButton!
     @IBOutlet weak var blurView: UIVisualEffectView!
-    //MARK:- Class Life Cycle
+    //MARK: - Class Life Cycle
     var type : PaymentScreenType = .kExtraShakes
     
     
@@ -87,9 +87,10 @@ class PremiumVC: BaseVC {
         super.viewWillAppear(true)
         
         self.purchase = kSixMonthly
+        self.pageControlle.numberOfPages=5
         
 //        IAPHandler.shared.validatePurchase { (status,productId) in
-//            print("Payment buy status = \(status) \(productId)")
+//            debugPrint("Payment buy status = \(status) \(productId)")
 //            if status
 //            {
 //
@@ -137,7 +138,7 @@ class PremiumVC: BaseVC {
         //tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: -headerView.bounds.height, right: 0)
     }
     
-    //MARK:- Select premium action
+    //MARK: - Select premium action
     
     
     //
@@ -184,7 +185,7 @@ class PremiumVC: BaseVC {
        
     
     }
-    //MARK:-IBActions
+    //MARK: -IBActions
     @IBAction func backBtnAction(_ sender: UIButton) {
         self.navigationController?.popViewController(animated: true)
         self.dismiss(animated: true, completion: nil)
@@ -195,17 +196,24 @@ class PremiumVC: BaseVC {
     }
 
     @IBAction func restoreBtnAction(_ sender: UIButton) {
-        print("restore purchase")
-       
-        IAPHandler.shared.restoreProducts()
+        debugPrint("restore purchase")
+        if Connectivity.isConnectedToInternet {
+            IAPHandler.shared.restoreProducts()
+         } else {
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
+
 //        self.navigationController?.popViewController(animated: true)
 //        self.dismiss(animated: true, completion: nil)
     }
-    //MARK:- Buy button action
+    //MARK: - Buy button action
     
     @IBAction func premiumBtnAction(sender:UIButton) {
+        /*
+        if Connectivity.isConnectedToInternet {
+                    
         IAPHandler.shared.getProducts()
-        print("come from = \(type) \(self.purchase)")
+        debugPrint("come from = \(type) \(self.purchase)")
         
         
         
@@ -258,7 +266,11 @@ class PremiumVC: BaseVC {
             }
         }
     
-    
+        } else {
+
+           self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+       }
+        */
     }
     @IBAction func noThanksBtnAction(sender:UIButton) {
         self.dismiss(animated: true, completion: nil)
@@ -273,16 +285,20 @@ extension PremiumVC:UICollectionViewDelegate,UICollectionViewDataSource,UICollec
             self.premCollection.delegate=self
             self.premCollection.dataSource=self
             self.premCollection.register(UINib(nibName: "PremiumCCell", bundle: nil), forCellWithReuseIdentifier: "PremiumCCell")
+        self.premCollection.register(UINib(nibName: "NewPremiumCCell", bundle: nil), forCellWithReuseIdentifier: "NewPremiumCCell")
+        
         
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
   
-        return  3
+        return  5
     }
     
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+      
     
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PremiumCCell", for: indexPath)
             as! PremiumCCell
@@ -382,7 +398,9 @@ extension PremiumVC:UICollectionViewDelegate,UICollectionViewDataSource,UICollec
             cell.lblPack3.text = dayPackList[2]
             cell.lblAmount3.text = "\(amountListForExtraShake[2])"
             
-        } else if  type == .Prolong {
+        }
+        else if  type == .Prolong
+        {
             cell.lblIcebreaker1.text = list[0]
             cell.lblPack1.text = monthPackList[0]
             cell.lblAmount1.text = "\(amountListForProlongChats[0])"
@@ -427,6 +445,7 @@ extension PremiumVC:UICollectionViewDelegate,UICollectionViewDataSource,UICollec
             cell.discountView3.isHidden = true
         }
         return cell
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize
@@ -498,17 +517,29 @@ extension PremiumVC:UICollectionViewDelegate,UICollectionViewDataSource,UICollec
             type = .Regret
             self.btnRestore.isHidden=false
         }
-        else
+        else if  page == 2
         {
             type = .Prolong
             self.btnRestore.isHidden=false
         }
         
+        else if  page == 3
+        {
+            type = .Hangout
+            self.btnRestore.isHidden=false
+        }
+        else
+        {
+            type = .Story
+            self.btnRestore.isHidden=false
+        }
+        
+        
         if type == .Regret
         {
             imgHeader.image = #imageLiteral(resourceName: "yellow")
-            lblRegret.text = "Regret Swiping Right?"
-            lblPremium.text = "Get Premium and never regret swiping."
+            lblRegret.text = kRegretSwipe
+            lblPremium.text = kRegretSwipeMessage
             
             
             self.transaction_id="1000000859449277"
@@ -519,18 +550,19 @@ extension PremiumVC:UICollectionViewDelegate,UICollectionViewDataSource,UICollec
         }
         else if  type == .kExtraShakes{
             imgHeader.image = #imageLiteral(resourceName: "ExtraShake")
-            lblRegret.text = "Extra Shakes"
-            lblPremium.text = "Don't bother about shake limits anymore."
+            lblRegret.text = kExtraShake
+            lblPremium.text = kExtraShakeMessage
             self.transaction_id="1000000859449277"
             self.amount=25
             self.subscription_type=kShake
             self.name="Shake"
             self.extra_shake=3
             self.purchase=kSixMonthly
-        } else if  type == .Prolong {
+        }
+        else if  type == .Prolong {
             imgHeader.image = #imageLiteral(resourceName: "Prolong")
-            lblRegret.text = "Prolong Chats"
-            lblPremium.text = "Get more time to know more about the\n other person."
+            lblRegret.text = kProlongChats
+            lblPremium.text = kProlongChatsMessage
             
             self.transaction_id="1000000859449277"
             self.amount=35
@@ -539,6 +571,33 @@ extension PremiumVC:UICollectionViewDelegate,UICollectionViewDataSource,UICollec
             self.purchase=kSixMonthly
             
         }
+        
+        else if  type == .Hangout {
+            imgHeader.image = #imageLiteral(resourceName: "Prolong")
+            lblRegret.text = kHangout
+            lblPremium.text = kEmptyString
+            
+            self.transaction_id="1000000859449277"
+            self.amount=35
+            self.subscription_type=kHangout
+            self.name="Prolong"
+            self.purchase=kSixMonthly
+            
+        }
+        
+        else if  type == .Story {
+            imgHeader.image = #imageLiteral(resourceName: "Prolong")
+            lblRegret.text = kStory
+            lblPremium.text = kEmptyString
+            
+            self.transaction_id="1000000859449277"
+            self.amount=35
+            self.subscription_type=kStory
+            self.name="Prolong"
+            self.purchase=kSixMonthly
+            
+        }
+        
         
         self.premCollection.reloadData()
     }
@@ -645,11 +704,11 @@ extension PremiumVC: UITableViewDelegate, UITableViewDataSource {
         
       
     }
-    //MARK:- Buy button action
+    //MARK: - Buy button action
     
     @objc func premiumBtnAction(sender:UIButton) {
 
-        print("come from = \(type)")
+        debugPrint("come from = \(type)")
         
         
         
@@ -733,7 +792,7 @@ extension PremiumVC
     @objc func methodOfReceivedPaymentDone(notification: Notification) {
       // Take Action on Notification
         
-        print(notification)
+        debugPrint(notification)
         
         if let dict = notification.userInfo as? [String:Any]
         {
@@ -766,7 +825,7 @@ extension PremiumVC
                 
             }
             
-            print("Payment para = \(data)")
+            debugPrint("Payment para = \(data)")
             
             if Connectivity.isConnectedToInternet {
 

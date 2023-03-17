@@ -9,11 +9,12 @@ import UIKit
 import CountryPickerView
 import IQKeyboardManagerSwift
 import CoreLocation
+import SkeletonView
 
 class MobileVerificationVC: BaseVC {
     
-    //MARK:- All outlets  
-    
+    //MARK: - All outlets
+    @IBOutlet weak var imgBackground: UIImageView!
     @IBOutlet weak var imgCountry: UIImageView!
     @IBOutlet weak var lblOtpSent: UILabel!
     @IBOutlet weak var topConst: NSLayoutConstraint!
@@ -21,23 +22,27 @@ class MobileVerificationVC: BaseVC {
     @IBOutlet weak var lblCountryCode: UILabel!
     @IBOutlet weak var txtPhoneNumber: UITextField!
     
-    //MARK:- All Variable  
+    @IBOutlet weak var viewPhone: UIView!
+    @IBOutlet weak var btnContinue: UIButton!
+    //MARK: - All Variable
     
     let countryPickerView = CountryPickerView()
     var countryCode=kCurrentCountryCode
     let manager = CLLocationManager()
     var locationMenualy = false
-    //MARK:- View Lifecycle   
+    //MARK: - View Lifecycle   
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpUI()
+        
     }
-    
-    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
+        txtPhoneNumber.text? = ""
+        validationNexButton()
+        
         manager.requestAlwaysAuthorization()
         manager.delegate = self
         manager.requestLocation()
@@ -68,7 +73,14 @@ class MobileVerificationVC: BaseVC {
         
     }
     
-    //MARK:- Select country button action 
+    //MARK: - backBtnAction
+
+    @IBAction func backBtnAction(_ sender: UIButton) {
+     
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    //MARK: - Select country button action
     
     @IBAction func selectCountryCodeAct(_ sender: UIButton)
     {
@@ -76,7 +88,7 @@ class MobileVerificationVC: BaseVC {
         countryPickerView.showCountriesList(from: self)
     }
     
-    //MARK:- send OTP button action 
+    //MARK: - send OTP button action 
     
     @IBAction func sendOTPAct(_ sender: UIButton)
     {
@@ -88,13 +100,14 @@ class MobileVerificationVC: BaseVC {
         }
         else
         {
+           
             var data = JSONDictionary()
             
             data[ApiKey.kPhoneNumber] = txtPhoneNumber.text!.trimmingCharacters(in: .whitespacesAndNewlines)
             data[ApiKey.kCountryCode] = lblCountryCode.text
             
             if Connectivity.isConnectedToInternet {
-                
+                self.showLoader()
                 self.callApiForPhoneLogin(data: data)
             } else {
                 
@@ -106,7 +119,7 @@ class MobileVerificationVC: BaseVC {
         
     }
     
-    //MARK:- Keyboard method 
+    //MARK: - Keyboard method
     
     @objc
     func keyboardWillAppear(notification: NSNotification?) {
@@ -137,40 +150,23 @@ class MobileVerificationVC: BaseVC {
         sendButtonConst.constant = 26
     }
     
-    //MARK:- Setup UI method 
+    //MARK: - Setup UI method
     
     func setUpUI()
     {
-        let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: lblOtpSent.text ?? "")
-        attributedString.setColorForText(textForAttribute: kVerificationSend, withColor: UIColor.black)
-        attributedString.setColorForText(textForAttribute: kOneTimePassword, withColor: TEXTCOLOR)
-        attributedString.setColorForText(textForAttribute: kToVerify, withColor: UIColor.black)
-        
-        lblOtpSent.attributedText = attributedString
-        
-        self.setCustomHeader(title: kVerification, showBack: true, showMenuButton: false)
-        
-        if self.getDeviceModel() == "iPhone 6"
-        {
-            self.topConst.constant = TOPSPACING+STATUSBARHEIGHT+TOPLABELSAPACING
-        }
-        else if self.getDeviceModel() == "iPhone 8+"
-        {
-            self.topConst.constant = TOPSPACING+STATUSBARHEIGHT+TOPLABELSAPACING
-        }
-        else
-        {
-            self.topConst.constant = TOPSPACING+TOPLABELSAPACING
-        }
+        lblOtpSent.makeBoldText(withString: kVerificationSend, boldString: kOneTimePassword, normalfont: UIFont.CustomFont.regular.fontWithSize(size: 16), boldfont: UIFont.CustomFont.bold.fontWithSize(size: 16))
         self.countryPickerView.delegate = self
         self.countryPickerView.dataSource = self
         
         txtPhoneNumber.attributedPlaceholder = NSAttributedString(string:kPhoneNumber, attributes:[NSAttributedString.Key.foregroundColor: PLACEHOLDERCOLOR,NSAttributedString.Key.font :UIFont(name: AppFontName.regular, size: 18)!])
+        self.imgBackground.loadingGif(gifName: "backgound_Gif",placeholderImage: "NewLoginBackground")
+        self.btnContinue.setTitle(self.btnContinue.titleLabel?.text?.uppercased(), for: .normal)
+        self.btnContinue.setTitle(self.btnContinue.titleLabel?.text?.uppercased(), for: .selected)
+
     }
+
     
-    
-    
-    // MARK:- Private Functions
+    // MARK: - Private Functions
     private func validateData () -> String?
     {
         if txtPhoneNumber.isEmpty {
@@ -184,9 +180,36 @@ class MobileVerificationVC: BaseVC {
         return nil
     }
     
+    func showLoader()
+    {
+
+ Indicator.sharedInstance.showIndicator3(views: [self.viewPhone,self.btnContinue])
+
+    }
+    func hideLoader()
+    {
+        Indicator.sharedInstance.hideIndicator3(views: [self.viewPhone,self.btnContinue])
+    }
+    //MARK: - validationNexButton
+    
+    func validationNexButton(count:Int=0)
+    {
+        debugPrint("text count = \(count)")
+        if count < 8//validateData() != nil || count == 0
+        {
+            self.btnContinue.isEnabled=false
+            self.btnContinue.backgroundColor = DISABLECOLOR
+        }
+        
+        else
+        {
+            self.btnContinue.backgroundColor = ENABLECOLOR
+            self.btnContinue.isEnabled=true
+        }
+    }
 }
 
-// MARK:- send OTP Api Calls
+// MARK: - send OTP Api Calls
 
 extension MobileVerificationVC
 {
@@ -196,36 +219,38 @@ extension MobileVerificationVC
             
             if error != nil
             {
+                self.hideLoader()
                 self.showErrorMessage(error: error)
             }
             else{
                 
-                let vc = self.storyboard?.instantiateViewController(withIdentifier: "VerificationVC") as! VerificationVC
-                
+                self.hideLoader()
+                let vc = VerificationVC.instantiate(fromAppStoryboard: .Main)
                 vc.mobileNumber=self.txtPhoneNumber.text!
                 vc.countryCode=self.lblCountryCode.text!
                 vc.forTesting="no"
-                vc.SentOTP=(OnBoardingVM.shared.sendOTPData[ApiKey.kOtp] as? String ?? "")
+               // vc.SentOTP=(OnBoardingVM.shared.sendOTPData[ApiKey.kOtp] as? String ?? "")
                 self.navigationController?.pushViewController(vc, animated: true)
             }
         })
     }
 }
 
-//MARK:- textfield delegate method 
+//MARK: - textfield delegate method 
 
 extension MobileVerificationVC:UITextFieldDelegate {
     
-    
+  
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
                    replacementString string: String) -> Bool
     {
         
+       
         let maxLength = 15
         let currentString: NSString = textField.text! as NSString
         let newString: NSString =
             currentString.replacingCharacters(in: range, with: string) as NSString
-        
+        self.validationNexButton(count: newString.length)
         if newString.rangeOfCharacter(from: CharacterSet.whitespacesAndNewlines).location == 0
         
         {
@@ -238,13 +263,13 @@ extension MobileVerificationVC:UITextFieldDelegate {
     }
 }
 
-//MARK:- Select country method 
+//MARK: - Select country method
 
 extension MobileVerificationVC: CountryPickerViewDelegate, CountryPickerViewDataSource
 {
     func countryPickerView(_ countryPickerView: CountryPickerView, didSelectCountry country: Country)
     {
-        let code = (country.phoneCode ?? kCurrentCountryCode).count
+        // let code = (country.phoneCode).count
         
         self.imgCountry.roundedImageWithBorder()
         self.imgCountry.image =  country.flag
@@ -262,14 +287,14 @@ extension MobileVerificationVC: CountryPickerViewDelegate, CountryPickerViewData
     }
     
 }
-//MARK:- Get current location 
+//MARK: - Get current location 
 
 extension MobileVerificationVC: CLLocationManagerDelegate
 {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first
         {
-            print("Found user's location: \(location)")
+            debugPrint("Found user's location: \(location)")
             CURRENTLAT=location.coordinate.latitude
             CURRENTLONG=location.coordinate.longitude
             
@@ -286,12 +311,12 @@ extension MobileVerificationVC: CLLocationManagerDelegate
                     self.countryPickerView.setCountryByPhoneCode(self.countryCode)
                 }
                 
-                print(self.countryCode)
+                debugPrint(self.countryCode)
             }
         }
     }
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
     {
-        print("Failed to find user's location: \(error.localizedDescription)")
+        debugPrint("Failed to find user's location: \(error.localizedDescription)")
     }
 }

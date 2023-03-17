@@ -8,21 +8,23 @@
 import UIKit
 import AVFoundation
 import SDWebImage
+import SkeletonView
+
 class ViewStoryVC: BaseVC {
     @IBOutlet weak var tableStory: UITableView!
     @IBOutlet weak var topView: UIView!
-    var cellData:PostdetailModel?
+    var cellData:SinglePostDataModel?
     var isMute = true
     var player:AVPlayer?
     var cell:StoryTCell?
     let actInd: UIActivityIndicatorView = UIActivityIndicatorView()
       var StoryId = ""
-
+    @IBOutlet weak var btnThreeDot: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        self.callGetStoryApi(StoryId: self.StoryId)
+
         self.setUpTable()
+        
         
 //        topView.borderColor=HOMESADOWCOLOR
 //        self.topView.addBottomShadow()
@@ -31,7 +33,13 @@ class ViewStoryVC: BaseVC {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         Indicator.sharedInstance.hideIndicator()
-        self.tableStory.reloadData()
+        
+        if Connectivity.isConnectedToInternet {
+            self.callGetStoryApi(StoryId: self.StoryId)
+                 } else {
+
+                    self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+                }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -52,14 +60,39 @@ class ViewStoryVC: BaseVC {
         DataManager.comeFrom = kViewProfile
     self.navigationController?.popViewController(animated: false)
     }
+    
+    @IBAction func ThreeDotAct(_ sender:UIButton)
+    {
+       
+        
+        let destVC = StoryMenuPopUpVC.instantiate(fromAppStoryboard: .Stories)
+
+        destVC.type = .ViewPostStory
+        destVC.comeFromScreen = .ViewPostStory
+            destVC.delegate=self
+            //self.view_user_id = cellData?.user_id ?? ""
+            destVC.post_id = self.StoryId
+        destVC.user_name = cellData?.profile_data?.username?.capitalized ?? ""
+            destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+            destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+            
+        if let tab = self.tabBarController
+        {
+            tab.present(destVC, animated: true, completion: nil)
+        }
+        else
+        {
+            self.present(destVC, animated: true, completion: nil)
+        }
+        
+        
+    }
 }
-extension ViewStoryVC:UITableViewDelegate,UITableViewDataSource
+extension ViewStoryVC:UITableViewDelegate,UITableViewDataSource,SkeletonTableViewDataSource
 {
 
     func setUpTable()
     {
-        
-        
         self.tableStory.register(UINib(nibName: "StoryTCell", bundle: nil), forCellReuseIdentifier: "StoryTCell")
         
         self.tableStory.register(UINib(nibName: "StoryAdsTCell", bundle: nil), forCellReuseIdentifier: "StoryAdsTCell")
@@ -70,11 +103,18 @@ extension ViewStoryVC:UITableViewDelegate,UITableViewDataSource
         self.tableStory.dataSource = self
     }
     
+    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
+        return "StoryTCell"
+    }
+    
+    func collectionSkeletonView(_ skeletonView: UITableView, skeletonCellForRowAt indexPath: IndexPath) -> UITableViewCell? {
+        let cell = skeletonView.dequeueReusableCell(withIdentifier: "StoryTCell") as! StoryTCell
+        return cell
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int
     {
-        
-    return 1
-
+        return 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
@@ -83,62 +123,30 @@ extension ViewStoryVC:UITableViewDelegate,UITableViewDataSource
         self.cell=cell
         cell.imgStory.sd_imageIndicator = SDWebImageActivityIndicator.gray
         cell.viewTop.isHidden=true
+        cell.stackBtn.isHidden=true
         cell.topViewHeightConst.constant = 0
-    
+        cell.constDescTop.constant = 16
         cell.btnProfile.tag=0
         cell.btnThreeDot.tag=0
         cell.btnHearVoice.tag=0
         cell.btnLikeProfile.tag=0
         cell.btnPlay.tag=0
         cell.btnMute.tag=0
-        //cell.lblUsername.text = (cellData?.profile_data?.username)?.capitalized
-
-        
-//        if cellData?.post_details?.user_id == DataManager.Id
-//        {
-//            cell.btnThreeDot.isHidden=false
-//            cell.viewLike.isHidden=true
-//            cell.stackLeftConst.constant=SCREENWIDTH/2
-//        }
-//        else
-//        {
-//            cell.btnThreeDot.isHidden=false
-//            cell.viewLike.isHidden=false
-//            cell.stackLeftConst.constant=24
-//        }
-      
-            
-       
-//        if cellData?.profile_data?.images?.count ?? 0>0
-//            {
-//              if let img = cellData?.profile_data?.images?[0].image
-//              {
-//                let url = URL(string: img)!
-//                DispatchQueue.main.async {
-//                cell.imgProfile.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: .refreshCached, completed: nil)
-//                }
-//              }
-//            }
-   
         if kVideo.equalsIgnoreCase(string: cellData?.file_type ?? "") //kVideo
         {
             
             if let img = cellData?.thumbnail
                 {
-            
-                    let url = URL(string: img)!
-                cell.imgStory.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: [], completed: nil)
-                
+ 
+                cell.imgStory.setImage(imageName: img, isStory:true)
                 cell.imgStory.isHidden=false
                 
                 let video = cellData?.file_name ?? ""
                 let urlVideo = URL(string: video)!
                 cell.btnMute.isHidden=false
-               // cell.configureCell(imageUrl: img, description: "Video", videoUrl: video)
-        
+ 
                 self.player = AVPlayer(url: urlVideo)
-              //  self.player?.addObserver(self, forKeyPath: "rate", options: NSKeyValueObservingOptions(rawValue: NSKeyValueObservingOptions.new.rawValue | NSKeyValueObservingOptions.old.rawValue), context: nil)
-                self.setupAVPlayer()
+ 
                 let playerLayer = AVPlayerLayer(player: player)
                
                 playerLayer.frame = CGRect(x: 0, y: 0, width: SCREENWIDTH, height: cell.viewPlayer.frame.height)
@@ -150,7 +158,7 @@ extension ViewStoryVC:UITableViewDelegate,UITableViewDataSource
                 } else {
                     player?.play()
                 }
-                
+                self.setupAVPlayer()
                 NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: player?.currentItem, queue: .main) { [weak self] _ in
                     self?.player?.seek(to: CMTime.zero)
                     self?.player?.play()
@@ -177,13 +185,9 @@ extension ViewStoryVC:UITableViewDelegate,UITableViewDataSource
 
             actInd.center = cell.imgStory.center
             actInd.style = UIActivityIndicatorView.Style.white
-           // cell.imgStory.addSubview(actInd)
-           
-            
+     
             cell.btnPlay.isHidden=false
-           
-           
-        
+
         }
         else
         {
@@ -193,110 +197,29 @@ extension ViewStoryVC:UITableViewDelegate,UITableViewDataSource
             cell.btnMute.isHidden=true
             if let img = cellData?.file_name
                 {
-                    let url = URL(string: img)!
-                
-                var cellFrame = cell.frame.size
-               
+     
+                cell.imgHeightConst.constant = kListImageHeight
+                cell.imgStory.contentMode = .scaleAspectFill
+                cell.imgStory.setImage(imageName: img, isStory: true)
 
-                cell.imgStory.sd_setImage(with: url, placeholderImage: nil, options: [], completed: { (theImage, error, cache, url) in
-                    
-                    if theImage != nil
-                    {
-                    //cell.imgHeightConst.constant  = self.getAspectRatioAccordingToiPhones(cellImageFrame: cellFrame,downloadedImage: theImage!)
-                        let height = self.getAspectRatioAccordingToiPhones(cellImageFrame: cellFrame,downloadedImage: theImage!)
-                        print("Height = \(height)")
-                        if height>600
-                        {
-                            cell.imgHeightConst.constant  = 390//height-120
-                            cell.imgStory.contentMode = .scaleAspectFill
-                        }
-                    else
-                        {
-                            cell.imgHeightConst.constant  = 390//height
-                            cell.imgStory.contentMode = .scaleAspectFill
-                        }
-                        
-                    }
-                    else
-                    {
-                        cell.imgHeightConst.constant = 390
-                        cell.imgStory.contentMode = .scaleAspectFill
-                    }
-
-                        })
-
-                /*
-                DispatchQueue.main.async
-                {
-                    cell.imgStory.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: .refreshCached, completed: nil)
-                }
-                
-                let size = cell.imgStory.image?.getImageSizeWithURL(url: img)
-                
-                let height = size?.height ?? 375
-                if height > SCREENHEIGHT
-                {
-                    let per = (height*kLongImagePercent)/100
-                    
-                    cell.imgHeightConst.constant = SCREENHEIGHT-120//height-per
-                }
-                
-                else if height > 700
-                {
-                    let per = (height*kImagePercent)/100
-                    
-                    cell.imgHeightConst.constant = height-per
-                }
-                else
-                {
-                    cell.imgHeightConst.constant = size?.height ?? 390
-                }
-                */
             }
         }
         if let post_date_time = cellData?.post_date_time
             {
-            let time = post_date_time.dateFromString(format: .NewISO, type: .utc)
-            cell.lblTime.text = time.string(format: .date12HourTime, type: .local)
+            //let time = post_date_time.dateFromString(format: .NewISO, type: .utc)
+            cell.lblTime.text = kEmptyString.checkTimeAgo(startTime: post_date_time)//time.string(format: .date12HourTime, type: .local)
             
            }
         
         
         
           cell.txtViewDesc.text = cellData?.post_text
+        
+        cell.txtViewDesc.TextSpacing(text: cell.txtViewDesc.text ?? kEmptyString)
         cell.btnPlay.isHidden=true
-        
-      
-//        if cellData?.is_liked_by_self_user == 1 && cellData?.is_liked_by_other_user_id == 1
-//        {
-//            cell.imgHeart.image = UIImage(named: "Message")
-//            cell.lblLike.text = kMessage
-//            cell.lblLike.textColor = LINECOLOR
-//        }
-//       else if cellData?.is_liked_by_self_user == 1
-//        {
-//            cell.imgHeart.image = UIImage(named: "redLike3")
-//            cell.lblLike.text = kLikeProfile//kDislikeProfile
-//            cell.lblLike.textColor = LIKECOLOR
-//        }
-//        else
-//        {
-//            cell.imgHeart.image = UIImage(named: "BlackLike")
-//            cell.lblLike.text = kLikeProfile
-//            cell.lblLike.textColor = UIColor.black
-//        }
-       
-        
-        
-//            cell.btnThreeDot.addTarget(self, action: #selector(ThreeDotAct), for: .touchUpInside)
-//            cell.btnProfile.addTarget(self, action: #selector(viewProfileAct), for: .touchUpInside)
-//
-//        cell.btnHearVoice.addTarget(self, action: #selector(hearVoiceAct), for: .touchUpInside)
-//        cell.btnLikeProfile.addTarget(self, action: #selector(likeBtnAct), for: .touchUpInside)
-//
+
         cell.btnMute.addTarget(self, action: #selector(muteAct), for: .touchUpInside)
-//
-//        cell.btnPlay.addTarget(self, action: #selector(playAct), for: .touchUpInside)
+
        
         return cell
     }
@@ -366,26 +289,26 @@ extension ViewStoryVC:UITableViewDelegate,UITableViewDataSource
                     if player?.timeControlStatus == .playing {
                         //Indicator.sharedInstance.hideIndicator()
                         self.actInd.stopAnimating()
-                        print("Playing...")
+                        debugPrint("Playing...")
                       
                        // self.cell?.imgStory.isHidden=true
                     } else {
                         
                        // Indicator.sharedInstance.showIndicator()
-                        print("Not Playing...")
+                        debugPrint("Not Playing...")
                         self.actInd.startAnimating()
                         //self.cell?.imgStory.isHidden=false
                     }
                 }
             } else if keyPath == "rate" {
                 if player?.rate ?? 0 > 0 {
-                    print("Playing...")
+                    debugPrint("Playing...")
                     self.actInd.stopAnimating()
                     //self.cell?.imgStory.isHidden=true
                     //Indicator.sharedInstance.hideIndicator()
                 } else {
                     //Indicator.sharedInstance.showIndicator()
-                    print("Not Playing...")
+                    debugPrint("Not Playing...")
                     self.actInd.startAnimating()
                    // self.cell?.imgStory.isHidden=false
                 }
@@ -416,17 +339,29 @@ extension ViewStoryVC:FeedbackAlertDelegate
     
     func callApiForStoryDetails(data:JSONDictionary)
     {
+        self.showLoader()
         StoriesVM.shared.callApiGetStoryDetail(showIndiacter:true, data: data, response: { (message, error) in
         
             if error != nil
             {
-                
+                self.hideLoader()
                 self.showErrorMessage2(error: error)
             }
             else
             {
-                self.cellData=StoriesVM.shared.singleStory?.post_details
+                self.hideLoader()
+                self.cellData=StoriesVM.shared.singleStory
                 
+                let id = StoriesVM.shared.singleStory?.user_id
+                
+                if id == DataManager.Id
+                {
+                    self.btnThreeDot.isHidden = true
+                }
+                else
+                {
+                    self.btnThreeDot.isHidden = false
+                }
                 self.tableStory.reloadData()
             }
 
@@ -451,23 +386,30 @@ extension ViewStoryVC:FeedbackAlertDelegate
             let code = (error! as NSError).code
             if  code == 401 || code == 451
             {
-                let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-                let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+            
+                let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
+
                 destVC.type = .BlockReportError
                 destVC.user_name=message
                 destVC.errorCode=code
                 destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                 destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-                self.present(destVC, animated: true, completion: nil)
-                
+                if let tab = self.tabBarController
+                {
+                    tab.present(destVC, animated: true, completion: nil)
+                }
+                else
+                {
+                    self.present(destVC, animated: true, completion: nil)
+                }
               
             }
            else
             {
       
-                let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-                let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
+
                 destVC.type = .BlockReportError
                 destVC.user_name=message
                 destVC.delegate=self
@@ -475,8 +417,14 @@ extension ViewStoryVC:FeedbackAlertDelegate
                 destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                 destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-                self.present(destVC, animated: true, completion: nil)
-                
+                if let tab = self.tabBarController
+                {
+                    tab.present(destVC, animated: true, completion: nil)
+                }
+                else
+                {
+                    self.present(destVC, animated: true, completion: nil)
+                }
             }
         
     }
@@ -492,4 +440,38 @@ extension ViewStoryVC:FeedbackAlertDelegate
             }
         
 }
+extension ViewStoryVC:threeDotMenuDelegate
+{
+    func ClickNameAction(name: String)
+    {
+       
+        
+        if name.equalsIgnoreCase(string: kReportPost)
+        {
+            self.dismiss(animated:true) {
+            
+                let destVC = BlockReportPopUpVC.instantiate(fromAppStoryboard: .Stories)
+                destVC.comeFromScreen = .ViewPostStory
+                destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+                destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+                
+                self.navigationController?.pushViewController(destVC, animated: false)
+                
+            }
+            
+        }
+      
+    }
+}
 
+extension ViewStoryVC {
+    func showLoader() {
+        self.tableStory.isSkeletonable = true
+        
+        self.tableStory.showAnimatedSkeleton()
+    }
+    
+    func hideLoader() {
+        self.tableStory.hideSkeleton()
+    }
+}

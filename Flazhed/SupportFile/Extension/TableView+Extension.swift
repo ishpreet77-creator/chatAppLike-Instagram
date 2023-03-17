@@ -54,7 +54,7 @@ extension UITableView
     }
   }
 }
-//MARK:- table extension 
+//MARK: - table extension 
 
 extension UITableView {
       // center point of content size

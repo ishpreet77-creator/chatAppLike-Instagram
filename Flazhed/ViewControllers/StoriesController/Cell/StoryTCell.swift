@@ -11,6 +11,8 @@ import AVFoundation
 
 class StoryTCell: UITableViewCell, ASAutoPlayVideoLayerContainer {
     
+    @IBOutlet weak var constDescTop: NSLayoutConstraint!
+    @IBOutlet weak var stackBtn: UIStackView!
     
     @IBOutlet weak var btnShare: UIButton!
     @IBOutlet weak var lblShare: UILabel!
@@ -61,6 +63,7 @@ class StoryTCell: UITableViewCell, ASAutoPlayVideoLayerContainer {
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        self.viewLike.skeletonCornerRadius = 15
 //        self.imgStory.backgroundColor = UIColor.white
 //        self.viewPlayer.backgroundColor = UIColor.white
         
@@ -78,7 +81,7 @@ class StoryTCell: UITableViewCell, ASAutoPlayVideoLayerContainer {
         //spinner.startAnimating()
         
         
-        //MARK:- Video stop
+        //MARK: - Video stop
         
 //        NotificationCenter.default.addObserver(forName: .AVPlayerItemDidPlayToEndTime, object: self.viewPlayer.player?.currentItem, queue: nil) { (_) in
 //            self.viewPlayer.player?.seek(to: .zero)
@@ -89,7 +92,7 @@ class StoryTCell: UITableViewCell, ASAutoPlayVideoLayerContainer {
         
         
 //        if (self.viewPlayer.player?.rate != 0 && self.viewPlayer.player?.error == nil) {
-//           print("playing")
+//           debugPrint("playing")
 //            spinner.stopAnimating()
 //        }
 //        else
@@ -108,6 +111,8 @@ class StoryTCell: UITableViewCell, ASAutoPlayVideoLayerContainer {
         videoLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
         imgStory.layer.addSublayer(videoLayer)
         selectionStyle = .none
+       
+      
     }
     override func prepareForReuse() {
         imgStory.imageURL = nil
@@ -118,7 +123,8 @@ class StoryTCell: UITableViewCell, ASAutoPlayVideoLayerContainer {
     func configureCell(imageUrl: String?,
                        description: String,
                        videoUrl: String?) {
-      
+    
+        
         self.imgStory.imageURL = imageUrl
         self.videoURL = videoUrl
     }
@@ -137,7 +143,7 @@ class StoryTCell: UITableViewCell, ASAutoPlayVideoLayerContainer {
         super.layoutSubviews()
         let horizontalMargin: CGFloat = 20
         let width: CGFloat = bounds.size.width - horizontalMargin * 2
-        let height: CGFloat = (width * 0.9).rounded(.up)
+       // let height: CGFloat = (width * 0.9).rounded(.up)
         videoLayer.frame = self.imgStory.frame//CGRect(x: 0, y: 0, width: width, height: height)
     }
     

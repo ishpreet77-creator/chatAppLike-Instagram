@@ -8,60 +8,44 @@
 import UIKit
 
 class GetStartedVC: BaseVC {
+    @IBOutlet weak var imgBackground: UIImageView!
     @IBOutlet weak var imgMatch: UIImageView!
-    
-    
-    @IBOutlet weak var imgSwipe: UIImageView!
-    @IBOutlet weak var imgHangout: UIImageView!
-    @IBOutlet weak var imgNearby: UIImageView!
+    @IBOutlet weak var textGetStartedDesc: UITextView!
+    @IBOutlet weak var lblTitle: UILabel!
     @IBOutlet weak var topConst: NSLayoutConstraint!
+    @IBOutlet weak var btnContinue: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
-//        if self.getDeviceModel() == "iPhone 6"
-//        {
-//            self.topConst.constant = TOPSPACING
-//        }
-//        else if self.getDeviceModel() == "iPhone 8+"
-//        {
-//            self.topConst.constant = TOPSPACING
-//        }
-//        else
-//        {
-//            self.topConst.constant = TOPSPACING
-//        }
-        self.topConst.constant = 0
-        
-        
-        self.imgMatch.image = self.imgMatch.image?.tinted(color: UIColor.lightGray)
-        self.imgHangout.image = self.imgHangout.image?.tinted(color: UIColor.lightGray)
-        
-        self.imgSwipe.image = self.imgSwipe.image?.tinted(color: UIColor.lightGray)
-        self.imgNearby.image = self.imgNearby.image?.tinted(color: UIColor.lightGray)
-        
-        self.updateUnit()
+        //self.topConst.constant = 0
+        setupUI()
+  
+       // self.updateUnit()
+    }
+    
+    //MARK: - Setup UI
+    
+    func setupUI()
+    {
+        self.lblTitle.text = kFGetStarted
+        self.textGetStartedDesc.text = kWelcometoFlazhed
+        self.imgBackground.loadingGif(gifName: "backgound_Gif",placeholderImage: "NewLoginBackground")
+//        self.btnContinue.setTitle(self.btnContinue.titleLabel?.text?.uppercased(), for: .normal)
+//        self.btnContinue.setTitle(self.btnContinue.titleLabel?.text?.uppercased(), for: .selected)
+
     }
     @IBAction func NextAct(_ sender: UIButton)
     {
       
-        
-        let storyBoard = UIStoryboard.init(name: "Profile", bundle: nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "PreferencesVC") as! PreferencesVC
+        let vc = PreferencesVC.instantiate(fromAppStoryboard: .Profile)
         vc.comeFrom=kAppDelegate
          self.navigationController?.pushViewController(vc, animated: true)
     }
     
-    @IBAction func SkipAct(_ sender: UIButton)
-    {
-        let vc = self.storyboard?.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
-        DataManager.isProfileCompelete=true
-        DataManager.comeFromTag=5
-        self.navigationController?.pushViewController(vc, animated: true)
-    }
+ 
 
 }
-//MARK:- api call
+//MARK: - api call
 
 extension GetStartedVC
 {

@@ -14,6 +14,17 @@ class ChatActiveTCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        self.btnActive.setTitle(kActiveChats, for: .normal)
+        self.btnInactive.setTitle(kInactiveChats, for: .normal)
+        self.btnActive.setTitle(kActiveChats, for: .selected)
+        self.btnInactive.setTitle(kInactiveChats, for: .selected)
+        
+        self.btnInactive.setTitleColor(PURPLECOLOR, for: .selected)
+        self.btnInactive.setTitleColor(ENABLECOLOR, for: .normal)
+        
+        self.btnActive.setTitleColor(PURPLECOLOR, for: .selected)
+        self.btnActive.setTitleColor(ENABLECOLOR, for: .normal)
+
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

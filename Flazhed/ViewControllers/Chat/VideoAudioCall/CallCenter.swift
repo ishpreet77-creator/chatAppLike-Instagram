@@ -60,7 +60,7 @@ class CallCenter: NSObject {
         
         provider.reportNewIncomingCall(with: uuid, update: callUpdate, completion: { error in
             if let error = error {
-                print("reportNewIncomingCall error: \(error.localizedDescription)")
+                debugPrint("reportNewIncomingCall error: \(error.localizedDescription)")
             }
         })
     }
@@ -74,7 +74,7 @@ class CallCenter: NSObject {
         let transaction = CXTransaction(action: startCallAction)
         controller.request(transaction) { (error) in
             if let error = error {
-                print("startOutgoingSession failed: \(error.localizedDescription)")
+                debugPrint("startOutgoingSession failed: \(error.localizedDescription)")
             }
         }
     }
@@ -91,7 +91,7 @@ class CallCenter: NSObject {
         let transaction = CXTransaction(action: muteCallAction)
         controller.request(transaction) { (error) in
             if let error = error {
-                print("muteSession \(muted) failed: \(error.localizedDescription)")
+                debugPrint("muteSession \(muted) failed: \(error.localizedDescription)")
             }
         }
     }
@@ -101,7 +101,7 @@ class CallCenter: NSObject {
         let transaction = CXTransaction(action: endCallAction)
         controller.request(transaction) { error in
             if let error = error {
-                print("endSession failed: \(error.localizedDescription)")
+                debugPrint("endSession failed: \(error.localizedDescription)")
             }
         }
     }

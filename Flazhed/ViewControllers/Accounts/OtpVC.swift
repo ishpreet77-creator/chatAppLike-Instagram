@@ -9,19 +9,22 @@ import UIKit
 
 class OtpVC: BaseVC {
     
-    //MARK:- Variables
-    
-    
-    //MARK:-  IBOutlets
+    //MARK: -  IBOutlets
+    @IBOutlet weak var btnVerify: UIButton!
+    @IBOutlet weak var lblOTPText: UILabel!
+    @IBOutlet weak var viewButtom: UIView!
+    @IBOutlet weak var viewOtp: UIView!
     @IBOutlet weak var txtFieldOtp: UITextField!
     @IBOutlet weak var verifyBottonConstraint: NSLayoutConstraint!
     @IBOutlet weak var topConstraint: NSLayoutConstraint!
+    
+    //MARK: - Variables
     var countryCode = ""
     var mobileNumber = ""
     var SentOTP = ""
     var forTesting = ""
     
-    //MARK:- Class Life Cycle
+    //MARK: - Class Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -29,18 +32,21 @@ class OtpVC: BaseVC {
         {
         self.txtFieldOtp.text=SentOTP
         }
-        
+  
+        setUpUI()
         // Do any additional setup after loading the view.
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-        
+        self.tabBarController?.tabBar.isHidden = true
+        self.validationPassed()
+
         self.view.endEditing(true)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         
-        self.setCustomHeader(title: "Verification", showBack: true, showMenuButton: false)
+        self.setCustomHeader(title: kMOBILENUMBER, showBack: true, showMenuButton: false)
         
         if self.getDeviceModel() == "iPhone 6"
         {
@@ -57,18 +63,30 @@ class OtpVC: BaseVC {
       //  self.topConstraint.constant = 48
         
         self.txtFieldOtp.delegate=self
-        
+    
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
+        self.tabBarController?.tabBar.isHidden = false
+
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification , object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification , object: nil)
         
     }
     
-    //MARK:-IBActions
+    func setUpUI()
+    {
+     
+        self.lblOTPText.text = kOTP
+        self.btnVerify.setTitle(kVerify, for: .normal)
+        self.btnVerify.setTitle(kVerify, for: .selected)
+        
+        self.btnVerify.backgroundColor = ENABLECOLOR
+
+    }
+    
+    //MARK: -IBActions
     @IBAction func backBtnAction(_ sender: UIButton) {
         self.navigationController?.popViewController(animated: true)
     }
@@ -87,7 +105,7 @@ class OtpVC: BaseVC {
             data[ApiKey.kOtp] = self.txtFieldOtp.text!
 
             if Connectivity.isConnectedToInternet {
-              
+                self.showLoader()
                 self.updateMobileApi(data: data)
              } else {
                 
@@ -98,7 +116,7 @@ class OtpVC: BaseVC {
       
     }
     
-    //MARK:- Functions
+    //MARK: - Functions
     @objc
      func keyboardWillAppear(notification: NSNotification?) {
      
@@ -131,7 +149,7 @@ class OtpVC: BaseVC {
     
     
     
-    // MARK:- Private Functions
+    // MARK: - Private Functions
     private func validateData () -> String?
     {
         if txtFieldOtp.isEmpty  {
@@ -145,6 +163,33 @@ class OtpVC: BaseVC {
         return nil
     }
     
+    
+    func showLoader()
+    {
+        Indicator.sharedInstance.showIndicator3(views: [self.viewOtp,self.viewButtom])
+    
+    }
+    func hideLoader()
+    {
+        Indicator.sharedInstance.hideIndicator3(views: [self.viewOtp,self.viewButtom])
+    }
+    //MARK: - Validate button
+    
+    func validationPassed(count:Int=0)
+    {
+        debugPrint("text count = \(count)")
+        if validateData() != nil || count == 0
+        {
+            self.btnVerify.isEnabled=false
+            self.btnVerify.backgroundColor = DISABLECOLOR
+        }
+        
+        else
+        {
+            self.btnVerify.backgroundColor = ENABLECOLOR
+            self.btnVerify.isEnabled=true
+        }
+    }
 }
 
 extension OtpVC:UITextFieldDelegate {
@@ -158,7 +203,8 @@ extension OtpVC:UITextFieldDelegate {
         let currentString: NSString = textField.text! as NSString
         let newString: NSString =
             currentString.replacingCharacters(in: range, with: string) as NSString
-        
+        self.validationPassed(count: newString.length)
+
         if newString.rangeOfCharacter(from: CharacterSet.whitespacesAndNewlines).location == 0
         
         {
@@ -171,7 +217,7 @@ extension OtpVC:UITextFieldDelegate {
     }
 }
 
-// MARK:- Extension Api Calls
+// MARK: - Extension Api Calls
 extension OtpVC
 {
 
@@ -181,13 +227,13 @@ extension OtpVC
             
             if error != nil
             {
+                self.hideLoader()
                 self.showErrorMessage(error: error)
             }
             else{
-             
-                let storyBoard = UIStoryboard(name: kAccount, bundle: nil)
-        
-                let vc = storyBoard.instantiateViewController(withIdentifier: "AccountsVC") as! AccountsVC
+                self.hideLoader()
+                
+                let vc = AccountsVC.instantiate(fromAppStoryboard: .Account)
                 vc.comeFromVerify=true
                 DataManager.comeFrom = kOTPValidAlert
                 self.navigationController?.pushViewController(vc, animated: false)

@@ -202,3 +202,15 @@ extension UIView {
         return gradient
     }
 }
+extension UIView {
+    var textFieldsInView: [UITextField] {
+        return subviews
+            .filter ({ !($0 is UITextField) })
+            .reduce (( subviews.compactMap { $0 as? UITextField }), { summ, current in
+                return summ + current.textFieldsInView
+        })
+    }
+    var selectedTextField: UITextField? {
+        return textFieldsInView.filter { $0.isFirstResponder }.first
+    }
+}

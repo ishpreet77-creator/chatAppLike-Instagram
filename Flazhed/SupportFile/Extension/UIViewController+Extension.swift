@@ -12,7 +12,7 @@ import MapKit
 import AudioToolbox
 extension UIViewController{
 
-    //MARK:- User of alert/action sheet
+    //MARK: - User of alert/action sheet
     public func openAlert(title: String?,
                           message: String?,
                           alertStyle:UIAlertController.Style?,
@@ -40,30 +40,44 @@ extension UIViewController{
     
     public func openSimpleAlert(message: String?)
     {
-        
+        Indicator.sharedInstance.hideIndicator()
         if kLoginSession.equalsIgnoreCase(string: message ?? "")
         {
-            let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-            let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+
+            let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
             destVC.type = .BlockReportError
             destVC.user_name=message ?? kError
             destVC.errorCode=401
             destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-            self.present(destVC, animated: true, completion: nil)
+            if let tab = self.tabBarController
+            {
+                tab.present(destVC, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(destVC, animated: true, completion: nil)
+            }
         }
+        
         else
         {
-            let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-            let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
-
+           
+            let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
             destVC.type = .BlockReportError
             destVC.user_name=message ?? kError
             destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-            self.present(destVC, animated: true, completion: nil)
+            if let tab = self.tabBarController
+            {
+                tab.present(destVC, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(destVC, animated: true, completion: nil)
+            }
         }
 
 //
@@ -118,11 +132,7 @@ func locationManager(manager: CLLocationManager,didUpdateToLocation newLocation:
 }
 
 }
-extension UIDevice {
-    static func vibrate() {
-           AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
-       }
-}
+
 extension Date {
 
     func dateFormatWithSuffix() -> String {
@@ -145,13 +155,13 @@ extension Date {
         }
     }
 }
-////MARK:- POPup delegate
+////MARK: - POPup delegate
 //
 //extension BaseVC:FeedbackAlertDelegate
 //{
 //    func FeedbackAlertOkFunc(name: String)
 //    {
-//    print("Name = \(name)")
+//    debugPrint("Name = \(name)")
 //    }
 //
 //
@@ -234,3 +244,55 @@ extension UIViewController {
         }
  
     }
+enum AppStoryboard : String {
+    case Main
+    case Chat
+    case Account
+    case Home
+    case Profile
+    case Hangouts
+    case Stories
+    case CustomTabar
+    case Shake
+    case Anonymous
+    
+    
+}
+extension AppStoryboard {
+    
+    var instance : UIStoryboard {
+        
+        return UIStoryboard(name: self.rawValue, bundle: Bundle.main)
+    }
+    
+    func viewController<T : UIViewController>(viewControllerClass : T.Type, function : String = #function, line : Int = #line, file : String = #file) -> T {
+        
+        let storyboardID = (viewControllerClass as UIViewController.Type).storyboardID
+        
+        guard let scene = instance.instantiateViewController(withIdentifier: storyboardID) as? T else {
+            
+            fatalError("ViewController with identifier \(storyboardID), not found in \(self.rawValue) Storyboard.\nFile : \(file) \nLine Number : \(line) \nFunction : \(function)")
+        }
+        
+        return scene
+    }
+    
+    func initialViewController() -> UIViewController? {
+        
+        return instance.instantiateInitialViewController()
+    }
+}
+
+extension UIViewController {
+    
+    // Not using static as it wont be possible to override to provide custom storyboardID then
+    class var storyboardID : String {
+        
+        return "\(self)"
+    }
+    static func instantiate(fromAppStoryboard appStoryboard: AppStoryboard) -> Self {
+        
+        return appStoryboard.viewController(viewControllerClass: self)
+    }
+    
+}

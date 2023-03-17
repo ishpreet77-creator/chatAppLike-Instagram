@@ -16,7 +16,8 @@ protocol threeDotMenuDelegate
 
 class StoryMenuPopUpVC: BaseVC {
     
-
+    @IBOutlet weak var lblTitle: UILabel!
+    
     @IBOutlet weak var viewProfileBUtton: UIButton!
     @IBOutlet weak var reportPostBUtton: UIButton!
     @IBOutlet weak var viewProfileButtonBGImage: UIImageView!
@@ -24,6 +25,7 @@ class StoryMenuPopUpVC: BaseVC {
     @IBOutlet weak var blurView: UIVisualEffectView!
     var delegate:threeDotMenuDelegate?
     var type: ScreenType = .storiesScreen
+    var comeFromScreen: ScreenType = .storiesScreen
     var view_user_id = ""
     var from_user_id = ""
     var post_id = ""
@@ -33,16 +35,17 @@ class StoryMenuPopUpVC: BaseVC {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setUpUI()
         if type == .messageScreen
         {
-            viewProfileBUtton.setTitle("BLOCK AND REPORT", for: .normal)
+            viewProfileBUtton.setTitle(kBLOCKANDREPORT, for: .normal)
             if self.is_hangout_strory
             {
-                reportPostBUtton.setTitle("END CHAT", for: .normal)
+                reportPostBUtton.setTitle(kENDCHAT, for: .normal)
             }
             else
             {
-                reportPostBUtton.setTitle("REMOVE MATCH", for: .normal)
+                reportPostBUtton.setTitle(kREMOVEMATCH, for: .normal)
             }
             
             reportPostBUtton.setTitleColor(#colorLiteral(red: 0.9490196078, green: 0.2901960784, blue: 0.2901960784, alpha: 1), for: .normal) //= #colorLiteral(red: 0.9490196078, green: 0.2901960784, blue: 0.2901960784, alpha: 1)
@@ -50,13 +53,60 @@ class StoryMenuPopUpVC: BaseVC {
         else if type == .chatScreen
         {
            
-            viewProfileBUtton.setTitle("PROLONG CHAT", for: .normal)
-            reportPostBUtton.setTitle("DELETE CHAT", for: .normal)
+            viewProfileBUtton.setTitle(kPROLONGCHAT, for: .normal)
+            reportPostBUtton.setTitle(kDELETECHAT, for: .normal)
             reportPostBUtton.setTitleColor(#colorLiteral(red: 0.9490196078, green: 0.2901960784, blue: 0.2901960784, alpha: 1), for: .normal)
         }
   
+        else if type == .ViewProfile
+        {
+           
+            viewProfileBUtton.setTitle(kBLOCKANDREPORT, for: .normal)
+            reportPostBUtton.setTitle(kCancel.uppercased(), for: .normal)
+            reportPostBUtton.setTitleColor(#colorLiteral(red: 0.9490196078, green: 0.2901960784, blue: 0.2901960784, alpha: 1), for: .normal)
+        }
+
+        else if type == .ViewPostHangout
+        {
+            viewProfileBUtton.setTitle(kBLOCKANDREPORTHAGOUT, for: .normal)
+            reportPostBUtton.setTitle(kCancel.uppercased(), for: .normal)
+            reportPostBUtton.setTitleColor(#colorLiteral(red: 0.9490196078, green: 0.2901960784, blue: 0.2901960784, alpha: 1), for: .normal)
+        }
+                    
+        else if  type == .ViewPostStory
+        {
+           
+            viewProfileBUtton.setTitle(kBLOCKANDREPORTPOST, for: .normal)
+            reportPostBUtton.setTitle(kCancel.uppercased(), for: .normal)
+            reportPostBUtton.setTitleColor(#colorLiteral(red: 0.9490196078, green: 0.2901960784, blue: 0.2901960784, alpha: 1), for: .normal)
+        }
+        
+        else if  type == .ListHangout
+        {
+           
+          
+            reportPostBUtton.setTitle(kBLOCKANDREPORTHAGOUT, for: .normal)
+        
+        }
+        else if  type == .storiesScreen
+        {
+           
+    reportPostBUtton.setTitle(kBLOCKANDREPORTPOST, for: .normal)
+        
+        }
+        
+        
+        
     }
-    
+  //MARK: - Setup UI method
+    func setUpUI()
+    {
+   
+        self.lblTitle.text = kOptionChoose
+//        self.lblShakeLeft.text = kShakesLeft
+//        self.btnGetNow.setTitle(kGetMore, for: .normal)
+//        self.btnCancelShake.setTitle(kCANCELSHAKE, for: .normal)
+    }
     override var prefersStatusBarHidden: Bool {
         return true
     }
@@ -82,74 +132,127 @@ class StoryMenuPopUpVC: BaseVC {
         if type == .messageScreen
         {
 
-            let storyboard: UIStoryboard = UIStoryboard(name: "Stories", bundle: Bundle.main)
-            let destVC = storyboard.instantiateViewController(withIdentifier: "StoryDiscardVC") as!  StoryDiscardVC
+            let destVC = StoryDiscardVC.instantiate(fromAppStoryboard: .Stories)
+
             destVC.type = .blockRemoveAlert
+            destVC.comefrom = comeFromScreen
+            destVC.comeFromScreen = comeFromScreen
             destVC.User_Id=self.view_user_id
             destVC.User_Name=self.user_name
             destVC.is_hangout_strory=self.is_hangout_strory
             destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-            self.present(destVC, animated: true, completion: nil)
-            
+            if let tab = self.tabBarController
+            {
+                tab.present(destVC, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(destVC, animated: true, completion: nil)
+            }
         }
         else if type == .chatScreen
         {
           
-            //delete alert
-            let storyboard: UIStoryboard = UIStoryboard(name: "Account", bundle: Bundle.main)
-            let destVC = storyboard.instantiateViewController(withIdentifier: "DeleteAccountPopUpVC") as!  DeleteAccountPopUpVC
+            
+            let destVC = DeleteAccountPopUpVC.instantiate(fromAppStoryboard: .Account)
+
             destVC.comeFrom = kChat
+            destVC.comeFromScreen = comeFromScreen
             destVC.delegate=self
             destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-            self.present(destVC, animated: true, completion: nil)
-           
+            if let tab = self.tabBarController
+            {
+                tab.present(destVC, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(destVC, animated: true, completion: nil)
+            }
+        }
+        else if type == .ViewProfile ||  type == .ViewPostHangout ||  type == .ViewPostStory
+        {
+            self.dismiss(animated: true, completion: nil)
         }
         else{
             
-            let storyboard: UIStoryboard = UIStoryboard(name: "Stories", bundle: Bundle.main)
-           // var vc = storyboard.instantiateViewController(withIdentifier: "BlockReportPopUpVC") as!  StoriesVC
-            let destVC = storyboard.instantiateViewController(withIdentifier: "BlockReportPopUpVC") as!  BlockReportPopUpVC
+            let destVC = BlockReportPopUpVC.instantiate(fromAppStoryboard: .Stories)
             destVC.postID=self.post_id
             destVC.user_name=self.user_name
             destVC.UserID=self.view_user_id
             destVC.from_user_id=self.from_user_id
+            destVC.type = type
+            destVC.comeFromScreen = comeFromScreen
             destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
-            self.present(destVC, animated: true, completion: nil)
+            if let tab = self.tabBarController
+            {
+                tab.present(destVC, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(destVC, animated: true, completion: nil)
+            }
+            
         }
         
         
     }
     @IBAction func viewProfileAct(_ sender: UIButton)
     {
-        if type == .messageScreen
+        if type == .messageScreen || type == .ViewProfile || type == .ViewPostHangout ||  type == .ViewPostStory
         {
-            let storyboard: UIStoryboard = UIStoryboard(name: "Stories", bundle: Bundle.main)
-            let destVC = storyboard.instantiateViewController(withIdentifier: "BlockReportPopUpVC") as!  BlockReportPopUpVC
-            destVC.type = .messageScreen
+          
+            let destVC = BlockReportPopUpVC.instantiate(fromAppStoryboard: .Stories)
+            destVC.type = type//.messageScreen
             destVC.UserID=self.view_user_id
             destVC.user_name=self.user_name
+            destVC.postID = self.post_id
+            destVC.comeFromScreen = comeFromScreen
             destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
-            self.present(destVC, animated: true, completion: nil)
-            
+            if let tab = self.tabBarController
+            {
+                tab.present(destVC, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(destVC, animated: true, completion: nil)
+            }
         }else if type == .chatScreen{
-            let storyboard: UIStoryboard = UIStoryboard(name: "Account", bundle: Bundle.main)
-            let destVC = storyboard.instantiateViewController(withIdentifier: "RegretPopUpVC") as!  RegretPopUpVC
+           
+            let destVC = RegretPopUpVC.instantiate(fromAppStoryboard: .Account)
             destVC.type = .Prolong
+            destVC.view_user_id=self.view_user_id
+            destVC.comeFromScreen = comeFromScreen
             destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-            self.present(destVC, animated: true, completion: nil)
-        }
-        else{
-            self.dismiss(animated: false) {
-                self.delegate?.ClickNameAction(name: kViewProfile)
+            if let tab = self.tabBarController
+            {
+                tab.present(destVC, animated: true, completion: nil)
             }
+            else
+            {
+                self.present(destVC, animated: true, completion: nil)
+            }
+            
+        }
+       
+        
+        else{
+            if Connectivity.isConnectedToInternet {
+                self.dismiss(animated: false) {
+                    self.delegate?.ClickNameAction(name: kViewProfile)
+                }
+                     } else {
+
+                        self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+                    }
+           
          
         }
         
@@ -180,7 +283,7 @@ extension StoryMenuPopUpVC:deleteAccountDelegate
         }
     }
     
-    //MARK:-  shake user like
+    //MARK: -  shake user like
     
     func likeUnlikeAPI(other_user_id:String,action:String,like_mode:String,type:String)
     {
@@ -288,7 +391,7 @@ extension StoryMenuPopUpVC:deleteAccountDelegate
     
     func sendMatchBlockNoti_Method()
     {
-        print("sendSMS ")
+        debugPrint("sendSMS ")
     
         let dict2 = ["from_user_id":DataManager.Id,"to_user_id":self.view_user_id,"alert_type":"removematch"]
         SocketIOManager.shared.sendMatchBlockNoti(MessageChatDict: dict2)

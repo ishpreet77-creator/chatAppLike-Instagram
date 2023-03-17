@@ -7,8 +7,7 @@
 
 import UIKit
 import IQKeyboardManagerSwift
-
-
+import SkeletonView
 protocol SendFeedbackDelegate {
 
     func feedbackText(text:String)
@@ -17,11 +16,15 @@ protocol SendFeedbackDelegate {
 
 class SendFeedbackAlertVC: BaseVC {
 
+    @IBOutlet weak var viewSendBtn: UIView!
+    @IBOutlet weak var viewTextBack: UIView!
     @IBOutlet weak var txtViewFeedback: UITextView!
     @IBOutlet weak var topConst: NSLayoutConstraint!
     @IBOutlet weak var sendButtonConst: NSLayoutConstraint!
     @IBOutlet weak var blurView: UIVisualEffectView!
     
+    @IBOutlet weak var btnSendFeedback: UIButton!
+    @IBOutlet weak var lblTitle: UILabel!
     var delegate:SendFeedbackDelegate?
     var comeFrom = ""
     var fromBlock = false
@@ -29,6 +32,7 @@ class SendFeedbackAlertVC: BaseVC {
     var postID = ""
     var user_name = ""
     var type: ScreenType = .storiesScreen
+    var comeFromScreen: ScreenType = .storiesScreen
     var UserID = ""
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,7 +67,10 @@ class SendFeedbackAlertVC: BaseVC {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
          
-
+        self.lblTitle.text = kTellUsMore
+        
+        self.btnSendFeedback.setTitle(kSENDFEEDBACK, for: .normal)
+        self.btnSendFeedback.backgroundColor = ENABLECOLOR
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -105,11 +112,12 @@ class SendFeedbackAlertVC: BaseVC {
                 }
                 else
                 {
-                  
+                    self.showLoader()
                     self.blockReason = self.txtViewFeedback.text ?? ""
                     
-                    if type == .messageScreen
+                    if type == .messageScreen || type == .ViewProfile
                     {
+                        
                         self.call_User_Report_Block_Api(reason: self.blockReason)
                     }
                     else
@@ -160,6 +168,27 @@ class SendFeedbackAlertVC: BaseVC {
         sendButtonConst.constant = 26+32
     }
     
+    
+    func showLoader()
+    {
+        
+        
+        self.viewSendBtn.clipsToBounds=true
+        self.viewTextBack.clipsToBounds=true
+     
+        
+        self.viewTextBack.clipsToBounds=true
+        self.viewSendBtn.isSkeletonable=true
+        self.viewSendBtn.showAnimatedGradientSkeleton()
+        self.viewTextBack.showAnimatedGradientSkeleton()
+
+    }
+    func hideLoader()
+    {
+        self.viewTextBack.hideSkeleton()
+        self.viewSendBtn.hideSkeleton()
+    }
+    
 }
 
 extension SendFeedbackAlertVC:UITextViewDelegate {
@@ -181,14 +210,23 @@ extension SendFeedbackAlertVC
 
         data[ApiKey.kPost_id] = self.postID
    
-            data[ApiKey.kReason_text] = reason
+        data[ApiKey.kReason_text] = reason
         
+        var urlType:PostType = .story
+        if type == .ViewPostHangout || type == .ListHangout
+        {
+            urlType = .hangout
+        }
+        else
+        {
+            urlType = .story
+        }
             
             if Connectivity.isConnectedToInternet {
-              
-                self.callApiForReportBlock(data: data)
+                self.showLoader()
+                self.callApiForReportBlock(data: data,type:urlType)
              } else {
-                
+                 self.hideLoader()
                 self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
             }
         
@@ -196,28 +234,35 @@ extension SendFeedbackAlertVC
         
     }
     
-    func callApiForReportBlock(data:JSONDictionary)
+    func callApiForReportBlock(data:JSONDictionary,type:PostType = .story)
     {
     
-        StoriesVM.shared.callApiReportBlock(data: data, response: { (message, error) in
+        StoriesVM.shared.callApiReportBlock(data: data,type: type, response: { (message, error) in
             
             if error != nil
             {
-              
+                self.hideLoader()
                     self.showErrorMessage(error: error)
        
             }
             else{
-            
-                    let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-                    let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                self.hideLoader()
+                let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
                     destVC.type = .sendFeedback
+                destVC.comeFromScreen = self.comeFromScreen
+                   destVC.Alerttype = self.type
                     destVC.user_name=self.user_name
                     destVC.fromBlock="reported"
                     destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                     destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+                if let tab = self.tabBarController
+                {
+                    tab.present(destVC, animated: true, completion: nil)
+                }
+                else
+                {
                     self.present(destVC, animated: true, completion: nil)
-                          
+                }
             }
 
          
@@ -237,10 +282,10 @@ extension SendFeedbackAlertVC
         
             
             if Connectivity.isConnectedToInternet {
-              
+                self.showLoader()
                 self.call_Api_For_User_Report_Block(data: data)
              } else {
-                
+                 self.hideLoader()
                 self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
             }
         
@@ -253,16 +298,16 @@ extension SendFeedbackAlertVC
             
             if error != nil
             {
-            
+                self.hideLoader()
                         self.showErrorMessage(error: error)
 
                 
             }
             else{
-             
-                    let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-                    let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                self.hideLoader()
+                let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
                     destVC.type = .sendFeedback
+                destVC.comeFromScreen = self.comeFromScreen
                     destVC.Alerttype = .messageScreen
                     destVC.user_name=self.user_name
                 if  self.fromBlock
@@ -275,8 +320,14 @@ extension SendFeedbackAlertVC
                 }
                     destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                     destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+                if let tab = self.tabBarController
+                {
+                    tab.present(destVC, animated: true, completion: nil)
+                }
+                else
+                {
                     self.present(destVC, animated: true, completion: nil)
-                
+                }
                           
             }
 

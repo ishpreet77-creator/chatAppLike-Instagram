@@ -24,18 +24,20 @@ class ApiKey {
     static let kDetails =  "details"
     static let kNotifyKey =  "Notifykey"
     static let kDeviceType = "1"
-    //MARK:- Send OTP
+    //MARK: - Send OTP
     static let kOTPDATA = "saveOTPData"
     static let kPhoneNumber = "phone_number"
     static let kCountryCode = "country_code"
     static let kOtp = "otp"
     static let kId = "id"
+    static let kBirthday = "birthday"
+    
     static let k_Id = "_id"
     static let kChildrenId = "children_id"
     static let kDevicetype = "device_type"
     static let KDeviceToken = "device_token"
     static let KVoip_device_token = "voip_device_token"
-    //MARK:- Verify OTP
+    //MARK: - Verify OTP
     static let kUser = "user"
     static let kAuthToken = "authToken"
     static let kDeletedAt = "deletedAt"
@@ -44,7 +46,7 @@ class ApiKey {
     static let kSocial_id = "social_id"
     static let kSocial_type = "social_type"
     
-    //MARK:- Social Login
+    //MARK: - Social Login
 
     //MARK: Facebook
     static let kPicture = "picture"
@@ -59,6 +61,8 @@ class ApiKey {
     
     static let kTimezone = "timezone"
     static let kUsername = "username"
+    static let kfrom_story_only = "from_story_only"
+    
     static let kDOB = "dob"
     static let kLatitude = "latitude"
     static let kLongitude = "longitude"
@@ -98,7 +102,7 @@ class ApiKey {
     static let kChildren_selected = "children_selected"
     static let kHair_selected = "hair_selected"
     
-    //MARK:- Home page
+    //MARK: - Home page
     
     static let kOffset = "offset"
     static let kUsers = "users"
@@ -111,7 +115,7 @@ class ApiKey {
     static let kLike_mode = "like_mode"
     static let kStory_Id = "story_id"
     static let kHangout_Id = "hangout_id"
-    //MARK:- Edit profile
+    //MARK: - Edit profile
     static let kAge = "age"
     static let kJob_title = "job_title"
     static let kCompany_name = "company_name"
@@ -127,7 +131,7 @@ class ApiKey {
     static let kHeight = "height"
     
     
-    //MARK:- Unit
+    //MARK: - Unit
     
     static let kUnit = "unit"
     static let kNotification_settings = "notification_settings"
@@ -142,10 +146,12 @@ class ApiKey {
     static let knew_like_mail = "new_like_mail"
     static let knew_hangout_mail = "new_hangout_mail"
     static let kteam_flazhed = "team_flazhed"
+    static let knew_shake_push = "new_shake_push"
+    
     static let kUser_id = "user_id"
     
     
-    //MARK:- Post stories
+    //MARK: - Post stories
     
     static let kPost_listing = "post_listing"
     static let kPosts = "posts"
@@ -168,13 +174,13 @@ class ApiKey {
     static let kfilter_img = "filter_img"
     static let kfilter_video = "filter_video"
    
-    //MARK:- Facebook data
+    //MARK: - Facebook data
     
     static let kFacebook_data = "facebook_data"
     static let kInstagram_data = "instagram_data"
     
     
-    //MARK:- Hangout
+    //MARK: - Hangout
     
     static let kHangout_listing = "hangout_listing"
     static let kSubscription_id = "subscription_id"
@@ -198,6 +204,9 @@ class ApiKey {
     static let kFilter_type = "filter_type"
     static let kIs_like = "is_like"
     
+    static let kAction_type = "action_type"
+    
+    
     
     static let ksocial = "social"
     static let ktravel = "travel"
@@ -210,7 +219,7 @@ class ApiKey {
     static let kascending_age = "ascending_age"
     static let kdescending_age = "descending_age"
     
-    //MARK:- Chat module
+    //MARK: - Chat module
     static let kMatched_profile = "matched_profile"
     static let kOpen_status = "open_status"
     static let kFilter = "filter"
@@ -226,13 +235,41 @@ class ApiKey {
     static let kExtra_shake = "extra_shake"
     static let kMonth_up_to = "month_up_to"
     
+    static let kShake_radius = "shake_radius"
+    
+    
     static let kParlong = "Parlong"
     static let kSwiping = "Swiping"
     static let kShake = "Shake"
+    
+    
+    static let kHangout = "Hangout"
+    static let kStory = "Story"
+    static let kChating = "Chating"
+    
+    
     
     static let kTo_user_id = "to_user_id"
     static let kCall_type = "call_type"
     static let kRole_type = "role_type"
     static let kRegret_type = "type"
     
+    
+// MARK: Core Data Manager Keys
+    static let kAppName = "Flazhed"
+    static let kHangouts = "hangouts"
+    static let kHangoutListing = "HangoutListing"
+    static let kappData = "appData"
+    
+    static let kStoryListing = "StoryListing"
+    static let kStories = "stories"
+    
+    static let kMyProfile = "MyProfile"
+    static let kOwnProfile = "OwnProfile"
+    static let kProfileDetails = "profileDetails"
+    
+    static let kCoreDataEnLtityArray:[String] = [kHangoutListing,kMyProfile,kOwnProfile,kStoryListing]
+    
+    static let kChatData = "ChatData"
+    static let kChatDetails = "chatDetails"
 }

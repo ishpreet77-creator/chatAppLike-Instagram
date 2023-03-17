@@ -11,11 +11,13 @@
     import FBSDKLoginKit
     import FBSDKShareKit
     import FBSDKCoreKit
+    import SkeletonView
 
     class ShareStoryVC: BaseVC, DiscardDelegate,UITextViewDelegate {
         
         
         
+        @IBOutlet weak var viewTextBack: UIView!
         @IBOutlet weak var heightConst: NSLayoutConstraint!
         @IBOutlet weak var topConst: NSLayoutConstraint!
         @IBOutlet weak var storyImg: UIImageView!
@@ -28,9 +30,10 @@
         @IBOutlet weak var btnPlay: UIButton!
         
         var selectedIndex = 2
-        
+        var dataImage1 = Data()
+        var fromSetting=false
         override func viewDidLoad() {
-            
+            DataManager.currentScreen=kShare
             
             super.viewDidLoad()
             
@@ -62,12 +65,13 @@
                 self.btnPlay.isHidden=true
             }
             btnShare.isEnabled=false
-          
+            txtShare.text = ""
             setNeedsStatusBarAppearanceUpdate()
         }
         
         override func viewWillAppear(_ animated: Bool) {
             super.viewWillAppear(true)
+            
             self.heightConst.constant = NAVIHEIGHT
             self.topConst.constant = getStatusBarHeight()
             NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
@@ -83,8 +87,65 @@
                 btnShare.isEnabled=false
             }
             
-            txtShare.text = ""
+           
             txtShare.becomeFirstResponder()
+            
+            // Get the current authorization state.
+            let status = PHPhotoLibrary.authorizationStatus()
+
+            if (status == PHAuthorizationStatus.authorized) {
+                // Access has been granted.
+            }
+
+            else if (status == PHAuthorizationStatus.denied) {
+                // Access has been denied.
+                DispatchQueue.main.async {
+                    PHPhotoLibrary.requestAuthorization({ (newStatus) in
+
+                        if (newStatus == PHAuthorizationStatus.authorized) {
+
+                        }
+
+                        else {
+
+                        }
+                    })
+                }
+            }
+
+            else if (status == PHAuthorizationStatus.notDetermined) {
+
+                // Access has not been determined.
+                DispatchQueue.main.async {
+                    PHPhotoLibrary.requestAuthorization({ (newStatus) in
+
+                        if (newStatus == PHAuthorizationStatus.authorized) {
+
+                        }
+
+                        else {
+
+                        }
+                    })
+                }
+               
+            }
+
+            else if (status == PHAuthorizationStatus.restricted) {
+                // Restricted access - normally won't happen.
+                DispatchQueue.main.async {
+                    PHPhotoLibrary.requestAuthorization({ (newStatus) in
+
+                        if (newStatus == PHAuthorizationStatus.authorized) {
+
+                        }
+
+                        else {
+
+                        }
+                    })
+                }
+            }
         }
         
         override func viewWillDisappear(_ animated: Bool) {
@@ -107,8 +168,8 @@
         {
             //self.navigationController?.popViewController(animated: true)
             
-            let storyboard: UIStoryboard = UIStoryboard(name: "Stories", bundle: Bundle.main)
-            let destVC = storyboard.instantiateViewController(withIdentifier: "StoryDiscardVC") as!  StoryDiscardVC
+        
+            let destVC = StoryDiscardVC.instantiate(fromAppStoryboard: .Stories)
             destVC.delegate=self
             destVC.type = .discardPost
             if self.comeFrom.equalsIgnoreCase(string: "video")
@@ -122,7 +183,15 @@
             destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
             
-            self.present(destVC, animated: true, completion: nil)
+            if let tab = self.tabBarController
+            {
+                tab.present(destVC, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(destVC, animated: true, completion: nil)
+            }
+            
         }
         
         @IBAction func playAct(_ sender: UIButton)
@@ -133,19 +202,27 @@
             }
         }
         
-        //MARK:- popup delegate method
+        //MARK: - popup delegate method
         
         func showFacebookInstallPopup()
         {
-            let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-            let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+            let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
+
             destVC.delegate=self
             destVC.type = .BlockReportError
             destVC.user_name=kInstallFacebookAlert
             destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-            self.present(destVC, animated: true, completion: nil)
+            if let tab = self.tabBarController
+            {
+                tab.present(destVC, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(destVC, animated: true, completion: nil)
+            }
+            
         }
         
         func ClickNameAction(name: String)
@@ -153,9 +230,8 @@
             
             if name.equalsIgnoreCase(string: kDiscard)
             {
-              //  self.navigationController?.popViewController(animated: true)
-                let storyBoard = UIStoryboard.init(name: "Stories", bundle: nil)
-                let vc = storyBoard.instantiateViewController(withIdentifier: "StoryCameraVC") as! StoryCameraVC
+                let vc = NewStoryCameraVC.instantiate(fromAppStoryboard: .Stories)
+
                 vc.selectedIndex = self.selectedIndex
                 self.navigationController?.pushViewController(vc, animated: false)
             }
@@ -169,9 +245,11 @@
 //                        APPDEL.navigateToStories()
 //                    }
                     
-                    let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-                    let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+                    let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
                     vc.selectedIndex=1
+                    DataManager.comeFrom=kShare
+                    self.appDelegate?.storyVisitCount=0
                     self.navigationController?.pushViewController(vc, animated: true)
 
                 }
@@ -181,35 +259,60 @@
             else if name.equalsIgnoreCase(string: kShare)
             {
                 self.dismiss(animated: true) {
+                    if Connectivity.isConnectedToInternet
+                    {
                     if self.comeFrom.equalsIgnoreCase(string: "video")
                      {
-                        Indicator.sharedInstance.showIndicator()
+                        
                             let content: ShareVideoContent = ShareVideoContent()
                         
                         DispatchQueue.main.async {
-                          
+                            let status = PHPhotoLibrary.authorizationStatus()
+                            if (status == PHAuthorizationStatus.denied || status == PHAuthorizationStatus.notDetermined || status == PHAuthorizationStatus.restricted) {
+                                
+                                
+                                  debugPrint("Access has been denied.")
+                                  DispatchQueue.main.async {
+                                      self.openSettings2(message: PermissonType.kLibraryEnable)
+                                      PHPhotoLibrary.requestAuthorization({ (newStatus) in
+
+                                          if (newStatus == PHAuthorizationStatus.authorized) {
+
+                                          }
+
+                                          else {
+
+                                          }
+                                      })
+                                  }
+                                
+                              }
+                            else
+                            {
+                        
                         self.createAssetURL(url: self.url) { (url) in
-                            Indicator.sharedInstance.showIndicator()
+                            Indicator.sharedInstance.showIndicator2()
                             let video = ShareVideo()
                             video.videoURL = URL(string: url)//URL(string: url)
                                             content.video = video
                                 
                                 let videoURLs = self.url!//Bundle.main.url(forResource: "video", withExtension: "mp4")!
-                               let shareDialog = ShareDialog(fromViewController: self, content: content, delegate: nil)
+                        let shareDialog = ShareDialog(fromViewController: self, content: content, delegate: nil)
                            
                             shareDialog.shareContent = content
-                            shareDialog.mode = .native
-                            shareDialog.delegate = self
+                           
+                           // shareDialog.delegate = self
                            
                        if (shareDialog.canShow)
                         {
-                         
-                                shareDialog.show()
-                        Indicator.sharedInstance.hideIndicator()
+                           shareDialog.delegate=self
+                        shareDialog.show()
+                        Indicator.sharedInstance.hideIndicator2()
                       
                            
-                        } else {
-                            Indicator.sharedInstance.hideIndicator()
+                        }
+                            else {
+                            Indicator.sharedInstance.hideIndicator2()
                             
                             
                             self.showFacebookInstallPopup()
@@ -227,7 +330,7 @@
 //                                                            APPDEL.navigateToStories()
 //                                                        }
                                                         let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-                                                        let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+                                                        let vc = storyBoard.instantiateViewController(withIdentifier: "OldTapControllerVC") as! OldTapControllerVC
                                                         vc.selectedIndex=1
                                                         self.navigationController?.pushViewController(vc, animated: true)
                                                     }
@@ -237,6 +340,10 @@
                                 }
                                         
                         }
+                                
+                            }
+                          
+                            
                         
                     }
                      }
@@ -260,7 +367,7 @@
                                            actions: [
                                             {_ in
                                                 let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-                                                let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+                                                let vc = storyBoard.instantiateViewController(withIdentifier: "OldTapControllerVC") as! OldTapControllerVC
                                                 vc.selectedIndex=1
                                                 self.navigationController?.pushViewController(vc, animated: true)
                                             }
@@ -269,6 +376,12 @@
                             */
                         }
                     }
+                }
+                    else {
+                      
+                      self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+                  }
+                    
                 }
             
             }
@@ -285,6 +398,7 @@
             }
             else
             {
+                
                 self.callGetStoriesApi()
             }
             
@@ -302,7 +416,7 @@
             } else {
                 keyboardHeight = keyboardFrame.cgRectValue.height
             }
-            print(keyboardHeight)
+            debugPrint(keyboardHeight)
             if self.getDeviceModel() == "iPhone 6"
             {
                 btnButtomConst.constant = keyboardHeight+26
@@ -336,7 +450,7 @@
                         completion(thumbImage) //9
                     }
                 } catch {
-                    print(error.localizedDescription) //10
+                    debugPrint(error.localizedDescription) //10
                     DispatchQueue.main.async {
                         completion(nil) //11
                     }
@@ -372,6 +486,68 @@
             }
             return nil
         }
+        
+        
+        
+        
+        func showLoader()
+        {
+            Indicator.sharedInstance.showIndicator2()
+            /*
+            self.viewTextBack.clipsToBounds=true
+            self.btnPlay.clipsToBounds=true
+            self.btnShare.clipsToBounds=true
+
+            self.viewTextBack.isSkeletonable=true
+            self.btnPlay.isSkeletonable=true
+            self.btnShare.isSkeletonable=true
+
+            self.viewTextBack.showAnimatedGradientSkeleton()
+            self.btnPlay.showAnimatedGradientSkeleton()
+            self.btnShare.showAnimatedGradientSkeleton()
+            */
+            
+           // Indicator.sharedInstance.showIndicator2()
+            
+        }
+        func hideLoader()
+        {
+        
+            
+          //  Indicator.sharedInstance.hideIndicator2()
+            
+//            self.viewTextBack.hideSkeleton()
+//            self.btnPlay.hideSkeleton()
+//            self.btnShare.hideSkeleton()
+            
+            Indicator.sharedInstance.hideIndicator2()
+        }
+        
+       
+        func openSettings2(message:String = kSettingMessage)
+        {
+            DispatchQueue.main.async {
+                let vc = DeleteAccountPopUpVC.instantiate(fromAppStoryboard: .Account)
+                vc.comeFrom = kSetting
+                vc.messageType=message
+                self.fromSetting=true
+                vc.delegate=self
+                vc.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+                vc.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+                if let tab = self.tabBarController
+                {
+                    tab.present(vc, animated: true, completion: nil)
+                }
+                else
+                {
+                    self.present(vc, animated: true, completion: nil)
+                }
+                
+            }
+            // }
+            
+        }
+        
     }
     // MARK:- Extension Api Calls
     extension ShareStoryVC
@@ -387,18 +563,20 @@
             var imageData2 = Data()
             if self.comeFrom.equalsIgnoreCase(string: "video")
             {
+                self.showLoader()
                 
                 do{
                     imageData = try Data(contentsOf: url)
                 }catch{
-                    print("Unable to load audioData: \(error)")
+                    debugPrint("Unable to load audioData: \(error)")
                 }
              //   imageData2 = Data() //self.storyImg.image?.jpegData(compressionQuality: 1) ?? Data()
                 
                 let dataImage1 =  self.storyImg.image?.jpegData(compressionQuality: 1) ?? Data()
-                var imageSize1: Int = dataImage1.count
+                let imageSize1: Int = dataImage1.count
                 let size = Double(imageSize1) / 1000.0
                 //var  dataImage = Data()
+                /*
                 if size>1500
                 {
                     imageData2 =  self.storyImg.image?.jpegData(compressionQuality: 0.03) ?? Data()
@@ -424,8 +602,15 @@
                {
                 imageData2 =  self.storyImg.image?.jpegData(compressionQuality: 0.7) ?? Data()
                }
-                
-                
+                */
+                if size>500
+                {
+                    imageData2 =  self.storyImg.image?.jpegData(compressionQuality: kImageCompressGreaterThan500) ?? Data()
+                }
+                else
+                {
+                    imageData2 =  self.storyImg.image?.jpegData(compressionQuality: kImageCompressLessThan500) ?? Data()
+                }
                 
                 
                 if Connectivity.isConnectedToInternet
@@ -433,13 +618,13 @@
                     
                     self.addPostApi(image1: imageData, image2: imageData2, data: data, fileType: self.comeFrom)
                 } else {
-                    
+                    self.hideLoader()
                     self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
                 }
             }
             else
             {
-                
+                /*
                 imageData =  self.storyImg.image?.jpegData(compressionQuality: 1) ?? Data()
                 
                 let dataImage1 =  self.storyImg.image?.jpegData(compressionQuality: 1) ?? Data()
@@ -472,12 +657,13 @@
                 imageData =  self.storyImg.image?.jpegData(compressionQuality: 0.7) ?? Data()
                }
                 
+                */
                 if Connectivity.isConnectedToInternet
                 {
-                    
-                    self.addPostApi(image1: imageData, image2: imageData2, data: data, fileType: self.comeFrom)
+                    self.showLoader()
+                    self.addPostApi(image1: self.dataImage1, image2: imageData2, data: data, fileType: self.comeFrom)
                 } else {
-                    
+                    self.hideLoader()
                     self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
                 }
             }
@@ -492,12 +678,15 @@
             APIManager.callApiForMultiImages(image1: image1,image2: image2, data: data, imageParaName1: ApiKey.kFile_name, imageParaName2: ApiKey.kThumbnail, api: "post-story",fileType: fileType,successCallback: {
                 
                 (responseDict) in
-                print(responseDict)
+                debugPrint(responseDict)
                 
                 if  kSucess.equalsIgnoreCase(string: responseDict[ApiKey.kStatus] as? String ?? "")
                 {
-                    let storyboard: UIStoryboard = UIStoryboard(name: "Stories", bundle: Bundle.main)
-                    let destVC = storyboard.instantiateViewController(withIdentifier: "StoryDiscardVC") as!  StoryDiscardVC
+                    self.hideLoader()
+                    
+                
+                    let destVC = StoryDiscardVC.instantiate(fromAppStoryboard: .Stories)
+
                     destVC.delegate=self
                    // let cellData = self.MyHangoutData[sender.tag]
                    // self.hangout_id=cellData._id ?? ""
@@ -505,8 +694,14 @@
                     destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                     destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-                    self.present(destVC, animated: true, completion: nil)
-                    /*
+                    if let tab = self.tabBarController
+                    {
+                        tab.present(destVC, animated: true, completion: nil)
+                    }
+                    else
+                    {
+                        self.present(destVC, animated: true, completion: nil)
+                    }                    /*
                     if self.comeFrom == kVideo
                     {
                        
@@ -598,7 +793,7 @@
                                         },
                                         { [self]_ in
                                             
-                                            print("Yes click")
+                                            debugPrint("Yes click")
                                             let photo = SharePhoto(image: self.storyImg.image!, userGenerated: true)
                                             
                                             let content = SharePhotoContent()
@@ -639,9 +834,12 @@
                 }
                 else
                 {
+                    self.hideLoader()
                     let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
                     self.dismiss(animated: true) {
-                    self.openSimpleAlert(message: message)
+                   // self.openSimpleAlert(message: message)
+                        
+                        self.showNewErrorMessage(error: message)
                     }
                 }
                 
@@ -649,7 +847,8 @@
                 
             },  failureCallback: { (errorReason, error) in
                 self.dismiss(animated: true) {
-                    print(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+                    self.hideLoader()
+                    debugPrint(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
                     self.navigationController?.popViewController(animated: true)
                 }
                
@@ -661,8 +860,8 @@
     {
         func sharer(_ sharer: Sharing, didCompleteWithResults results: [String : Any])
         {
-            print(#function)
-            print(results)
+            debugPrint(#function)
+            debugPrint(results)
             
 //            if #available(iOS 13.0, *) {
 //
@@ -671,18 +870,21 @@
 //                // Fallback on earlier versions
 //                APPDEL.navigateToStories()
 //            }
-            let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+            self.hideLoader()
+            let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
             vc.selectedIndex=1
+            DataManager.comeFrom=kShare
+            self.appDelegate?.storyVisitCount=0
             self.navigationController?.pushViewController(vc, animated: true)
 
         }
         
         func sharer(_ sharer: Sharing, didFailWithError error: Error)
         {
-            print(#function)
+            debugPrint(#function)
             
-            print(error.localizedDescription)
+            debugPrint(error.localizedDescription)
 //            if #available(iOS 13.0, *) {
 //
 //                SCENEDEL?.navigateToStories()
@@ -691,15 +893,17 @@
 //                APPDEL.navigateToStories()
 //            }
             
-            let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+            let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
             vc.selectedIndex=1
+            DataManager.comeFrom=kShare
+            self.appDelegate?.storyVisitCount=0
             self.navigationController?.pushViewController(vc, animated: true)
         }
         
         func sharerDidCancel(_ sharer: Sharing)
         {
-            print(#function)
+            debugPrint(#function)
             
 //            if #available(iOS 13.0, *) {
 //
@@ -708,21 +912,23 @@
 //                // Fallback on earlier versions
 //                APPDEL.navigateToStories()
 //            }
-            let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+            let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
             vc.selectedIndex=1
+            DataManager.comeFrom=kShare
+            self.appDelegate?.storyVisitCount=0
             self.navigationController?.pushViewController(vc, animated: true)
         }
         
         func createAssetURL(url: URL, completion: @escaping (String) -> Void) {
          
-            Indicator.sharedInstance.showIndicator()
+           
     
                   let photoLibrary = PHPhotoLibrary.shared()
                   var videoAssetPlaceholder:PHObjectPlaceholder!
             DispatchQueue.main.async {
                   photoLibrary.performChanges({
-                   
+                      Indicator.sharedInstance.showIndicator2()
                       let request = PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: url)
                       videoAssetPlaceholder = request!.placeholderForCreatedAsset
                     
@@ -737,12 +943,14 @@
                               "assets-library://asset/asset.\(ext)?id=\(assetID)&ext=\(ext)"
 
                               completion(assetURLStr)
-                                Indicator.sharedInstance.hideIndicator()
+                                Indicator.sharedInstance.hideIndicator2()
                             }
                           }
+                      
                         else
                           {
-                            Indicator.sharedInstance.hideIndicator()
+                              
+                            Indicator.sharedInstance.hideIndicator2()
                           }
                   })
             }
@@ -752,17 +960,92 @@
         
     }
     
-extension ShareStoryVC:FeedbackAlertDelegate
+extension ShareStoryVC:FeedbackAlertDelegate,deleteAccountDelegate
     {
         func FeedbackAlertOkFunc(name: String)
         {
-         if name == kInstallFacebookAlert
+            if name == kInstallFacebookAlert
          {
-            let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-            let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+             
+                let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
             vc.selectedIndex=1
+             DataManager.comeFrom=kShare
+                self.appDelegate?.storyVisitCount=0
             self.navigationController?.pushViewController(vc, animated: true)
          }
+           
         
         }
+    
+    func showNewErrorMessage(error:String)
+    {
+
+        
+        if error.contains(kRunningOut)
+        {
+           
+            let vc = DeleteAccountPopUpVC.instantiate(fromAppStoryboard: .Account)
+            vc.comeFrom = kRunningOut
+            vc.message=error
+            vc.messageTitle=kNumberofStories
+            self.fromSetting=false
+            vc.delegate=self
+            vc.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+            vc.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+            if let tab = self.tabBarController
+            {
+                tab.present(vc, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(vc, animated: true, completion: nil)
+            }
+            
+        }
+        else
+        {
+            self.openSimpleAlert(message: error)
+        }
+        
+       
+    }
+    
+    func deleteAccountFunc(name: String) {
+        
+        
+        if name.equalsIgnoreCase(string: kRunningOut)
+        {
+        
+            let destVC = NewPremiumVC.instantiate(fromAppStoryboard: .Account)
+            destVC.type = .Story
+            destVC.subscription_type=kStory
+            destVC.popupShowIndex=2
+          //  destVC.delegate=self
+            destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+            destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+            
+            if let tab = self.tabBarController
+            {
+                tab.present(destVC, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(destVC, animated: true, completion: nil)
+            }
+            
+        }
+        else  if name == kCancel || self.fromSetting
+        {
+            let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
+            vc.selectedIndex=1
+             DataManager.comeFrom=kShare
+            self.appDelegate?.storyVisitCount=0
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+        
+    }
+    
+    
     }

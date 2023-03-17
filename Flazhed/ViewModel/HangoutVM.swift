@@ -25,6 +25,8 @@ class HangoutVM {
     var total_travel_count = 0
     var total_social_count = 0
    
+    var hangoutArr: JSONArray = []
+    var localHangoutArr: JSONArray = []
     
     private init(){}
 
@@ -103,13 +105,26 @@ class HangoutVM {
     }
     
     
+    func callApiGetHangoutLimit(data: JSONDictionary,response: @escaping responseCallBack)
+    {
+        APIManager.callApiGetHangoutLimit(data:data,successCallback: { (responseDict) in
+         
+            let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
+   
+            response(message, nil)
+        }) { (errorReason, error) in
+            response(nil, APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+        }
+    }
+    
+    
 }
 extension APIManager {
 
     class func callApiCreateHangout(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesHangout.createHangout(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -121,7 +136,7 @@ extension APIManager {
     class func callApiGetMyHangout(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesHangout.myHangouts(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -133,7 +148,7 @@ extension APIManager {
     class func callApiDeleteHangout(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesHangout.deleteHangout(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -147,7 +162,7 @@ extension APIManager {
     class func callApiGetOtherHangout(showIndiacter:Bool,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesHangout.otherHangouts(data: data).request(showIndiacter: showIndiacter,isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -160,7 +175,7 @@ extension APIManager {
     class func callApiGetHangoutDetail(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesHangout.detailHangout(data: data).request(isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -173,7 +188,20 @@ extension APIManager {
     class func callApiLikeDislikeHangout(showIndiacter:Bool=true,data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
         APIServicesHangout.likeDislikeHangout(data: data).request(showIndiacter:showIndiacter,isJsonRequest: true,success:{ (response) in
             if let responseDict = response as? JSONDictionary {
-                print(responseDict)
+                debugPrint(responseDict)
+
+                successCallback(responseDict)
+            } else {
+                successCallback([:])
+            }
+        }, failure: failureCallback)
+    }
+    
+    
+    class func callApiGetHangoutLimit(data: JSONDictionary,successCallback: @escaping JSONDictionaryResponseCallback,failureCallback: @escaping APIServiceFailureCallback){
+        APIServicesHangout.check_hangout_limit(data: data).request(isJsonRequest: true,success:{ (response) in
+            if let responseDict = response as? JSONDictionary {
+                debugPrint(responseDict)
 
                 successCallback(responseDict)
             } else {
@@ -183,7 +211,7 @@ extension APIManager {
     }
     
 }
-//MARK:- Parsing the data
+//MARK: - Parsing the data
 extension HangoutVM {
     
     func parseHangoutData(response: JSONDictionary){
@@ -223,7 +251,6 @@ extension HangoutVM {
             
         }
     }
-    
     func parseOtherHangoutData(response: JSONDictionary){
         if let data = response[ApiKey.kData] as? JSONDictionary
         {
@@ -260,5 +287,46 @@ extension HangoutVM {
             //}
         }
     }
+    
+    func localHangoutData(array: JSONArray, arrayCount: Int){
+        self.localHangoutArr.removeAll()
+        for data in array {
+            let LocalHangout = HangoutListDM.init(detail: data).json()
+            self.localHangoutArr.append(LocalHangout)
+        }
+        self.parseLocalHangoutListData(arrayCount: arrayCount)
+    }
+    
+    func parseLocalHangoutListData(arrayCount: Int) {
+        DispatchQueue.background(background: {
+            if arrayCount == 0 {
+                CoreDataManager.deleteRecords(entityName: ApiKey.kHangoutListing)
+                CoreDataManager.saveHangoutListData(array: self.localHangoutArr)
+            } else {
+                CoreDataManager.appendHangoutListData(array: self.localHangoutArr)
+            }
+        }, completion: {
+        //  print("Coredata \(CoreDataManager.fetchHangoutistData())")
+            self.localHangoutArr.removeAll()
+        })
+    }
+    
+    }
 
+// MARK:- String to Data Conversion
+extension HangoutVM {
+    func stringToData(string: String) -> Data {
+        if string.isEmpty {
+            return Data()
+        }
+        let url = URL(string: string)
+        var data = Data()
+        if let imageData = try? Data(contentsOf: url ?? URL(fileURLWithPath: kEmptyString))
+        {
+            data = imageData
+        }
+        return data
+    }
+    
+ 
 }

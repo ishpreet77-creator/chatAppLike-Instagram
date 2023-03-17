@@ -9,19 +9,21 @@ import CountryPickerView
 import SDWebImage
 
 class ProfilePicVC: BaseVC {
-    //MARK:- All outlets  
-    
+    //MARK: - All outlets  
+    @IBOutlet weak var imgBackground: UIImageView!
     @IBOutlet weak var lblOtpSent: UILabel!
-    @IBOutlet weak var topConst: NSLayoutConstraint!
     @IBOutlet weak var sendButtonConst: NSLayoutConstraint!
     @IBOutlet weak var imageCollectionView:DragDropCollectionView!
-    var images = [#imageLiteral(resourceName: "addImage"),#imageLiteral(resourceName: "addImage"),#imageLiteral(resourceName: "addImage"),#imageLiteral(resourceName: "addImage"),#imageLiteral(resourceName: "addImage"),#imageLiteral(resourceName: "addImage"),#imageLiteral(resourceName: "addImage"),#imageLiteral(resourceName: "addImage"),#imageLiteral(resourceName: "addImage")]
+    @IBOutlet weak var btnContinue: UIButton!
+    var images = [#imageLiteral(resourceName: "NewAddImage"),#imageLiteral(resourceName: "NewAddImage"),#imageLiteral(resourceName: "NewAddImage"),#imageLiteral(resourceName: "NewAddImage"),#imageLiteral(resourceName: "NewAddImage"),#imageLiteral(resourceName: "NewAddImage"),#imageLiteral(resourceName: "NewAddImage"),#imageLiteral(resourceName: "NewAddImage"),#imageLiteral(resourceName: "NewAddImage")]
     var imageArray1:[UIImage] = []
     
     var SelectedImages:[UIImage]=[]
     var screenSize: CGRect!
     var screenWidth: CGFloat!
     
+    var userGender  = ""
+    var userBirthDay  = ""
     var userName  = ""
     var imageUrlArray:[URL]=[]
     var userProfile:URL!
@@ -32,34 +34,17 @@ class ProfilePicVC: BaseVC {
     var imageWidth:CGFloat = 120.0
     override func viewDidLoad() {
         super.viewDidLoad()
-        print(userName)
-        print(userProfile)
+       // debugPrint(userName)
+       // debugPrint(userProfile)
         setUpUI()
     }
     
     func setUpUI()
     {
-        let attributedString: NSMutableAttributedString = NSMutableAttributedString(string: lblOtpSent.text ?? "")
-        attributedString.setColorForText(textForAttribute: kAddingAtLeast, withColor: UIColor.black)
-        attributedString.setColorForText(textForAttribute: k20x, withColor: TEXTCOLOR)
-     
 
-        lblOtpSent.attributedText = attributedString
-        
-        self.setCustomHeader(title: kProfilePicture, showBack: false, showMenuButton: false)
-        
-        if self.getDeviceModel() == "iPhone 6"
-        {
-            self.topConst.constant = TOPSPACING+STATUSBARHEIGHT+TOPLABELSAPACING
-        }
-        else if self.getDeviceModel() == "iPhone 8+"
-        {
-            self.topConst.constant = TOPSPACING+STATUSBARHEIGHT+TOPLABELSAPACING
-        }
-        else
-        {
-            self.topConst.constant = TOPSPACING+TOPLABELSAPACING
-        }
+        self.lblOtpSent.text = kAddingAtLeast
+
+  
         
         imageCollectionView.register(UINib(nibName: "EditProfileCell", bundle: nil), forCellWithReuseIdentifier: "EditProfileCell")
         imageCollectionView.delegate=self
@@ -69,39 +54,45 @@ class ProfilePicVC: BaseVC {
             screenSize = UIScreen.main.bounds
             screenWidth = screenSize.width-6
            
-        if userProfile != nil
-        {
+        ///if userProfile != nil
+      //  {
             self.imageCollectionView.isHidden=false
             self.viewAddImage.isHidden=true
-        }
-        else
-        {
-            self.imageCollectionView.isHidden=true
+     //   }
+//        else
+//        {
+//            self.imageCollectionView.isHidden=true
+//
+//            self.viewAddImage.isHidden=false
+//        }
 
-            self.viewAddImage.isHidden=false
-        }
-
-      //  self.imageCollectionView.dragInteractionEnabled = true
-      //  self.imageCollectionView.dragDelegate = self
-      //  self.imageCollectionView.dropDelegate = self
-      //  imageCollectionView.reorderingCadence = .fast
         
         imageCollectionView.draggingDelegate = self
         imageCollectionView.enableDragging(true)
+        self.imgBackground.loadingGif(gifName: "backgound_Gif",placeholderImage: "NewLoginBackground")
+        self.btnContinue.setTitle(self.btnContinue.titleLabel?.text?.uppercased(), for: .normal)
+        self.btnContinue.setTitle(self.btnContinue.titleLabel?.text?.uppercased(), for: .selected)
         
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         self.view.endEditing(true)
-      
+        imageCollectionView.enableDragging(true)
+        validationNexButton()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
+        imageCollectionView.enableDragging(false)
         super.viewWillDisappear(animated)
         self.view.endEditing(true)
     }
-   
+    //MARK: - backBtnAction
+
+    @IBAction func backBtnAction(_ sender: UIButton) {
+     
+        self.navigationController?.popViewController(animated: true)
+    }
     
     @IBAction func AddPicAct(_ sender: UIButton)
     {
@@ -122,18 +113,20 @@ class ProfilePicVC: BaseVC {
     @IBAction func NextAct(_ sender: UIButton)
     {
       
-        print(self.SelectedImages)
+        debugPrint(self.SelectedImages)
         if let message = validateData()
         {
             self.openSimpleAlert(message: message)
         }
         else
         {
-                    let vc = self.storyboard?.instantiateViewController(withIdentifier: "UserNameVC") as! UserNameVC
-                    vc.imageArray1=self.SelectedImages
+            let vc = UserNameVC.instantiate(fromAppStoryboard: .Main)
+                vc.imageArray1=self.SelectedImages
                     vc.userName=self.userName
+            vc.userGender=self.userGender
+            vc.userBirthDay=self.userBirthDay
             
-                    self.navigationController?.pushViewController(vc, animated: true)
+            self.navigationController?.pushViewController(vc, animated: true)
         }
         
         
@@ -171,11 +164,9 @@ class ProfilePicVC: BaseVC {
     // MARK:- validateData Functions
     private func validateData () -> String?
     {
-        if self.SelectedImages.count == 0 {
+        if self.SelectedImages.count < 2 {
             return kEmptyImageAlert
         }
-       
-    
         return nil
      }
     
@@ -185,7 +176,23 @@ class ProfilePicVC: BaseVC {
         
         CustomImagePickerView.sharedInstace.delegate = self
     }
-
+    //MARK: - validationNexButton
+    
+    func validationNexButton()
+    {
+        debugPrint("SelectedImages = \(self.SelectedImages.count)")
+        if  self.SelectedImages.count < 2
+        {
+            self.btnContinue.isEnabled=false
+            self.btnContinue.backgroundColor = DISABLECOLOR
+        }
+        
+        else
+        {
+            self.btnContinue.backgroundColor = ENABLECOLOR
+            self.btnContinue.isEnabled=true
+        }
+    }
 }
 
 extension ProfilePicVC:CountryPickerViewDataSource,CustomImagePickerDelegate
@@ -203,9 +210,20 @@ extension ProfilePicVC:CountryPickerViewDataSource,CustomImagePickerDelegate
        // let dataImage =  image.jpegData(compressionQuality: 0.7) ?? Data()
         
         let dataImage1 =  image.jpegData(compressionQuality: 1) ?? Data()
-        var imageSize1: Int = dataImage1.count
+        let imageSize1: Int = dataImage1.count
         let size = Double(imageSize1) / 1000.0
-        var  dataImage = Data()
+            var  dataImage = Data()
+           
+            if size>500
+                    {
+                        dataImage =  image.jpegData(compressionQuality: kImageCompressGreaterThan500) ?? Data()
+                    }
+                    else
+                    {
+                        dataImage =  image.jpegData(compressionQuality: kImageCompressLessThan500) ?? Data()
+                    }
+            /*
+       
         if size>1500
         {
             dataImage =  image.jpegData(compressionQuality: 0.03) ?? Data()
@@ -231,19 +249,49 @@ extension ProfilePicVC:CountryPickerViewDataSource,CustomImagePickerDelegate
        {
         dataImage =  image.jpegData(compressionQuality: 0.7) ?? Data()
        }
-        
+        */
       
         
          APIManager.callApiForImageCheck(image1: dataImage,imageParaName1: kMedia, api: "",successCallback: {
              
              (responseDict) in
-             print(responseDict)
+             debugPrint(responseDict)
             let data =   self.parseImageCheckData(response: responseDict)
             
             if kSucess.equalsIgnoreCase(string: responseDict[ApiKey.kStatus] as? String ?? "")//responseDict[ApiKey.kStatus] as? String == kSucess
              {
 
-                 print(data)
+                let weapon = data?.weapon ?? 0.0
+                let drugs = data?.drugs ?? 0.0
+                let partial = data?.nudity?.partial ?? 0.0
+                if weapon>kNudityCheck || drugs>kNudityCheck || partial>kNudityCheck
+                {
+                    self.dismiss(animated: true) {
+                     self.openSimpleAlert(message: kImageCkeckAlert)
+                    }
+
+                }
+                else
+                {
+                   self.dismiss(animated: true, completion: nil)
+                   self.SelectedImages.append(image)
+                   self.imageCollectionView.reloadData()
+                   
+                  // if self.SelectedImages.count>0
+                  // {
+                       self.imageCollectionView.isHidden=false
+                       self.viewAddImage.isHidden=true
+                  // }
+                  // else
+                   //{
+                     //  self.imageCollectionView.isHidden=true
+
+                       //self.viewAddImage.isHidden=false
+                  // }
+                }
+                
+                /*
+                 debugPrint(data)
                  if data?.weapon ?? 0.0 > kNudityCheck
                  {
                     self.dismiss(animated: true) {
@@ -266,24 +314,8 @@ extension ProfilePicVC:CountryPickerViewDataSource,CustomImagePickerDelegate
                      self.openSimpleAlert(message: kImageCkeckAlert)
                     }
                  }
-                 else
-                 {
-                    self.dismiss(animated: true, completion: nil)
-                    self.SelectedImages.append(image)
-                    self.imageCollectionView.reloadData()
-                    
-                    if self.SelectedImages.count>0
-                    {
-                        self.imageCollectionView.isHidden=false
-                        self.viewAddImage.isHidden=true
-                    }
-                    else
-                    {
-                        self.imageCollectionView.isHidden=true
-
-                        self.viewAddImage.isHidden=false
-                    }
-                 }
+                */
+                
                  
              }
              else
@@ -310,7 +342,7 @@ extension ProfilePicVC:CountryPickerViewDataSource,CustomImagePickerDelegate
          },  failureCallback: { (errorReason, error) in
             self.dismiss(animated: true, completion: nil)
 
-             print(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+             debugPrint(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
              
          })
            
@@ -368,8 +400,8 @@ extension ProfilePicVC:UICollectionViewDataSource,UICollectionViewDelegate {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EditProfileCell", for: indexPath) as! EditProfileCell
         
-        
         cell.profileImage.contentMode = .scaleAspectFill
+        
         if SelectedImages.count == 0
         {
             if userProfile != nil
@@ -385,11 +417,13 @@ extension ProfilePicVC:UICollectionViewDataSource,UICollectionViewDelegate {
                     
                     
                     cell.crossButton.addTarget(self, action: #selector(self.DeleteImageAct), for: UIControl.Event.touchUpInside)
+                    cell.profileImage.contentMode = .scaleAspectFill
                 }
                 }
                 else
                 {
                     cell.profileImage.image=images[indexPath.row]
+                    cell.profileImage.contentMode = .scaleToFill
                 }
             }
             
@@ -402,12 +436,14 @@ extension ProfilePicVC:UICollectionViewDataSource,UICollectionViewDelegate {
                 if indexPath.row == 0
                 {
                     cell.profileImage.sd_setImage(with: userProfile, completed: nil)
+                    cell.profileImage.contentMode = .scaleAspectFill
                 }
                 else
                 {
                     if indexPath.row<self.SelectedImages.count-1
                     {
                         cell.profileImage.image = SelectedImages[indexPath.row-1]
+                        cell.profileImage.contentMode = .scaleAspectFill
                     }
                 
                    
@@ -419,6 +455,7 @@ extension ProfilePicVC:UICollectionViewDataSource,UICollectionViewDelegate {
                 if indexPath.row < self.SelectedImages.count
                 {
                     cell.profileImage.image = SelectedImages[indexPath.row]
+                    cell.profileImage.contentMode = .scaleAspectFill
                 }
                 
             }
@@ -430,7 +467,7 @@ extension ProfilePicVC:UICollectionViewDataSource,UICollectionViewDelegate {
             cell.crossButton.isHidden = false
             cell.profileImage.image = SelectedImages[indexPath.row]
            
-            
+            cell.profileImage.contentMode = .scaleAspectFill
             cell.crossButton.addTarget(self, action: #selector(DeleteImageAct), for: UIControl.Event.touchUpInside)
         }
         else {
@@ -464,12 +501,12 @@ extension ProfilePicVC:UICollectionViewDataSource,UICollectionViewDelegate {
                 }
             }
             cell.addButton.addTarget(self, action: #selector(addImageAct), for: .touchUpInside)
-
+            cell.profileImage.contentMode = .scaleToFill
 
         }
         
         
-        if cell.profileImage.image != UIImage(named: "addImage")
+        if cell.profileImage.image != UIImage(named: "NewAddImage")
         {
           
         if !self.SelectedImages.contains(cell.profileImage.image!)//self.imageArray1.contains(cell.profileImage.image!)
@@ -482,7 +519,7 @@ extension ProfilePicVC:UICollectionViewDataSource,UICollectionViewDelegate {
         cell.crossButton.tag=indexPath.row
         DataManager.imageCount=self.SelectedImages.count
         
-        
+        self.validationNexButton()
         return cell
   
     }
@@ -515,32 +552,32 @@ extension ProfilePicVC:UICollectionViewDataSource,UICollectionViewDelegate {
 
 
        }
-        if SelectedImages.count>0
-        {
+       // if SelectedImages.count>0
+       // {
             self.imageCollectionView.isHidden=false
             self.viewAddImage.isHidden=true
-        }
-        else
-        {
-            self.imageCollectionView.isHidden=true
+       // }
+        //else
+       // {
+          //  self.imageCollectionView.isHidden=true
 
-            self.viewAddImage.isHidden=false
-        }
+           // self.viewAddImage.isHidden=false
+       // }
         self.imageCollectionView.reloadData()
         DataManager.imageCount=self.SelectedImages.count
     }
     
 }
 
-// MARK:- Extension UICollectionViewDelegateFlowLayout
+// MARK: - Extension UICollectionViewDelegateFlowLayout
 extension ProfilePicVC:UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
      
             let size = collectionView.frame.size
-        self.imageHeight = (size.height/3-3)
-        self.imageWidth = (size.width/3-3)
-            return CGSize(width:size.width/3-3  , height: (size.height/3-3))
+        self.imageHeight = (size.height/3-8)
+        self.imageWidth = (size.width/3-8)
+            return CGSize(width:size.width/3-8  , height: (size.height/3-8))
         
         
     }
@@ -549,11 +586,11 @@ extension ProfilePicVC:UICollectionViewDelegateFlowLayout {
         return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return 3
+        return 8
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return 3
+        return 8
         
     }
     

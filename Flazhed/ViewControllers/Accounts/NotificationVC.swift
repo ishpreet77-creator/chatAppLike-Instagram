@@ -9,12 +9,21 @@ import UIKit
 
 class NotificationVC: BaseVC {
     
-    // MARK:- Variables
-    var list = ["NEW MATCHES","NEW MESSAGES","NEW LIKES"]//,"HANGOUT REQUESTS"]
+    // MARK: - Variables
+    var email = ["NEW MATCHES","NEW MESSAGES","NEW LIKES"]//,"HANGOUT REQUESTS"]
+    var notification = [kNEWMATCHES,kNEWMESSAGESL,kNewShakes]
+    
     var selectedIndexPushTable:[Int] = []
     var selectedIndexEmailTable = [Int]()
     
-    // MARK:- IBOutlets
+    // MARK: - IBOutlets
+    @IBOutlet weak var lblTitle: UILabel!
+    @IBOutlet weak var viewPromotion: UIView!
+    @IBOutlet weak var lblPromotion: UILabel!
+    @IBOutlet weak var viewEmail: UIView!
+    @IBOutlet weak var lblEmail: UILabel!
+    @IBOutlet weak var viewPush: UIView!
+    @IBOutlet weak var lblPush: UILabel!
     @IBOutlet weak var lblFlazhed: UILabel!
     @IBOutlet weak var imageFlazhed: UIImageView!
     @IBOutlet weak var tableViewPushNotification: UITableView!
@@ -32,7 +41,7 @@ class NotificationVC: BaseVC {
     var new_like_mail = 0
     var new_hangout_mail = 0
     var team_flazhed = 0
-    
+    var new_shake_push = 0
     var changesMade = false
     
     
@@ -45,6 +54,27 @@ class NotificationVC: BaseVC {
         tableViewEmail.register(UINib(nibName: "ListCell", bundle: nil), forCellReuseIdentifier: "ListCell")
         
         self.getNotificationSetup()
+        setUpUI()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        
+        //MARK: - Hide for CF
+        
+        self.viewPromotion.isHidden=true
+        self.viewEmail.isHidden=true
+        self.lblEmail.isHidden=true
+        self.lblPromotion.isHidden=true
+    }
+    func setUpUI()
+    {
+        self.lblTitle.text = kNOTIFICATIONS.capitalized
+        self.lblPush.text = kPUSHNOTIFICATIONS
+        self.lblPush.textColor = PURPLECOLOR
+        
+       
+        
+        
     }
     
     // MARK:- IBActions
@@ -52,16 +82,16 @@ class NotificationVC: BaseVC {
     {
         DataManager.comeFrom = kViewProfile
         
-       if changesMade
-       {
-        self.updateNotificationSetting()
-       }
+        if changesMade
+        {
+            self.updateNotificationSetting()
+        }
         else
-       {
-        self.navigationController?.popViewController(animated: true)
-       }
+        {
+            self.navigationController?.popViewController(animated: true)
+        }
         
-       
+        
     }
     
     
@@ -69,7 +99,7 @@ class NotificationVC: BaseVC {
     @IBAction func flazhedBtnAction(_ sender: UIButton) {
         sender.isSelected = !sender.isSelected
         if sender.isSelected {
-            lblFlazhed.textColor = #colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1)
+            lblFlazhed.textColor = PURPLECOLOR
             imageFlazhed.image = #imageLiteral(resourceName: "SelectedCheck")
             self.team_flazhed=1
             
@@ -80,72 +110,89 @@ class NotificationVC: BaseVC {
         }
         
     }
+    
+    func showLoader()
+    {
+        
+        Indicator.sharedInstance.showIndicator3(views: [self.tableViewEmail,self.tableViewPushNotification,self.viewPromotion])
+        
+    }
+    func hideLoader()
+    {
+        
+        Indicator.sharedInstance.hideIndicator3(views: [self.tableViewEmail,self.tableViewPushNotification,self.viewPromotion])
+        
+    }
 }
 
-//MARK- extension UITableViewDelegate, UITableViewDataSource
+//MARK: - extension UITableViewDelegate, UITableViewDataSource
 extension NotificationVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return list.count
+        if  tableView == tableViewPushNotification {
+            return self.notification.count
+        }
+        return self.email.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if tableView == tableViewPushNotification {
             let cell = tableView.dequeueReusableCell(withIdentifier: "ListCell", for: indexPath) as! ListCell
             
-            cell.lbl.text = list[indexPath.row]
-          
+            //kNEWMATCHES,kNEWMESSAGESL,kNewShakes
+            cell.lbl.text = notification[indexPath.row].uppercased()
+            
             if indexPath.row==0
             {
-            if self.new_matches_push==1
-            {
-                cell.lbl.textColor = #colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1)
-                cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
-            }
-            else{
-                cell.lbl.textColor = UIColor.black
-                cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
-            }
+                if self.new_matches_push==1
+                {
+                    cell.lbl.textColor = PURPLECOLOR
+                    cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
+                }
+                else{
+                    cell.lbl.textColor = UIColor.black
+                    cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                }
             }
             else if indexPath.row==1
             {
-            if self.new_message_push==1
-            {
-                cell.lbl.textColor = #colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1)
-                cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
-            }
-            else{
-                cell.lbl.textColor = UIColor.black
-                cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
-            }
+                if self.new_message_push==1
+                {
+                    cell.lbl.textColor = PURPLECOLOR
+                    cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
+                }
+                else{
+                    cell.lbl.textColor = UIColor.black
+                    cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                }
             }
             else if indexPath.row==2
             {
-            if self.new_like_push==1
-            {
-                cell.lbl.textColor = #colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1)
-                cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
-            }
-            else{
-                cell.lbl.textColor = UIColor.black
-                cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
-            }
+                if self.new_shake_push==1
+                {
+                    cell.lbl.textColor = PURPLECOLOR
+                    cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
+                }
+                else{
+                    cell.lbl.textColor = UIColor.black
+                    cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                }
             }
             else if indexPath.row==3
             {
-            if self.new_hangout_push==1
-            {
-                cell.lbl.textColor = #colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1)
-                cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
-            }
-            else{
-                cell.lbl.textColor = UIColor.black
-                cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
-            }
+                if self.new_hangout_push==1
+                {
+                    cell.lbl.textColor = PURPLECOLOR
+                    cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
+                }
+                else{
+                    cell.lbl.textColor = UIColor.black
+                    cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                }
             }
             
             
-            if indexPath.row == self.list.count-1 {
+            if indexPath.row == self.notification.count-1 {
                 cell.bottomLineView.isHidden = true
             } else {
                 cell.bottomLineView.isHidden = false
@@ -154,66 +201,59 @@ extension NotificationVC: UITableViewDelegate, UITableViewDataSource {
             return cell
         }  else {
             let cell = tableView.dequeueReusableCell(withIdentifier: "ListCell", for: indexPath) as! ListCell
-            cell.lbl.text = list[indexPath.row]
-//            if selectedIndexEmailTable.contains(indexPath.row) {
-//                cell.lbl.textColor = #colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1)
-//                cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
-//            } else {
-//                cell.lbl.textColor = UIColor.black
-//                cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
-//            }
+            cell.lbl.text = email[indexPath.row]
             
             if indexPath.row==0
             {
-            if self.new_matches_mail==1
-            {
-                cell.lbl.textColor = #colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1)
-                cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
-            }
-            else{
-                cell.lbl.textColor = UIColor.black
-                cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
-            }
+                if self.new_matches_mail==1
+                {
+                    cell.lbl.textColor = PURPLECOLOR
+                    cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
+                }
+                else{
+                    cell.lbl.textColor = UIColor.black
+                    cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                }
             }
             else if indexPath.row==1
             {
-            if self.new_message_mail==1
-            {
-                cell.lbl.textColor = #colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1)
-                cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
-            }
-            else{
-                cell.lbl.textColor = UIColor.black
-                cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
-            }
+                if self.new_message_mail==1
+                {
+                    cell.lbl.textColor = PURPLECOLOR
+                    cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
+                }
+                else{
+                    cell.lbl.textColor = UIColor.black
+                    cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                }
             }
             else if indexPath.row==2
             {
-            if self.new_like_mail==1
-            {
-                cell.lbl.textColor = #colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1)
-                cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
-            }
-            else{
-                cell.lbl.textColor = UIColor.black
-                cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
-            }
+                if self.new_like_mail==1
+                {
+                    cell.lbl.textColor = PURPLECOLOR
+                    cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
+                }
+                else{
+                    cell.lbl.textColor = UIColor.black
+                    cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                }
             }
             else if indexPath.row==3
             {
-            if self.new_hangout_mail==1
-            {
-                cell.lbl.textColor = #colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1)
-                cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
-            }
-            else{
-                cell.lbl.textColor = UIColor.black
-                cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
-            }
+                if self.new_hangout_mail==1
+                {
+                    cell.lbl.textColor = PURPLECOLOR
+                    cell.selectImage.image = #imageLiteral(resourceName: "SelectedCheck")
+                }
+                else{
+                    cell.lbl.textColor = UIColor.black
+                    cell.selectImage.image = #imageLiteral(resourceName: "unselectedCheck")
+                }
             }
             
             
-            if indexPath.row == self.list.count-1 {
+            if indexPath.row == self.email.count-1 {
                 cell.bottomLineView.isHidden = true
             } else {
                 cell.bottomLineView.isHidden = false
@@ -229,7 +269,7 @@ extension NotificationVC: UITableViewDelegate, UITableViewDataSource {
         self.changesMade = true
         if tableView == tableViewPushNotification
         {
-           
+            
             if indexPath.row==0
             {
                 if self.new_matches_push==0
@@ -254,13 +294,13 @@ extension NotificationVC: UITableViewDelegate, UITableViewDataSource {
             }
             else if indexPath.row==2
             {
-                if self.new_like_push==0
+                if self.new_shake_push==0
                 {
-                    self.new_like_push=1
+                    self.new_shake_push=1
                 }
                 else
                 {
-                    self.new_like_push=0
+                    self.new_shake_push=0
                 }
             }
             else if indexPath.row==3
@@ -278,11 +318,11 @@ extension NotificationVC: UITableViewDelegate, UITableViewDataSource {
             tableViewPushNotification.reloadData()
         }
         else if tableView == tableViewEmail {
-//            if !selectedIndexEmailTable.contains(indexPath.row) {
-//                selectedIndexEmailTable.append(indexPath.row)
-//            }else if let index = selectedIndexEmailTable.firstIndex(of: indexPath.row) {
-//                selectedIndexEmailTable.remove(at: index)
-//            }
+            //            if !selectedIndexEmailTable.contains(indexPath.row) {
+            //                selectedIndexEmailTable.append(indexPath.row)
+            //            }else if let index = selectedIndexEmailTable.firstIndex(of: indexPath.row) {
+            //                selectedIndexEmailTable.remove(at: index)
+            //            }
             
             
             if indexPath.row==0
@@ -307,7 +347,7 @@ extension NotificationVC: UITableViewDelegate, UITableViewDataSource {
                     self.new_message_mail=0
                 }
             }
-        
+            
             else if indexPath.row==2
             {
                 if self.new_like_mail==0
@@ -338,13 +378,13 @@ extension NotificationVC: UITableViewDelegate, UITableViewDataSource {
 }
 extension NotificationVC
 {
-    //MARK:- Get notification  details
+    //MARK: - Get notification  details
     
     func getNotificationSetup()
     {
         
         if Connectivity.isConnectedToInternet {
-            
+            self.showLoader()
             self.getNotificationSetupApi()
         } else {
             
@@ -358,13 +398,16 @@ extension NotificationVC
         AccountVM.shared.callApiGetNotificationSetup(response: { (message, error) in
             if error != nil
             {
+                self.hideLoader()
                 self.showErrorMessage(error: error)
             }
             else{
+                self.hideLoader()
                 self.new_message_push=AccountVM.shared.notificationSetupData?.new_message_push ?? 0
                 self.new_matches_push=AccountVM.shared.notificationSetupData?.new_matches_push ?? 0
                 
                 self.new_like_push=AccountVM.shared.notificationSetupData?.new_like_push ?? 0
+                self.new_shake_push=AccountVM.shared.notificationSetupData?.new_shake_push ?? 0
                 self.new_hangout_push=AccountVM.shared.notificationSetupData?.new_hangout_push ?? 0
                 
                 self.new_message_mail=AccountVM.shared.notificationSetupData?.new_message_mail ?? 0
@@ -375,7 +418,7 @@ extension NotificationVC
                 self.team_flazhed=AccountVM.shared.notificationSetupData?.team_flazhed ?? 0
                 
                 if  self.team_flazhed == 1 {
-                    self.lblFlazhed.textColor = #colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1)
+                    self.lblFlazhed.textColor = PURPLECOLOR
                     self.imageFlazhed.image = #imageLiteral(resourceName: "SelectedCheck")
                     self.team_flazhed=1
                     
@@ -391,48 +434,50 @@ extension NotificationVC
         })
     }
     
-        func updateNotificationSetting()
+    func updateNotificationSetting()
+    {
+        
+        var data = JSONDictionary()
+        
+        data[ApiKey.knew_message_push] = self.new_message_push
+        data[ApiKey.knew_matches_push] = self.new_matches_push
+        data[ApiKey.knew_like_push] = self.new_like_push
+        data[ApiKey.knew_hangout_push] = self.new_hangout_push
+        
+        data[ApiKey.knew_message_mail] = self.new_message_mail
+        data[ApiKey.knew_matches_mail] = self.new_matches_mail
+        data[ApiKey.knew_like_mail] = self.new_like_mail
+        data[ApiKey.knew_hangout_mail] = self.new_hangout_mail
+        data[ApiKey.kteam_flazhed] = self.team_flazhed
+        data[ApiKey.knew_shake_push] = self.new_shake_push
+        if Connectivity.isConnectedToInternet
         {
-    
-            var data = JSONDictionary()
-    
-            data[ApiKey.knew_message_push] = self.new_message_push
-            data[ApiKey.knew_matches_push] = self.new_matches_push
-            data[ApiKey.knew_like_push] = self.new_like_push
-            data[ApiKey.knew_hangout_push] = self.new_hangout_push
+            self.showLoader()
+            self.updateNotificationSettingApi(data: data)
+        } else {
             
-            data[ApiKey.knew_message_mail] = self.new_message_mail
-            data[ApiKey.knew_matches_mail] = self.new_matches_mail
-            data[ApiKey.knew_like_mail] = self.new_like_mail
-            data[ApiKey.knew_hangout_mail] = self.new_hangout_mail
-            data[ApiKey.kteam_flazhed] = self.team_flazhed
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
+        
+    }
+    
+    
+    func updateNotificationSettingApi(data:JSONDictionary)
+    {
+        AccountVM.shared.callApiUpdateNotificationSetup(data: data, response: { (message, error) in
+            if error != nil
+            {
+                self.hideLoader()
+                self.showErrorMessage(error: error)
+            }
+            else{
+                self.hideLoader()
+                self.navigationController?.popViewController(animated: true)
+            }
             
-                if Connectivity.isConnectedToInternet {
-    
-                    self.updateNotificationSettingApi(data: data)
-                 } else {
-    
-                    self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
-                }
-    
-        }
-    
-    
-        func updateNotificationSettingApi(data:JSONDictionary)
-        {
-            AccountVM.shared.callApiUpdateNotificationSetup(data: data, response: { (message, error) in
-                if error != nil
-                {
-                    self.showErrorMessage(error: error)
-                }
-                else{
-    
-                    self.navigationController?.popViewController(animated: true)
-                }
-    
-    
-            })
-        }
+            
+        })
+    }
     
 }
 

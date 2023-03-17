@@ -13,7 +13,9 @@ protocol chatSortDelegate {
 
 
 class SortingAlertVC: UIViewController {
-
+    @IBOutlet weak var lblTitle: UILabel!
+    
+    @IBOutlet weak var btnApply: UIButton!
     @IBOutlet weak var unreadButton: UIButton!
     @IBOutlet weak var latestButton: UIButton!
     @IBOutlet weak var closetToMeButton: UIButton!
@@ -52,6 +54,12 @@ class SortingAlertVC: UIViewController {
             self.ShowSelectedOption(tag:2)
         }
         
+        self.latestButton.setTitle(kLATEST, for: .normal)
+        self.unreadButton.setTitle(kUNREAD, for: .normal)
+        self.closetToMeButton.setTitle(kCLOSESTTOME, for: .normal)
+        self.lblTitle.text = kSORT.capitalized
+        self.btnApply.setTitle(kAPPLY, for: .normal)
+        self.btnApply.backgroundColor = ENABLECOLOR
     }
     override var prefersStatusBarHidden: Bool {
         return true
@@ -93,8 +101,8 @@ class SortingAlertVC: UIViewController {
         {
             if  self.unreadButton.titleColor(for: .normal) == #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1) //self.unreadButton.isSelected==false
             {
-
-            unreadButton.setTitleColor(#colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1), for: .normal)
+                unreadButton.setTitleColor(PURPLECOLOR, for: .normal)
+//            unreadButton.setTitleColor(#colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1), for: .normal)
             latestButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
             closetToMeButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
                               
@@ -120,9 +128,9 @@ class SortingAlertVC: UIViewController {
             {
             
             unreadButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
-
-            latestButton.setTitleColor(#colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1), for: .normal)
-                
+                    latestButton.setTitleColor(PURPLECOLOR, for: .normal)
+//            latestButton.setTitleColor(#colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1), for: .normal)
+//
             closetToMeButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
                 
             unreadCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
@@ -150,7 +158,8 @@ class SortingAlertVC: UIViewController {
             {
             unreadButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
             latestButton.setTitleColor(#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), for: .normal)
-            closetToMeButton.setTitleColor(#colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1), for: .normal)
+                closetToMeButton.setTitleColor(PURPLECOLOR, for: .normal)
+//            closetToMeButton.setTitleColor(#colorLiteral(red: 0, green: 0.4078431373, blue: 1, alpha: 1), for: .normal)
             unreadCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
             latestCheckUncheckImage.image = #imageLiteral(resourceName: "unselectedCheck")
             closetToMeCheckUncheckImage.image = #imageLiteral(resourceName: "SelectedCheck")

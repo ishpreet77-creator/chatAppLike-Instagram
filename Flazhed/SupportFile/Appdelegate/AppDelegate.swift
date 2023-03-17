@@ -23,6 +23,9 @@ import AgoraRtcKit
 import AgoraRtmKit
 import CallKit
 import PushKit
+import Branch
+import GoogleAnalytics
+import FirebaseCore
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDelegate {
@@ -33,6 +36,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     var window: UIWindow?
      var provider: CXProvider?
     static var i=1;
+    var storyVisitCount = 0
+    var homeVisitCount = 0
+    var hangoutVisitCount = 0
+    var profileVisitCount = 0
+    var prefrenceVisitCount = 0
+    var chatVisitCount = 0
 
     var agoraKit: AgoraRtcEngineKit?
     var agoraRtmKit: AgoraRtmKit?
@@ -47,7 +56,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     var uuid = UUID()
     var isMessageNoti = false
     private lazy var appleCallKit = CallCenter(delegate: self)
-    //MARK:- For call
+    //MARK: - For call
     
     lazy private var backgroundTask: UIBackgroundTaskIdentifier = {
         let backgroundTask = UIBackgroundTaskIdentifier.invalid
@@ -67,9 +76,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     var kit = AgoraRtmKit(appId: AGORA_APP_ID, delegate: nil)
     
 
-    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
+    
         IQKeyboardManager.shared.enable = true
         IQKeyboardManager.shared.shouldResignOnTouchOutside = true
         IQKeyboardManager.shared.enableAutoToolbar = false
@@ -81,10 +89,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
         
         //
         
-        Thread.sleep(forTimeInterval: 3)
+        Thread.sleep(forTimeInterval: 2)
         callManager.setupCallKit()
         NotificationSetup()
         
+      
         if DataManager.isProfileCompelete
         {
             
@@ -108,16 +117,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
         {
             APPDEL.navigateToLogin()
         }
+        
+    
         clearFilter()
         
         
-                self.voipRegistration()
+        self.voipRegistration()
        
         
 //        let registry = PKPushRegistry(queue: nil)
 //        registry.delegate = self
 //        registry.desiredPushTypes = [PKPushType.voIP]
 //
+        Branch.getInstance().setIdentity("ios@deftsoft.info")
+        if #available(iOS 13.0, *) {
+            BranchScene.shared().initSession(launchOptions: launchOptions, registerDeepLinkHandler: { (params, error, scene) in
+                debugPrint("Param =\(String(describing: params))")
+                debugPrint("error =\(String(describing: error))")
+            })
+        } else {
+            // Fallback on earlier versions
+        }
+       
+        ConnectionManager.sharedInstance.observeReachability()
+        GoogleAnalyticsSetup()
+        DataManager.Language = kEmptyString.currentLanguage
         return true
     }
     
@@ -150,7 +174,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
         }
     }
     
-    //MARK:- Get device token
+    //MARK: - Get device token
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         
@@ -163,20 +187,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
         
         AppDelegate.DeviceToken = token
         
-        print("Device Token = \(token)")
-        
-        
+        debugPrint("Device Token = \(token)")
+    
         
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        print(error)
+        debugPrint(error)
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         UIApplication.shared.applicationIconBadgeNumber = 0// UIApplication.shared.applicationIconBadgeNumber+1
         
-        print("willPresent \(notification)")
+        debugPrint("willPresent \(notification)")
         if DataManager.isMessagePageOpen
         {
             completionHandler([])
@@ -193,8 +216,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
  
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void)
     {
-        print(#function)
-        print(userInfo)
+        debugPrint(#function)
+        debugPrint(userInfo)
         UIApplication.shared.applicationIconBadgeNumber = 0// UIApplication.shared.applicationIconBadgeNumber+1
         
 
@@ -203,11 +226,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        print("Do what ever you want")
+        debugPrint("Do what ever you want")
         UIApplication.shared.applicationIconBadgeNumber = 0
         
         let userInfo = response.notification.request.content.userInfo
-        print(userInfo)
+        debugPrint(userInfo)
         self.isMessageNoti=false
         if let details = userInfo["sendDetail"] as? JSONDictionary
         {
@@ -218,13 +241,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
             let likeMode = details["like_mode"] as? String ?? ""
             let story_id = details["story_id"] as? String ?? ""
             let hangout_id = details["hangout_id"] as? String ?? ""
-            print(id)
+            debugPrint(id)
             
             if Noti_type ==  "3"
             {
-                let storyBoard = UIStoryboard.storyboard(storyboard: .Home)
-                
-                let vc = storyBoard.instantiateViewController(withIdentifier: "MatchVC") as! MatchVC
+                let vc = MatchVC.instantiate(fromAppStoryboard: .Home)
+
                 vc.comefrom = kAppDelegate
                 vc.view_user_id = id
                 let navvc = UINavigationController(rootViewController: vc)
@@ -242,9 +264,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
             else  if Noti_type == "5"
             {
                 self.isMessageNoti=true
-                let storyBoard = UIStoryboard.storyboard(storyboard: .Chat)
                 
-                let vc = storyBoard.instantiateViewController(withIdentifier: "MessageVC") as! MessageVC
+                let vc = MessageVC.instantiate(fromAppStoryboard: .Chat)//storyBoard.instantiateViewController(withIdentifier: "MessageVC") as! MessageVC
                 vc.comfrom = kAppDelegate
                 vc.view_user_id=id
                 let navvc = UINavigationController(rootViewController: vc)
@@ -259,8 +280,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
                 }
                //
             }
-            else if Noti_type == "1"
+            //MARK: - Change notification redirection: Hangout Like: noti_type = "6";  Story Like : let noti_type = "9"; shake = 1, profile like = 2
+           
+            else if Noti_type == "1" || Noti_type == "6" || Noti_type == "2"
             {
+                /*
                 let storyBoard = UIStoryboard.storyboard(storyboard: .Home)
                 
                 let vc = storyBoard.instantiateViewController(withIdentifier: "ViewProfileVC") as! ViewProfileVC
@@ -280,13 +304,54 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
                     UIApplication.shared.keyWindow?.rootViewController = navvc
                     UIApplication.shared.keyWindow?.makeKeyAndVisible()
                 }
+                */
+                self.isMessageNoti=true
+                
+                let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)//storyBoard.instantiateViewController(withIdentifier: "MessageVC") as! MessageVC
+                vc.selectedIndex=2
+                let navvc = UINavigationController(rootViewController: vc)
+                navvc.navigationBar.isHidden = true
+                if UIApplication.shared.keyWindow == nil {
+                    self.window = UIWindow(frame: UIScreen.main.bounds)
+                    self.window?.rootViewController = navvc
+                    self.window?.makeKeyAndVisible()
+                }else {
+                    UIApplication.shared.keyWindow?.rootViewController = navvc
+                    UIApplication.shared.keyWindow?.makeKeyAndVisible()
+                }
+          //  self.navigateToHome(selectedIndex: 2)
             }
+         
+            
+            //Hangout update
+            
+            else if Noti_type == "11"
+            {
+                let vc = PostHangoutVC.instantiate(fromAppStoryboard: .Hangouts)
+
+                vc.comeFrom = kAppDelegate
+            
+                vc.view_user_id=id
+                vc.hangout_id=hangout_id
+                vc.fromEdit=true
+                let navvc = UINavigationController(rootViewController: vc)
+                
+                if UIApplication.shared.keyWindow == nil {
+                    self.window = UIWindow(frame: UIScreen.main.bounds)
+                    self.window?.rootViewController = navvc
+                    self.window?.makeKeyAndVisible()
+                }else {
+                    UIApplication.shared.keyWindow?.rootViewController = navvc
+                    UIApplication.shared.keyWindow?.makeKeyAndVisible()
+                }
+            }
+            
             else // if Noti_type == "6"
             {
                 let state = UIApplication.shared.applicationState
                 if state == .active || state == .inactive
                 {
-                   print("I'm active")
+                   debugPrint("I'm active")
                     NotificationCenter.default.post(name: Notification.Name("ViewProfileNotification"), object: nil, userInfo:details)
                     //["view_user_id":id,"likeMode":likeMode])
                     
@@ -296,11 +361,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
                 }
                 else
                 {
-                    print("I'm \(state)")
+                    debugPrint("I'm \(state)")
                     DataManager.comeFrom = kEmptyString
-                    let storyBoard = UIStoryboard.storyboard(storyboard: .Home)
-                    
-                    let vc = storyBoard.instantiateViewController(withIdentifier: "ViewProfileVC") as! ViewProfileVC
+                   
+                    let vc = ViewProfileVC.instantiate(fromAppStoryboard: .Home)//storyBoard.instantiateViewController(withIdentifier: "ViewProfileVC") as! ViewProfileVC
                     vc.comeFrom = kAppDelegate
                     vc.view_user_id=id
                     vc.likeMode=likeMode
@@ -323,7 +387,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
                     let vc = storyBoard.instantiateViewController(withIdentifier: "ViewProfileVC") as! ViewProfileVC
                     vc.comeFrom = kAppDelegate
                     //                let hangoutId = details["hangout_id"] as? String ?? ""
-                    //                print(hangoutId)
+                    //                debugPrint(hangoutId)
                     
                     vc.view_user_id=id
                     vc.likeMode=likeMode
@@ -353,7 +417,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
                     let vc = storyBoard.instantiateViewController(withIdentifier: "ViewProfileVC") as! ViewProfileVC
                     vc.comeFrom = kAppDelegate
                     //                let hangoutId = details["hangout_id"] as? String ?? ""
-                    //                print(hangoutId)
+                    //                debugPrint(hangoutId)
                     
                     vc.view_user_id=id
                     vc.likeMode=likeMode
@@ -372,10 +436,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
                  //
                 
 //                else if state == .inactive {
-//                   print("I'm inactive")
+//                   debugPrint("I'm inactive")
 //                }
 //                else if state == .background {
-//                   print("I'm in background")
+//                   debugPrint("I'm in background")
 //                }
                 
 
@@ -468,7 +532,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     
     
     func applicationDidEnterBackground(_ application: UIApplication) {
-        print(#function)
+        debugPrint(#function)
     
         Indicator.sharedInstance.hideIndicator()
         //        SocketIOManager.shared.disconnectSocket()
@@ -477,7 +541,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
         
     }
     func applicationWillTerminate(_ application: UIApplication) {
-        print(#function)
+        debugPrint(#function)
         APPDEL.timerBudgeCount?.invalidate()
         Indicator.sharedInstance.hideIndicator()
         DataManager.isMessagePageOpen=false
@@ -494,7 +558,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate,UNUserNotificationCenterDe
     
     func applicationWillResignActive(_ application: UIApplication) {
         Indicator.sharedInstance.hideIndicator()
-        print(#function)
+        debugPrint(#function)
     }
     
     
@@ -509,9 +573,9 @@ extension AppDelegate: GIDSignInDelegate {
         // Check for sign in error
         if let error = error {
             if (error as NSError).code == GIDSignInErrorCode.hasNoAuthInKeychain.rawValue {
-                print("The user has not signed in before or they have since signed out.")
+                debugPrint("The user has not signed in before or they have since signed out.")
             } else {
-                print("\(error.localizedDescription)")
+                debugPrint("\(error.localizedDescription)")
             }
             return
         }
@@ -531,8 +595,18 @@ extension Notification.Name {
 }
 extension AppDelegate {
     
+    
+//    func setUpBranchIO()
+//    {
+//
+//
+//    }
+//
+    
     func clearFilter()
     {
+        
+        self.hangoutVisitCount=0
         DataManager.isViewProfile=false
         DataManager.storyAllPostSelected=""
         DataManager.storyImageSelected=""
@@ -559,38 +633,34 @@ extension AppDelegate {
         
     }
     
-    func navigateToHome(userId:String = "") {
-        let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
-        vc.selectedIndex=2
-        if userId != ""
-        {
-            DataManager.HomeRefresh=true
-            DataManager.OtherUserId = userId
-            DataManager.comeFromTag=6
-        }
-        
+    func navigateToHome(userId:String = "",selectedIndex:Int = 2) {
+     
+ 
+        let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
         let nav = UINavigationController(rootViewController: vc)
+        vc.selectedIndex=selectedIndex
         nav.navigationBar.isHidden = true
         self.window = UIWindow(frame: UIScreen.main.bounds)
         self.window?.rootViewController = nav
         self.window?.makeKeyAndVisible()
-        
+    
     }
     func navigateToLogin() {
+        
         let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
-        let nav = UINavigationController(rootViewController: vc)
-        nav.navigationBar.isHidden = true
+       // let vc = storyBoard.instantiateViewController(withIdentifier: "LoginVC") as! LoginVC
+        let vc = storyBoard.instantiateViewController(withIdentifier: "loginNav") as! UINavigationController
+        //let nav = UINavigationController(rootViewController: vc)
+        vc.navigationBar.isHidden = true
         self.window = UIWindow(frame: UIScreen.main.bounds)
-        self.window?.rootViewController = nav
+        self.window?.rootViewController = vc
         self.window?.makeKeyAndVisible()
         
     }
     func navigateToSentShake()
     {
-        let storyBoard = UIStoryboard.init(name: "Home", bundle: nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "ShakeSentVC") as! ShakeSentVC
+    
+        let vc = ShakeSentVC.instantiate(fromAppStoryboard: .Shake)
         let nav = UINavigationController(rootViewController: vc)
         nav.navigationBar.isHidden = true
         self.window = UIWindow(frame: UIScreen.main.bounds)
@@ -601,10 +671,11 @@ extension AppDelegate {
     
     func navigateToStories()
     {
-        let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+      
+        
+        let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
         let nav = UINavigationController(rootViewController: vc)
-        vc.selectedIndex=1
+        vc.selectedIndex=2
         nav.navigationBar.isHidden = true
         self.window = UIWindow(frame: UIScreen.main.bounds)
         self.window?.rootViewController = nav
@@ -612,23 +683,12 @@ extension AppDelegate {
         
     }
     
-    func navigateToProfile()
-    {
-        let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
-        let nav = UINavigationController(rootViewController: vc)
-        vc.selectedIndex=4
-        nav.navigationBar.isHidden = true
-        self.window = UIWindow(frame: UIScreen.main.bounds)
-        self.window?.rootViewController = nav
-        self.window?.makeKeyAndVisible()
-        
-    }
+  
     
     func navigateToHangout()
     {
-        let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+       
+        let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
         let nav = UINavigationController(rootViewController: vc)
         vc.selectedIndex=0
         nav.navigationBar.isHidden = true
@@ -640,8 +700,8 @@ extension AppDelegate {
     
     func navigateToChat()
     {
-        let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+        let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
         let nav = UINavigationController(rootViewController: vc)
         vc.selectedIndex=3
         nav.navigationBar.isHidden = true
@@ -729,7 +789,7 @@ extension AppDelegate {
     let vc = storyBoard.instantiateViewController(withIdentifier: "ViewProfileVC") as! ViewProfileVC
     vc.comeFrom = kAppDelegate
     //                let hangoutId = details["hangout_id"] as? String ?? ""
-    //                print(hangoutId)
+    //                debugPrint(hangoutId)
     
         vc.view_user_id  = details["from_user_id"] as? String ?? ""
         
@@ -762,7 +822,7 @@ extension AppDelegate {
     }
 
 }
-//MARK:- For call
+//MARK: - For call
 
 extension AppDelegate
 {
@@ -784,11 +844,13 @@ extension AppDelegate
         //AIzaSyCMxGDqHae2l4uLVuAHNNFU5gd_ChoqXmo
 
         GADMobileAds.sharedInstance().start(completionHandler: nil)
+        GADMobileAds.sharedInstance().requestConfiguration.testDeviceIdentifiers = [(kGADSimulatorID as! String)]
+
     }
     
     
 }
-//MARK:- Google/facebook Url Methods
+//MARK: - Google/facebook Url Methods
 extension AppDelegate{
     
     @available(iOS 9.0, *)
@@ -818,13 +880,13 @@ extension AppDelegate:PKPushRegistryDelegate,CXProviderDelegate
         let token = pushCredentials.token.map { String(format: "%02.2hhx", $0) }.joined()
     
         AppDelegate.VOIPDeviceToken = token
-        print("Voip Device Token: \(token)")
+        debugPrint("Voip Device Token: \(token)")
         
     }
     
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
         
-        print("Payload =\(payload.dictionaryPayload as? [String : Any])")
+        debugPrint("Payload =\(payload.dictionaryPayload as? [String : Any])")
         self.provider?.reportCall(with: self.uuid, endedAt: Date(), reason: .remoteEnded)
         
         if !isCallOngoing,
@@ -837,7 +899,7 @@ extension AppDelegate:PKPushRegistryDelegate,CXProviderDelegate
             let rtmToken_subscriber = sendDetail["rtmToken_subscriber"] as? String ?? ""
             self.Agora_Rtm_Token=rtmToken_subscriber
            
-             let from_user_id = sendDetail["from_user_id"] as? String ?? ""
+            // let from_user_id = sendDetail["from_user_id"] as? String ?? ""
              //callManager.setConfiguration()
              self.VOIPDictionary = sendDetail
              //self.appleCallKit.showIncomingCall(of: callerName)
@@ -872,11 +934,11 @@ extension AppDelegate:PKPushRegistryDelegate,CXProviderDelegate
 //            self.Agora_RTM_Setup()
            
 //             if let kit = AgoraRtm.shared().kit {
-//                 print("self.from_user_id = \(DataManager.Id)")
+//                 debugPrint("self.from_user_id = \(DataManager.Id)")
 //
 //
 //                 kit.login(account: DataManager.Id, token: rtmToken_subscriber) { [unowned self] (error) in
-//                     print("App del rtm login error = \(error.localizedDescription)")
+//                     debugPrint("App del rtm login error = \(error.localizedDescription)")
 //                 }
 //             }
              DispatchQueue.main.async {
@@ -889,7 +951,7 @@ extension AppDelegate:PKPushRegistryDelegate,CXProviderDelegate
         }
 
         else {
-            print("else isCallOngoing")
+            debugPrint("else isCallOngoing")
         }
         
         self.getRTMTokenApi()
@@ -899,14 +961,14 @@ extension AppDelegate:PKPushRegistryDelegate,CXProviderDelegate
     
     func providerDidReset(_ provider: CXProvider)
     {
-        print(#function)
-        print("provider did reset \(provider)")
+        debugPrint(#function)
+        debugPrint("provider did reset \(provider)")
     }
-//MARK:- Answer call
+//MARK: - Answer call
     
         func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
-            print("Answer button tap")
-            print(#function)
+            debugPrint("Answer button tap")
+            debugPrint(#function)
             action.fulfill()
             
             let details = self.VOIPDictionary["object_data"] as? JSONDictionary ?? [:]
@@ -932,30 +994,30 @@ extension AppDelegate:PKPushRegistryDelegate,CXProviderDelegate
            
             
         }
-    //MARK:- Reject call
+    //MARK: - Reject call
         func provider(_ provider: CXProvider, perform action: CXEndCallAction)
         {
             if let inviter = AgoraRtm.shared().inviter  {
-                print("inviter =")
+                debugPrint("inviter =")
                 inviter.cancelLastOutgoingInvitation()//sendInvitation(peer: self.Other_user_id)
                 
                 
                 inviter.refuseLastIncomingInvitation {  [weak self] (error) in
-                   print("refuseLastIncomingInvitation =",error.localizedDescription)
+                   debugPrint("refuseLastIncomingInvitation =",error.localizedDescription)
                 }
             }
            
             self.leaveChannel(sendDetail: self.VOIPDictionary)
           //  NotificationCenter.default.post(name: Notification.Name("CallEndNotificationIdentifier"), object: nil)
-            print("Cancel button tap")
-            print(#function)
+            debugPrint("Cancel button tap")
+            debugPrint(#function)
             action.fulfill()
         }
     
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         
-        print("continue userActivity tap")
+        debugPrint("continue userActivity tap")
         guard let viewController = VideoCallingVC()  as? VideoCallingVC, let interaction = userActivity.interaction else {
             return false
         }
@@ -977,7 +1039,7 @@ extension AppDelegate:PKPushRegistryDelegate,CXProviderDelegate
     }
     
     func leaveChannel(sendDetail:JSONDictionary) {
-        print(#function)
+        debugPrint(#function)
         let details = sendDetail["object_data"] as? JSONDictionary ?? [:]
         self.agoraChannelName = details["chanel_name"] as? String ?? ""
         self.agoraToken = details["rtc_token_subscriber"] as? String ?? ""
@@ -986,14 +1048,14 @@ extension AppDelegate:PKPushRegistryDelegate,CXProviderDelegate
         
         self.agoraKit?.joinChannel(byToken: agoraToken, channelId: agoraChannelName, info: nil, uid: UInt(agoraChannelUID) ?? 0, joinSuccess: { [weak self] (channel, uid, elapsed) in
             
-            print("Join chanel \(channel) \(uid) \(elapsed)")
+            debugPrint("Join chanel \(channel) \(uid) \(elapsed)")
             if let weakSelf = self {
               //  weakSelf.agoraKit?.setEnableSpeakerphone(true)
                
                 UIApplication.shared.isIdleTimerDisabled = true
                 self?.agoraKit?.leaveChannel(nil)
                 AgoraRtcEngineKit.destroy()
-                print("leave channel call")
+                debugPrint("leave channel call")
                
                 self?.agoraKit = nil
                 
@@ -1002,7 +1064,7 @@ extension AppDelegate:PKPushRegistryDelegate,CXProviderDelegate
   
 //        self.agoraKit?.leaveChannel(nil)
 //        AgoraRtcEngineKit.destroy()
-//        print("leave channel call")
+//        debugPrint("leave channel call")
 //
 //        self.agoraKit = nil
         
@@ -1011,7 +1073,7 @@ extension AppDelegate:PKPushRegistryDelegate,CXProviderDelegate
     
 //    private func handleAudioCall(roomId: String, person: Person, token: String, uuid: UUID) {
 //        if let vc = Storyboards.Call.storyboard().instantiateViewController(withIdentifier: VoiceCallVC.className) as? VoiceCallVC  {
-//            print("UUID: setting \(uuid)")
+//            debugPrint("UUID: setting \(uuid)")
 //            vc.callUuid = uuid
 //            vc.person = person
 //            vc.chatRoomId = roomId
@@ -1050,11 +1112,11 @@ extension AppDelegate:PKPushRegistryDelegate,CXProviderDelegate
 //    }
     
 }
-//MARK:- CallCenterDelegate
+//MARK: - CallCenterDelegate
 
 extension AppDelegate: CallCenterDelegate {
     func callCenter(_ callCenter: CallCenter, answerCall session: String) {
-        print("callCenter answerCall")
+        debugPrint("callCenter answerCall")
                 
         if let inviter = AgoraRtm.shared().inviter {
             inviter.accpetLastIncomingInvitation()
@@ -1097,17 +1159,17 @@ extension AppDelegate: CallCenterDelegate {
          //   var data: (channel: String, remote: UInt)
          //   data.channel = channel
         //    data.remote = remote
-       // print("Video call")
+       // debugPrint("Video call")
            // self?.performSegue(withIdentifier: "DialToVideoChat", sender: data)
         //}
     }
     
     func callCenter(_ callCenter: CallCenter, declineCall session: String) {
-        print("callCenter declineCall")
+        debugPrint("callCenter declineCall")
         
         if let inviter = AgoraRtm.shared().inviter  {
             inviter.refuseLastIncomingInvitation {  [weak self] (error) in
-                print(error)
+                debugPrint(error)
                 
             }
         }
@@ -1116,7 +1178,7 @@ extension AppDelegate: CallCenterDelegate {
     }
     
     func callCenter(_ callCenter: CallCenter, startCall session: String) {
-        print("callCenter startCall")
+        debugPrint("callCenter startCall")
         
         guard let kit = AgoraRtm.shared().kit else {
             fatalError("rtm kit nil")
@@ -1178,26 +1240,26 @@ extension AppDelegate: CallCenterDelegate {
     }
     
     func callCenter(_ callCenter: CallCenter, muteCall muted: Bool, session: String) {
-        print("callCenter muteCall")
+        debugPrint("callCenter muteCall")
     }
     
     func callCenter(_ callCenter: CallCenter, endCall session: String) {
-        print("callCenter endCall")
+        debugPrint("callCenter endCall")
 
     }
     
     func callCenterDidActiveAudioSession(_ callCenter: CallCenter) {
         
-        print("callCenter didActiveAudioSession")
+        debugPrint("callCenter didActiveAudioSession")
 
     }
     
     func close(_ reason: HungupReason) {
-        print(#function)
-        print(reason)
+        debugPrint(#function)
+        debugPrint(reason)
     }
     
-    //MARK:- AGORA RTM setup
+    //MARK: - AGORA RTM setup
     /*
     func Agora_RTM_Setup()
     {
@@ -1215,15 +1277,15 @@ extension AppDelegate: CallCenterDelegate {
         
         
 //        kit.logout(completion: { logout in
-//            print("Rtm logout error \(logout.rawValue)")
+//            debugPrint("Rtm logout error \(logout.rawValue)")
 //        })
         
-        print("self.from_user_id = \(self.self_user_id)")
+        debugPrint("self.from_user_id = \(self.self_user_id)")
         
         
         kit.login(account: DataManager.Id, token: self.Agora_Rtm_Token) { [unowned self] (error) in
         
-            print("Rtm login error \(error)")
+            debugPrint("Rtm login error \(error)")
         }
 //        if let inviter = AgoraRtm.shared().inviter  {
 //            inviter.sendInvitation(peer: self.Other_user_id)
@@ -1233,7 +1295,7 @@ extension AppDelegate: CallCenterDelegate {
     }
     
     */
-    //MARK:- getRTMTokenApi
+    //MARK: - getRTMTokenApi
     func getRTMTokenApi()
     {
         ChatVM.shared.callApi_RTM_Token_Generate(showIndiacter: false, response: { (message, error) in
@@ -1245,7 +1307,7 @@ extension AppDelegate: CallCenterDelegate {
             {
                 let rtmToken = ChatVM.shared.Rtm_token
                 
-                print("RTM token = \(rtmToken)")
+                debugPrint("RTM token = \(rtmToken)")
                 let rtm = AgoraRtm.shared()
                 rtm.inviterDelegate = self
                 guard let kit = AgoraRtm.shared().kit else {
@@ -1254,7 +1316,7 @@ extension AppDelegate: CallCenterDelegate {
                 self.kit=kit
                 
                 kit.login(account: DataManager.Id, token: rtmToken) { [unowned self] (error) in
-                    print("Rtm login on home page error \(error)")
+                    debugPrint("Rtm login on home page error \(error)")
                     
                 }
                 
@@ -1267,41 +1329,60 @@ extension AppDelegate: CallCenterDelegate {
 
 extension AppDelegate: AgoraRtmInvitertDelegate {
     func inviter(_ inviter: AgoraRtmCallKit, didReceivedIncoming invitation: AgoraRtmInvitation) {
-        print(#function)
-        print("didReceivedIncoming")
+        debugPrint(#function)
+        debugPrint("didReceivedIncoming")
 
     }
 
     func inviter(_ inviter: AgoraRtmCallKit, remoteDidCancelIncoming invitation: AgoraRtmInvitation) {
-        print("App del remoteDidCancelIncoming")
+        debugPrint("App del remoteDidCancelIncoming")
         self.provider?.reportCall(with: self.uuid, endedAt: Date(), reason: .remoteEnded)
     }
 }
-//MARK:- RTM method
+//MARK: - RTM method
 
 extension AppDelegate:AgoraRtmDelegate
 {
     func rtmKit(_ kit: AgoraRtmKit, peersOnlineStatusChanged onlineStatus: [AgoraRtmPeerOnlineStatus]) {
-        print(#function ,(onlineStatus))
+        debugPrint(#function ,(onlineStatus))
     }
  
     func rtmKitTokenDidExpire(_ kit: AgoraRtmKit)
     {
-        print(#function ,(kit))
+        debugPrint(#function ,(kit))
     }
     
     func rtmKit(_ kit: AgoraRtmKit, connectionStateChanged state: AgoraRtmConnectionState, reason: AgoraRtmConnectionChangeReason) {
-        print(#function)
-        print(reason)
-        print(state)
+        debugPrint(#function)
+        debugPrint(reason)
+        debugPrint(state)
     }
     
     func rtmKit(_ kit: AgoraRtmKit, messageReceived message: AgoraRtmMessage, fromPeer peerId: String) {
         
-        print("\(message.text)")
-        print(#function , (peerId))
+        debugPrint("\(message.text)")
+        debugPrint(#function , (peerId))
         
     }
     
    
+}
+
+extension AppDelegate
+{
+    func GoogleAnalyticsSetup()
+    {
+        // Use Firebase library to configure APIs
+        FirebaseApp.configure()
+        if let gai = GAI.sharedInstance()  {
+            gai.tracker(withTrackingId: "YOUR_TRACKING_ID")
+            // Optional: automatically report uncaught exceptions.
+            gai.trackUncaughtExceptions = true
+
+            // Optional: set Logger to VERBOSE for debug information.
+            // Remove before app release.
+            gai.logger.logLevel = .verbose;
+        }
+      
+    }
 }

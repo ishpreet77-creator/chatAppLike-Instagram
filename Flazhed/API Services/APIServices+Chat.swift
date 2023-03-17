@@ -19,6 +19,11 @@ enum APIServicesChat:APIService {
     case Remove_Match(data: JSONDictionary)
     case Audio_Video_Call_Notification(data: JSONDictionary)
     case Rtm_Token_Generate
+    case save_video_call_record(data: JSONDictionary)
+    
+    case Current_Chat_Count(data: JSONDictionary)
+    case Current_Video_Call_Count
+    
     
     var path: String {
         var path = ""
@@ -52,6 +57,16 @@ enum APIServicesChat:APIService {
         case .Rtm_Token_Generate:
             path = BASE_URL.appending("rtm-token-generate")
             
+        case .save_video_call_record:
+            path = BASE_URL.appending("save-video-call-record")
+            
+        case .Current_Chat_Count:
+            path = BASE_URL.appending("count-for-active-chats")
+        case .Current_Video_Call_Count:
+            path = BASE_URL.appending("count-total-video-call-with-subs")
+            
+            
+            
         }
         return path
      }
@@ -84,6 +99,14 @@ enum APIServicesChat:APIService {
             resource = Resource(method: .post, parameters: data, headers:headerDict)
             
         case  .Rtm_Token_Generate:
+            resource = Resource(method: .get, parameters: nil, headers:headerDict)
+        case let .save_video_call_record(data):
+            resource = Resource(method: .post, parameters: data, headers:headerDict)
+            
+        case let .Current_Chat_Count(data):
+            resource = Resource(method: .post, parameters: data, headers:headerDict)
+            
+        case  .Current_Video_Call_Count:
             resource = Resource(method: .get, parameters: nil, headers:headerDict)
         }
         return resource

@@ -9,7 +9,7 @@ import UIKit
 
 class GoPremiumCell: UITableViewCell {
 
-    //MARK:- IBOutlets
+    //MARK: - IBOutlets
     @IBOutlet weak var discountView: UIView!
     @IBOutlet weak var lblDollar: UILabel!
     @IBOutlet weak var cellBG: UIView!

@@ -197,16 +197,16 @@ class AddressVC: BaseVC {
            let geocoder = GMSGeocoder()
            let coordinate = CLLocationCoordinate2DMake(lat,Long)
            
-           var currentAddress = String()
+        //   var currentAddress = String()
            
            geocoder.reverseGeocodeCoordinate(coordinate) { response , error in
                if let address = response?.firstResult() {
                    let lines = address.lines! as [String]
                    
-                   print("Response is = \(address)")
-                   print("Response is = \(lines)")
+                   debugPrint("Response is = \(address)")
+                   debugPrint("Response is = \(lines)")
                    
-                   currentAddress = lines.joined(separator: "\n")
+                  // currentAddress = lines.joined(separator: "\n")
                    
                }
 
@@ -242,8 +242,8 @@ extension AddressVC:GMSMapViewDelegate
 {
     func mapView (_ mapView: GMSMapView, didEndDragging didEndDraggingMarker: GMSMarker) {
 
-          print("Drag ended!")
-          print("Update Marker data if stored somewhere.")
+          debugPrint("Drag ended!")
+          debugPrint("Update Marker data if stored somewhere.")
 
       }
     
@@ -257,14 +257,14 @@ extension AddressVC:GMSMapViewDelegate
         let lat = coordinate.latitude
         let long = coordinate.longitude
 
-        print("Latitude: \(lat), Longitude: \(long)")
+        debugPrint("Latitude: \(lat), Longitude: \(long)")
         
         self.updateLocationoordinates(coordinates: coordinate)
         
         ReverseGeocoding.geocode(latitude: coordinate.latitude, longitude: coordinate.longitude, completion: { (placeMark, completeAddress, error) in
                     if let placeMark = placeMark, let completeAddress = completeAddress
                      {
-                           print("Address = \(completeAddress)")
+                           debugPrint("Address = \(completeAddress)")
                         self.hangoutLat="\(coordinate.latitude)"
                         self.hangoutLong="\(coordinate.longitude)"
                         self.txtAddress.text = completeAddress
@@ -272,7 +272,7 @@ extension AddressVC:GMSMapViewDelegate
                         
                        } else {
                        
-                        print(error)
+                        debugPrint(error)
                        }
         
                
@@ -284,11 +284,11 @@ extension AddressVC:GMSMapViewDelegate
     func mapView(_ mapView: GMSMapView, idleAt position: GMSCameraPosition)
     {
     
-        print(position)
+        debugPrint(position)
         ReverseGeocoding.geocode(latitude: position.target.latitude, longitude: position.target.longitude, completion: { (placeMark, completeAddress, error) in
                     if let placeMark = placeMark, let completeAddress = completeAddress
                      {
-                           print("Address = \(completeAddress)")
+                           debugPrint("Address = \(completeAddress)")
                         self.hangoutLat="\(position.target.latitude)"
                         self.hangoutLong="\(position.target.longitude)"
                         self.txtAddress.text = completeAddress
@@ -296,7 +296,7 @@ extension AddressVC:GMSMapViewDelegate
                         
                        } else {
                        
-                        print(error)
+                        debugPrint(error)
                        }
         
                
@@ -328,9 +328,9 @@ extension AddressVC: GMSAutocompleteViewControllerDelegate {
 
   // Handle the user's selection.
   func viewController(_ viewController: GMSAutocompleteViewController, didAutocompleteWith place: GMSPlace) {
-    print("Place name: \(String(describing: place.name))")
-    print("Place ID: \(String(describing: place.placeID))")
-    print("Place attributions: \(String(describing: place.attributions))")
+    debugPrint("Place name: \(String(describing: place.name))")
+    debugPrint("Place ID: \(String(describing: place.placeID))")
+    debugPrint("Place attributions: \(String(describing: place.attributions))")
     self.txtAddress.text=place.formattedAddress ?? ""
     CURRENTLAT=place.coordinate.latitude
     CURRENTLONG=place.coordinate.longitude
@@ -351,7 +351,7 @@ extension AddressVC: GMSAutocompleteViewControllerDelegate {
 
   func viewController(_ viewController: GMSAutocompleteViewController, didFailAutocompleteWithError error: Error) {
     // TODO: handle the error.
-    print("Error: ", error.localizedDescription)
+    debugPrint("Error: ", error.localizedDescription)
   }
 
   // User canceled the operation.
@@ -375,15 +375,15 @@ extension AddressVC: GMSAutocompleteResultsViewControllerDelegate {
                              didAutocompleteWith place: GMSPlace) {
         searchController?.isActive = false
         // Do something with the selected place.
-        print("Place name: \(String(describing: place.name))")
-        print("Place address: \(String(describing: place.formattedAddress))")
-        print("Place attributions: \(String(describing: place.attributions))")
+        debugPrint("Place name: \(String(describing: place.name))")
+        debugPrint("Place address: \(String(describing: place.formattedAddress))")
+        debugPrint("Place attributions: \(String(describing: place.attributions))")
       }
 
       func resultsController(_ resultsController: GMSAutocompleteResultsViewController,
                              didFailAutocompleteWithError error: Error){
         // TODO: handle the error.
-        print("Error: ", error.localizedDescription)
+        debugPrint("Error: ", error.localizedDescription)
       }
 
       // Turn the network activity indicator on and off again.

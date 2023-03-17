@@ -10,16 +10,39 @@ import UIKit
 
 extension UITextView
 {
-    func customFontText(boldSting:String,regularSting:String,fontSize:CGFloat?=14.0)
+    func customFontText(boldSting:String,regularSting:String,fontSize:CGFloat=14.0,spacing:CGFloat=8)
     {
 
-        let attributedText = NSMutableAttributedString(string: boldSting, attributes: [NSAttributedString.Key.font: UIFont(name: "Averta-Semibold", size: fontSize!)!])
-
-        attributedText.append(NSAttributedString(string: regularSting, attributes: [NSAttributedString.Key.font: UIFont(name: "Averta-Regular", size: 14)!]))
+//        let attributedText = NSMutableAttributedString(string: boldSting, attributes: [NSAttributedString.Key.font: UIFont(name: "Averta-Semibold", size: fontSize!)!])
+        let style = NSMutableParagraphStyle()
+        style.lineSpacing = 9.5
         
+        let attributedText = NSMutableAttributedString(string: boldSting, attributes: [NSAttributedString.Key.font: UIFont.CustomFont.bold.fontWithSize(size: fontSize),
+          NSAttributedString.Key.paragraphStyle : style])
+
+       // attributedText.append(NSAttributedString(string: regularSting, attributes: [NSAttributedString.Key.font: UIFont(name: "Averta-Regular", size: 14)!]))
+        
+        attributedText.append(NSAttributedString(string: regularSting, attributes: [NSAttributedString.Key.font: UIFont.CustomFont.regular.fontWithSize(size: 14),NSAttributedString.Key.paragraphStyle : style]))
+             
         //, NSAttributedStringKey.foregroundColor: UIColor.blue
 
         self.attributedText = attributedText
+
+       
+    }
+    
+    func TextSpacing(text:String,fontSize:CGFloat=14.0,spacing:CGFloat=8)
+    {
+
+        let style = NSMutableParagraphStyle()
+        style.lineSpacing = 9.5
+        
+        let attributedText = NSMutableAttributedString(string: text, attributes: [NSAttributedString.Key.font: UIFont.CustomFont.SemiBold.fontWithSize(size: fontSize),
+          NSAttributedString.Key.paragraphStyle : style])
+
+        self.attributedText = attributedText
+
+       
     }
 }
 extension UITextView{

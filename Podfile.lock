@@ -7,9 +7,9 @@ PODS:
     - AppAuth/ExternalUserAgent (= 1.4.0)
   - AppAuth/Core (1.4.0)
   - AppAuth/ExternalUserAgent (1.4.0)
+  - Branch (1.39.4)
   - CountryPickerView (3.1.3)
-  - CryptoSwift (1.3.8)
-  - FaveButton (3.2.1)
+  - CryptoSwift (1.4.2)
   - FBSDKCoreKit (9.3.0):
     - FBSDKCoreKit/Basics (= 9.3.0)
     - FBSDKCoreKit/Core (= 9.3.0)
@@ -24,17 +24,50 @@ PODS:
     - FBSDKShareKit/Share (= 9.3.0)
   - FBSDKShareKit/Share (9.3.0):
     - FBSDKCoreKit (~> 9.3.0)
+  - Firebase/Core (7.6.0):
+    - Firebase/CoreOnly
+    - FirebaseAnalytics (= 7.6.0)
+  - Firebase/CoreOnly (7.6.0):
+    - FirebaseCore (= 7.6.0)
+  - FirebaseAnalytics (7.6.0):
+    - FirebaseCore (~> 7.0)
+    - FirebaseInstallations (~> 7.0)
+    - GoogleAppMeasurement (= 7.6.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.0)
+    - GoogleUtilities/MethodSwizzler (~> 7.0)
+    - GoogleUtilities/Network (~> 7.0)
+    - "GoogleUtilities/NSData+zlib (~> 7.0)"
+    - nanopb (~> 2.30907.0)
+  - FirebaseCore (7.6.0):
+    - FirebaseCoreDiagnostics (~> 7.4)
+    - GoogleUtilities/Environment (~> 7.0)
+    - GoogleUtilities/Logger (~> 7.0)
+  - FirebaseCoreDiagnostics (7.9.0):
+    - GoogleDataTransport (~> 8.0)
+    - GoogleUtilities/Environment (~> 7.0)
+    - GoogleUtilities/Logger (~> 7.0)
+    - nanopb (~> 2.30907.0)
+  - FirebaseInstallations (7.11.0):
+    - FirebaseCore (~> 7.0)
+    - GoogleUtilities/Environment (~> 7.0)
+    - GoogleUtilities/UserDefaults (~> 7.0)
+    - PromisesObjC (~> 1.2)
   - Giphy (2.1.7):
     - libwebp
   - Google-Mobile-Ads-SDK (8.1.0):
     - GoogleAppMeasurement (~> 7.0)
     - GoogleUserMessagingPlatform (~> 1.1)
+  - GoogleAnalytics (3.20.0)
   - GoogleAppMeasurement (7.6.0):
     - GoogleUtilities/AppDelegateSwizzler (~> 7.0)
     - GoogleUtilities/MethodSwizzler (~> 7.0)
     - GoogleUtilities/Network (~> 7.0)
     - "GoogleUtilities/NSData+zlib (~> 7.0)"
     - nanopb (~> 2.30907.0)
+  - GoogleDataTransport (8.3.1):
+    - GoogleUtilities/Environment (~> 7.2)
+    - nanopb (~> 2.30907.0)
+    - PromisesObjC (~> 1.2)
   - GoogleMaps (4.2.0):
     - GoogleMaps/Maps (= 4.2.0)
   - GoogleMaps/Base (4.2.0)
@@ -64,6 +97,8 @@ PODS:
   - "GoogleUtilities/NSData+zlib (7.2.2)"
   - GoogleUtilities/Reachability (7.2.2):
     - GoogleUtilities/Logger
+  - GoogleUtilities/UserDefaults (7.2.2):
+    - GoogleUtilities/Logger
   - GTMAppAuth (1.1.0):
     - AppAuth/Core (~> 1.4)
     - GTMSessionFetcher (~> 1.4)
@@ -72,7 +107,6 @@ PODS:
   - GTMSessionFetcher/Core (1.5.0)
   - GTMSessionFetcher/Full (1.5.0):
     - GTMSessionFetcher/Core (= 1.5.0)
-  - InfiniteCarouselCollectionView (0.1.3)
   - IQKeyboardManagerSwift (6.5.6)
   - KeychainSwift (19.0.0)
   - libwebp (1.2.0):
@@ -84,6 +118,7 @@ PODS:
   - libwebp/mux (1.2.0):
     - libwebp/demux
   - libwebp/webp (1.2.0)
+  - ListPlaceholder (1.5)
   - nanopb (2.30907.0):
     - nanopb/decode (= 2.30907.0)
     - nanopb/encode (= 2.30907.0)
@@ -93,11 +128,11 @@ PODS:
   - SDWebImage (5.10.4):
     - SDWebImage/Core (= 5.10.4)
   - SDWebImage/Core (5.10.4)
+  - SkeletonView (1.25.2)
   - Socket.IO-Client-Swift (15.2.0):
     - Starscream (~> 3.1)
   - Starscream (3.1.1)
   - SwiftRangeControl (0.3)
-  - SwiftyCam (4.0.0)
   - SwiftyInsta (2.4.2):
     - CryptoSwift (~> 1.3)
     - KeychainSwift (~> 19.0)
@@ -106,23 +141,26 @@ DEPENDENCIES:
   - AgoraRtcEngine_iOS
   - AgoraRtm_iOS
   - Alamofire
+  - Branch
   - CountryPickerView
-  - FaveButton
   - FBSDKCoreKit (~> 9.3.0)
   - FBSDKLoginKit (~> 9.3.0)
   - FBSDKShareKit
+  - Firebase/Core
   - Giphy
   - Google-Mobile-Ads-SDK
+  - GoogleAnalytics
   - GoogleMaps
   - GooglePlaces
   - GoogleSignIn
-  - InfiniteCarouselCollectionView
   - IQKeyboardManagerSwift
+  - KeychainSwift
+  - ListPlaceholder
   - SDWebImage
+  - SkeletonView
   - Socket.IO-Client-Swift (~> 15.2.0)
   - SwiftRangeControl
-  - SwiftyCam
-  - SwiftyInsta (~> 2.0)
+  - SwiftyInsta
 
 SPEC REPOS:
   trunk:
@@ -130,15 +168,22 @@ SPEC REPOS:
     - AgoraRtm_iOS
     - Alamofire
     - AppAuth
+    - Branch
     - CountryPickerView
     - CryptoSwift
-    - FaveButton
     - FBSDKCoreKit
     - FBSDKLoginKit
     - FBSDKShareKit
+    - Firebase
+    - FirebaseAnalytics
+    - FirebaseCore
+    - FirebaseCoreDiagnostics
+    - FirebaseInstallations
     - Giphy
     - Google-Mobile-Ads-SDK
+    - GoogleAnalytics
     - GoogleAppMeasurement
+    - GoogleDataTransport
     - GoogleMaps
     - GooglePlaces
     - GoogleSignIn
@@ -146,17 +191,17 @@ SPEC REPOS:
     - GoogleUtilities
     - GTMAppAuth
     - GTMSessionFetcher
-    - InfiniteCarouselCollectionView
     - IQKeyboardManagerSwift
     - KeychainSwift
     - libwebp
+    - ListPlaceholder
     - nanopb
     - PromisesObjC
     - SDWebImage
+    - SkeletonView
     - Socket.IO-Client-Swift
     - Starscream
     - SwiftRangeControl
-    - SwiftyCam
     - SwiftyInsta
 
 SPEC CHECKSUMS:
@@ -164,15 +209,22 @@ SPEC CHECKSUMS:
   AgoraRtm_iOS: 178257883dd6773d3d26ca51045456c35221b715
   Alamofire: 2291f7d21ca607c491dd17642e5d40fdcda0e65c
   AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
+  Branch: d21c40c47b5c15c6ab709cdf7d965a50059e0546
   CountryPickerView: 383c09949f7455de9892db7ce3400b10da090150
-  CryptoSwift: 01b0f0cba1d5c212e5a335ff6c054fb75a204f00
-  FaveButton: 93cfebf6030336fa7653fad2068c3152ed668b39
+  CryptoSwift: a532e74ed010f8c95f611d00b8bbae42e9fe7c17
   FBSDKCoreKit: 0d1ae58388a458b8222f72025804cdc84eb5d0c3
   FBSDKLoginKit: aea68df6121c5e165ccae2fabfdc83c4644ee40f
   FBSDKShareKit: 70889c97c62f0c6b3ccb8b999e73a85f19024001
+  Firebase: e1e089d9aac215a52442583f818ab61de3c4581b
+  FirebaseAnalytics: 9f8f4feab1f3fddf4e4515f8f022fe6aa9e51043
+  FirebaseCore: 0a43b7f1c5b36f3358cd703011ca4c7e0df55870
+  FirebaseCoreDiagnostics: 3d36e05da74cb8b7ce30e6594a8f201b982c725c
+  FirebaseInstallations: a58d4f72ec5861840b84df489f2668d970df558a
   Giphy: 3bd0c57d981cc8c7e0521d4a48f81353173186f9
   Google-Mobile-Ads-SDK: efb7fb74595668fbbe680f0d1c06f9a8ff694c7c
+  GoogleAnalytics: 01e4c5a04544a3608f93e970ce0817836897c5a5
   GoogleAppMeasurement: c542a2feaac9ab98fd074e8f1a02c3585bbfbd47
+  GoogleDataTransport: 8b0e733ea77c9218778e5a9e34ba9508b8328939
   GoogleMaps: eb03e327edfd70b06de1e6e321653f73712df7ad
   GooglePlaces: 196a9dd88580dcb3f3df46f415057703d0d2a310
   GoogleSignIn: 7137d297ddc022a7e0aa4619c86d72c909fa7213
@@ -180,19 +232,19 @@ SPEC CHECKSUMS:
   GoogleUtilities: 31c5b01f978a70c6cff2afc6272b3f1921614b43
   GTMAppAuth: 197a8dabfea5d665224aa00d17f164fc2248dab9
   GTMSessionFetcher: b3503b20a988c4e20cc189aa798fd18220133f52
-  InfiniteCarouselCollectionView: d63e9c834ff41f4d2ce99a2b58c9bb679bb14ab5
   IQKeyboardManagerSwift: c7df9d2deb356c04522f5c4b7b6e4ce4d8ed94fe
   KeychainSwift: a06190cf933ad46b1e0abc3d77d29c06331715c7
   libwebp: e90b9c01d99205d03b6bb8f2c8c415e5a4ef66f0
+  ListPlaceholder: 2d7950014852ee5613d636cf14fd1bb93419e330
   nanopb: 59221d7f958fb711001e6a449489542d92ae113e
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
   SDWebImage: c666b97e1fa9c64b4909816a903322018f0a9c84
+  SkeletonView: 820b2bbd180d7408f3f03b6462cfc3cac39d2ef2
   Socket.IO-Client-Swift: 1e3e3a1f09f3312a167f0d781eb2f383d477357c
   Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
   SwiftRangeControl: 3a0880968eaa5089fded2751924c1112dcfc6325
-  SwiftyCam: 6e57914771d972fbe508e759dc9d0150a44a93fd
   SwiftyInsta: 39eeebf62d6fa58e1b0f57ab76552bf82ceaa947
 
-PODFILE CHECKSUM: 99f51e0a5db767377d9b8dfabd43486f91bceba6
+PODFILE CHECKSUM: 28f37e17c59195743849e079f48208a5a1409bf8
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.11.3

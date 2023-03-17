@@ -56,14 +56,14 @@ extension PlaceAutocompleteViewController: GMSAutocompleteTableDataSourceDelegat
 
   func tableDataSource(_ tableDataSource: GMSAutocompleteTableDataSource, didAutocompleteWith place: GMSPlace) {
     // Do something with the selected place.
-    print("Place name: \(place.name)")
-    print("Place address: \(place.formattedAddress)")
-    print("Place attributions: \(place.attributions)")
+      debugPrint("Place name: \(String(describing: place.name))")
+      debugPrint("Place address: \(String(describing: place.formattedAddress))")
+      debugPrint("Place attributions: \(String(describing: place.attributions))")
   }
 
   func tableDataSource(_ tableDataSource: GMSAutocompleteTableDataSource, didFailAutocompleteWithError error: Error) {
     // Handle the error.
-    print("Error: \(error.localizedDescription)")
+    debugPrint("Error: \(error.localizedDescription)")
   }
 
   func tableDataSource(_ tableDataSource: GMSAutocompleteTableDataSource, didSelect prediction: GMSAutocompletePrediction) -> Bool {

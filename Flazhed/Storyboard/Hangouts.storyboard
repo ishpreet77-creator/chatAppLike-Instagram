@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="XdD-7p-1yF">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="XdD-7p-1yF">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -35,9 +35,12 @@
                                 <rect key="frame" x="0.0" y="44" width="414" height="852"/>
                                 <subviews>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" contentInsetAdjustmentBehavior="never" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" sectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="jkZ-fb-ek0">
-                                        <rect key="frame" x="0.0" y="8" width="414" height="844"/>
+                                        <rect key="frame" x="0.0" y="16" width="414" height="836"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <color key="sectionIndexColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
                                     </tableView>
                                     <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="PoB-Gm-Pqc">
                                         <rect key="frame" x="159.5" y="16" width="95" height="28"/>
@@ -47,11 +50,14 @@
                                                 <subviews>
                                                     <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="learnBack" translatesAutoresizingMaskIntoConstraints="NO" id="qG4-zg-rRC">
                                                         <rect key="frame" x="0.0" y="0.0" width="95" height="28"/>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                        </userDefinedRuntimeAttributes>
                                                     </imageView>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="SORT" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UQv-qE-G44">
                                                         <rect key="frame" x="36.5" y="5.5" width="38.5" height="17"/>
                                                         <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="14"/>
-                                                        <nil key="textColor"/>
+                                                        <color key="textColor" red="0.4431372549" green="0.17254901959999999" blue="0.65490196079999996" alpha="1" colorSpace="calibratedRGB"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ShortIcon" translatesAutoresizingMaskIntoConstraints="NO" id="d3L-3e-Lnp">
@@ -68,6 +74,9 @@
                                                         <state key="normal">
                                                             <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         </state>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                        </userDefinedRuntimeAttributes>
                                                         <connections>
                                                             <action selector="SortAct:" destination="bkv-UT-sBy" eventType="touchUpInside" id="e4Y-Sg-bKg"/>
                                                         </connections>
@@ -102,21 +111,28 @@
                                                     <userDefinedRuntimeAttribute type="size" keyPath="shadowOffset">
                                                         <size key="value" width="1" height="1"/>
                                                     </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
                                                 </userDefinedRuntimeAttributes>
                                             </view>
                                         </subviews>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="95" id="S26-Va-ng5"/>
                                         </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
                                     </stackView>
                                     <view tag="-1" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="o1D-48-xdG">
-                                        <rect key="frame" x="360" y="16" width="30" height="30"/>
+                                        <rect key="frame" x="344" y="16" width="30" height="30"/>
                                         <subviews>
                                             <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" tag="1" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="learnBack" translatesAutoresizingMaskIntoConstraints="NO" id="zmC-qT-hPY">
                                                 <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                </userDefinedRuntimeAttributes>
                                             </imageView>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="+" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2FL-zI-3Wf">
-                                                <rect key="frame" x="49.5" y="1" width="9.5" height="49"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2FL-zI-3Wf">
+                                                <rect key="frame" x="5.5" y="-3" width="19.5" height="36"/>
                                                 <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="30"/>
                                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
@@ -127,6 +143,9 @@
                                                     <constraint firstAttribute="height" constant="40" id="RUr-Sv-Gdh"/>
                                                     <constraint firstAttribute="width" constant="40" id="RfR-3L-c7f"/>
                                                 </constraints>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                </userDefinedRuntimeAttributes>
                                             </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="loA-yk-VU1">
                                                 <rect key="frame" x="0.0" y="0.0" width="30" height="30"/>
@@ -134,12 +153,15 @@
                                                 <state key="normal">
                                                     <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </state>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                </userDefinedRuntimeAttributes>
                                                 <connections>
                                                     <action selector="createHangoutAct:" destination="bkv-UT-sBy" eventType="touchUpInside" id="za5-9Z-qIb"/>
                                                 </connections>
                                             </button>
                                         </subviews>
-                                        <color key="backgroundColor" red="0.0" green="0.40784313725490196" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                        <color key="backgroundColor" red="0.4431372549" green="0.17254901959999999" blue="0.65490196079999996" alpha="1" colorSpace="calibratedRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="bottom" secondItem="loA-yk-VU1" secondAttribute="bottom" id="0lB-hc-27P"/>
                                             <constraint firstItem="2FL-zI-3Wf" firstAttribute="centerY" secondItem="o1D-48-xdG" secondAttribute="centerY" id="2Xs-Ec-v58"/>
@@ -172,6 +194,7 @@
                                             <userDefinedRuntimeAttribute type="size" keyPath="shadowOffset">
                                                 <size key="value" width="1" height="1"/>
                                             </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
                                         </userDefinedRuntimeAttributes>
                                     </view>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No hangout found." textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V9N-3t-9QB">
@@ -180,22 +203,43 @@
                                         <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ji7-vs-Pxq">
+                                        <rect key="frame" x="0.0" y="792" width="414" height="60"/>
+                                        <subviews>
+                                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="NTD-fv-tXA">
+                                                <rect key="frame" x="197" y="20" width="20" height="20"/>
+                                                <color key="color" red="0.4431372549" green="0.17254901959999999" blue="0.65490196079999996" alpha="1" colorSpace="calibratedRGB"/>
+                                            </activityIndicatorView>
+                                        </subviews>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <constraints>
+                                            <constraint firstItem="NTD-fv-tXA" firstAttribute="centerY" secondItem="Ji7-vs-Pxq" secondAttribute="centerY" id="0kN-fu-SQk"/>
+                                            <constraint firstItem="NTD-fv-tXA" firstAttribute="centerX" secondItem="Ji7-vs-Pxq" secondAttribute="centerX" id="ZZp-T5-7vP"/>
+                                            <constraint firstAttribute="height" constant="60" id="y97-Mj-6TP"/>
+                                        </constraints>
+                                    </view>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
+                                    <constraint firstItem="Ji7-vs-Pxq" firstAttribute="leading" secondItem="IFA-Vm-Zwo" secondAttribute="leading" id="1kp-rG-m12"/>
                                     <constraint firstItem="V9N-3t-9QB" firstAttribute="centerX" secondItem="IFA-Vm-Zwo" secondAttribute="centerX" id="3mJ-8b-pU1"/>
+                                    <constraint firstAttribute="trailing" secondItem="Ji7-vs-Pxq" secondAttribute="trailing" id="7uK-wh-zNP"/>
                                     <constraint firstItem="jkZ-fb-ek0" firstAttribute="leading" secondItem="IFA-Vm-Zwo" secondAttribute="leading" id="EgG-m6-iZ6"/>
                                     <constraint firstItem="PoB-Gm-Pqc" firstAttribute="top" secondItem="IFA-Vm-Zwo" secondAttribute="top" constant="16" id="O5h-bk-JeP"/>
                                     <constraint firstItem="PoB-Gm-Pqc" firstAttribute="centerX" secondItem="IFA-Vm-Zwo" secondAttribute="centerX" id="Rty-t4-nfx"/>
+                                    <constraint firstAttribute="bottom" secondItem="Ji7-vs-Pxq" secondAttribute="bottom" id="V0s-L3-zTF"/>
                                     <constraint firstAttribute="trailing" secondItem="V9N-3t-9QB" secondAttribute="trailing" id="bob-id-jss"/>
                                     <constraint firstAttribute="trailing" secondItem="jkZ-fb-ek0" secondAttribute="trailing" id="efv-aq-1OE"/>
                                     <constraint firstItem="V9N-3t-9QB" firstAttribute="leading" secondItem="IFA-Vm-Zwo" secondAttribute="leading" id="ilX-Kw-Ukc"/>
                                     <constraint firstAttribute="bottom" secondItem="jkZ-fb-ek0" secondAttribute="bottom" id="kxF-ty-XRb"/>
                                     <constraint firstItem="o1D-48-xdG" firstAttribute="top" secondItem="PoB-Gm-Pqc" secondAttribute="top" id="okL-XY-tVu"/>
                                     <constraint firstItem="V9N-3t-9QB" firstAttribute="centerY" secondItem="IFA-Vm-Zwo" secondAttribute="centerY" id="rxO-3x-HT2"/>
-                                    <constraint firstItem="jkZ-fb-ek0" firstAttribute="top" secondItem="IFA-Vm-Zwo" secondAttribute="top" constant="8" id="tIc-2C-ECP"/>
-                                    <constraint firstAttribute="trailing" secondItem="o1D-48-xdG" secondAttribute="trailing" constant="24" id="wqq-mE-RVi"/>
+                                    <constraint firstItem="jkZ-fb-ek0" firstAttribute="top" secondItem="IFA-Vm-Zwo" secondAttribute="top" constant="16" id="tIc-2C-ECP"/>
+                                    <constraint firstAttribute="trailing" secondItem="o1D-48-xdG" secondAttribute="trailing" constant="40" id="wqq-mE-RVi"/>
                                 </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                </userDefinedRuntimeAttributes>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="L9B-9V-Fs0"/>
@@ -206,13 +250,21 @@
                             <constraint firstItem="IFA-Vm-Zwo" firstAttribute="leading" secondItem="L9B-9V-Fs0" secondAttribute="leading" id="U0d-UZ-yB0"/>
                             <constraint firstItem="IFA-Vm-Zwo" firstAttribute="trailing" secondItem="L9B-9V-Fs0" secondAttribute="trailing" id="oQd-gM-HmJ"/>
                         </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                        </userDefinedRuntimeAttributes>
                     </view>
+                    <tabBarItem key="tabBarItem" title="" image="HangouPeople" selectedImage="hangout-Blue" id="48s-cq-We2"/>
                     <navigationItem key="navigationItem" id="CZ3-3o-nnP"/>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="constTableTop" destination="tIc-2C-ECP" id="9aD-OY-Cit"/>
                         <outlet property="lblNoFound" destination="V9N-3t-9QB" id="V46-lu-QzF"/>
+                        <outlet property="sortLbl" destination="UQv-qE-G44" id="BBb-96-asb"/>
                         <outlet property="tableHangout" destination="jkZ-fb-ek0" id="KVF-ba-h2S"/>
                         <outlet property="topStackView" destination="PoB-Gm-Pqc" id="qu3-ou-dJt"/>
                         <outlet property="viewCreate" destination="o1D-48-xdG" id="f9S-sC-25m"/>
+                        <outlet property="viewLoader" destination="Ji7-vs-Pxq" id="TnR-Zj-3Nd"/>
                         <outlet property="viewSort" destination="8bE-hQ-rvp" id="TKk-Ee-VUQ"/>
                     </connections>
                 </viewController>
@@ -352,12 +404,15 @@
                                                             <constraint firstItem="s9M-ZO-zeX" firstAttribute="top" secondItem="ezh-EA-dP1" secondAttribute="top" id="PIR-pS-jWE"/>
                                                             <constraint firstItem="s9M-ZO-zeX" firstAttribute="leading" secondItem="ezh-EA-dP1" secondAttribute="leading" id="xO1-Ea-TML"/>
                                                         </constraints>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                        </userDefinedRuntimeAttributes>
                                                     </view>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LD4-to-23p">
-                                                        <rect key="frame" x="0.0" y="483" width="414" height="872"/>
+                                                        <rect key="frame" x="0.0" y="483" width="414" height="360"/>
                                                         <subviews>
                                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="detailsBack" translatesAutoresizingMaskIntoConstraints="NO" id="3PB-M6-yTY">
-                                                                <rect key="frame" x="0.0" y="0.0" width="414" height="872"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="414" height="360"/>
                                                             </imageView>
                                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hBx-uO-cfR">
                                                                 <rect key="frame" x="0.0" y="16" width="414" height="46"/>
@@ -455,6 +510,9 @@
                                                                     <constraint firstAttribute="height" constant="46" id="nmo-dQ-h9u"/>
                                                                     <constraint firstItem="Voy-G0-tqX" firstAttribute="bottom" secondItem="eRp-bv-XYt" secondAttribute="bottom" id="oOZ-zO-JCQ"/>
                                                                 </constraints>
+                                                                <userDefinedRuntimeAttributes>
+                                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                </userDefinedRuntimeAttributes>
                                                             </view>
                                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ztp-pW-9rY">
                                                                 <rect key="frame" x="20" y="62" width="374" height="30"/>
@@ -669,6 +727,9 @@
                                                             <constraint firstItem="3PB-M6-yTY" firstAttribute="top" secondItem="LD4-to-23p" secondAttribute="top" id="uFd-3b-j7o"/>
                                                             <constraint firstAttribute="trailing" secondItem="hBx-uO-cfR" secondAttribute="trailing" id="zvs-Ac-o9Q"/>
                                                         </constraints>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                        </userDefinedRuntimeAttributes>
                                                     </view>
                                                     <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="dD8-rl-iBL">
                                                         <rect key="frame" x="32" y="856" width="350" height="45"/>
@@ -889,11 +950,36 @@
                                                 </state>
                                             </button>
                                             <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hangout Detail" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Rt-ed-cud">
-                                                <rect key="frame" x="109.5" y="10.5" width="195.5" height="33.5"/>
+                                                <rect key="frame" x="109.5" y="10.5" width="195" height="33.5"/>
                                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="28"/>
                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fbp-KA-ECA">
+                                                <rect key="frame" x="358" y="2" width="40" height="40"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="40" id="X72-hP-qcZ"/>
+                                                    <constraint firstAttribute="height" constant="40" id="nlK-Ih-vCu"/>
+                                                </constraints>
+                                                <state key="normal" image="threedot_white"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="shadowRadius">
+                                                        <real key="value" value="1"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="number" keyPath="shadowOpacity">
+                                                        <real key="value" value="1"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="size" keyPath="shadowOffset">
+                                                        <size key="value" width="1" height="1"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="shadowColor">
+                                                        <color key="value" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="ThreeDotAct:" destination="f3C-Pa-fBy" eventType="touchUpInside" id="lle-Ad-wtE"/>
+                                                </connections>
+                                            </button>
                                         </subviews>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <constraints>
@@ -901,6 +987,8 @@
                                             <constraint firstItem="yim-V0-d1d" firstAttribute="leading" secondItem="UCI-lN-yop" secondAttribute="leading" constant="32" id="6PC-zf-Ztz"/>
                                             <constraint firstItem="yim-V0-d1d" firstAttribute="top" secondItem="UCI-lN-yop" secondAttribute="top" constant="2" id="Abq-oY-F9h"/>
                                             <constraint firstItem="QB9-6b-EVS" firstAttribute="leading" secondItem="UCI-lN-yop" secondAttribute="leading" constant="32" id="CNV-Ju-Jvw"/>
+                                            <constraint firstItem="Fbp-KA-ECA" firstAttribute="centerY" secondItem="yim-V0-d1d" secondAttribute="centerY" id="Q5g-0e-FDG"/>
+                                            <constraint firstAttribute="trailing" secondItem="Fbp-KA-ECA" secondAttribute="trailing" constant="16" id="U8Q-lm-zrn"/>
                                             <constraint firstAttribute="height" constant="44" id="cP2-2K-PuT"/>
                                             <constraint firstItem="0Rt-ed-cud" firstAttribute="centerY" secondItem="QB9-6b-EVS" secondAttribute="centerY" id="fI5-T6-b82"/>
                                             <constraint firstAttribute="bottom" secondItem="yim-V0-d1d" secondAttribute="bottom" constant="2" id="vy6-v0-Rbu"/>
@@ -935,6 +1023,7 @@
                     <connections>
                         <outlet property="btnDelete" destination="bKF-Cg-nbJ" id="zyN-yb-b57"/>
                         <outlet property="btnMessage" destination="0j4-Ld-ekl" id="zUg-TZ-WjY"/>
+                        <outlet property="btnThreeDot" destination="Fbp-KA-ECA" id="eYg-9w-waL"/>
                         <outlet property="heightLookingConst" destination="mnE-mx-3ba" id="VeC-F5-jBo"/>
                         <outlet property="imgDelete1" destination="1bX-FT-sAZ" id="oi6-gD-i56"/>
                         <outlet property="imgHangout" destination="s9M-ZO-zeX" id="uAZ-HG-6qT"/>
@@ -959,13 +1048,16 @@
                         <outlet property="txtViewTitle" destination="QDD-Eh-XxZ" id="zpP-JX-OF2"/>
                         <outlet property="viewAge" destination="rwI-Gt-FGS" id="Vqg-pJ-wYF"/>
                         <outlet property="viewDelate1" destination="chI-mj-Ln8" id="JyL-wc-ETe"/>
-                        <outlet property="viewDesc" destination="gwf-rE-fnc" id="X8P-qg-VjV"/>
+                        <outlet property="viewDesc" destination="gwf-rE-fnc" id="woK-yE-DCh"/>
                         <outlet property="viewHangout" destination="6TI-BF-GHm" id="Fro-W3-zbv"/>
                         <outlet property="viewHangoutType" destination="xhI-5l-ZSa" id="Ljj-Vr-0LL"/>
                         <outlet property="viewLineDesc" destination="QfM-uZ-WcT" id="fRO-CF-FVZ"/>
                         <outlet property="viewLoc" destination="ZZ6-jR-Ybc" id="Lfn-cz-NU0"/>
                         <outlet property="viewLookingFor" destination="teQ-33-pvL" id="gf8-Jz-2D8"/>
                         <outlet property="viewMessage1" destination="w2w-EB-yUK" id="Eq6-WA-a2f"/>
+                        <outlet property="viewProfileBack" destination="hBx-uO-cfR" id="fjg-YF-k66"/>
+                        <outlet property="viewTitleBack" destination="Ztp-pW-9rY" id="05S-uG-Cye"/>
+                        <outlet property="viewdateTime" destination="Swa-N2-yBG" id="CVO-kD-mDN"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="d5S-9P-rTo" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -1032,6 +1124,9 @@
                                             <constraint firstItem="V1j-SJ-Rh8" firstAttribute="centerX" secondItem="0Kg-t9-kaA" secondAttribute="centerX" id="glQ-l2-WPg"/>
                                             <constraint firstItem="V1j-SJ-Rh8" firstAttribute="centerY" secondItem="0Kg-t9-kaA" secondAttribute="centerY" id="q6h-Mo-rUo"/>
                                         </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fO5-5d-dvo">
                                         <rect key="frame" x="0.0" y="64" width="414" height="73"/>
@@ -1246,10 +1341,16 @@
                                             <constraint firstItem="uSD-N1-27K" firstAttribute="top" secondItem="fO5-5d-dvo" secondAttribute="top" id="de4-gJ-U8W"/>
                                             <constraint firstAttribute="bottom" secondItem="uSD-N1-27K" secondAttribute="bottom" id="s56-kd-O7c"/>
                                         </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
                                     </view>
                                     <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="prototypes" style="plain" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" sectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="9p7-Ht-xxH">
                                         <rect key="frame" x="0.0" y="157" width="414" height="695"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
                                     </tableView>
                                     <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Y76-tT-pET">
                                         <rect key="frame" x="0.0" y="64" width="414" height="788"/>
@@ -1318,6 +1419,9 @@ A Hangout will expire after hangout created date.</string>
                                         <state key="normal" title="CREATE HANGOUT" backgroundImage="createBack">
                                             <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </state>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
                                         <connections>
                                             <action selector="createHangoutAct:" destination="eDd-DK-9pW" eventType="touchUpInside" id="K7S-WI-9PU"/>
                                         </connections>
@@ -1343,6 +1447,9 @@ A Hangout will expire after hangout created date.</string>
                                     <constraint firstItem="VAm-oR-0Wh" firstAttribute="leading" secondItem="S2p-vT-Aaj" secondAttribute="leading" constant="30" id="puz-OR-mDw"/>
                                     <constraint firstItem="fO5-5d-dvo" firstAttribute="leading" secondItem="S2p-vT-Aaj" secondAttribute="leading" id="uUO-my-H28"/>
                                 </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                </userDefinedRuntimeAttributes>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="ei8-9R-TQK"/>
@@ -1353,6 +1460,9 @@ A Hangout will expire after hangout created date.</string>
                             <constraint firstItem="S2p-vT-Aaj" firstAttribute="trailing" secondItem="ei8-9R-TQK" secondAttribute="trailing" id="ayp-hx-kC7"/>
                             <constraint firstItem="S2p-vT-Aaj" firstAttribute="top" secondItem="ei8-9R-TQK" secondAttribute="top" id="vVG-cK-EHa"/>
                         </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                        </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
                         <outlet property="btnCreateHangout" destination="VAm-oR-0Wh" id="VRv-8n-o6U"/>
@@ -1407,7 +1517,7 @@ A Hangout will expire after hangout created date.</string>
                                                 </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Create Hangout" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7MG-4B-gJ8">
-                                                <rect key="frame" x="103.5" y="5.5" width="207.5" height="33.5"/>
+                                                <rect key="frame" x="103.5" y="5.5" width="207" height="33.5"/>
                                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="28"/>
                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
@@ -1430,39 +1540,100 @@ A Hangout will expire after hangout created date.</string>
                                         <rect key="frame" x="0.0" y="44" width="414" height="1056"/>
                                         <subviews>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="84c-P7-SSq">
-                                                <rect key="frame" x="0.0" y="0.0" width="414" height="798.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="414" height="882"/>
                                                 <subviews>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="sZM-HV-Qti">
-                                                        <rect key="frame" x="0.0" y="48" width="414" height="244"/>
+                                                        <rect key="frame" x="0.0" y="48" width="414" height="324"/>
                                                         <subviews>
                                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="32" translatesAutoresizingMaskIntoConstraints="NO" id="22W-YI-pXf">
-                                                                <rect key="frame" x="30" y="0.0" width="384" height="244"/>
+                                                                <rect key="frame" x="30" y="0.0" width="384" height="324"/>
                                                                 <subviews>
+                                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qBd-6S-45c">
+                                                                        <rect key="frame" x="0.0" y="0.0" width="384" height="57"/>
+                                                                        <subviews>
+                                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="RUNS FOR" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oyf-68-IQb">
+                                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="15"/>
+                                                                                <fontDescription key="fontDescription" name="Averta-Bold" family="Averta-Bold" pointSize="15"/>
+                                                                                <color key="textColor" red="0.0" green="0.40784313729999999" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                                                                <nil key="highlightedColor"/>
+                                                                            </label>
+                                                                            <textField opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Running for" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="JFd-Bh-U5y">
+                                                                                <rect key="frame" x="0.0" y="23" width="322" height="34"/>
+                                                                                <color key="tintColor" red="0.4431372549" green="0.17254901959999999" blue="0.65490196079999996" alpha="1" colorSpace="calibratedRGB"/>
+                                                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                                <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="15"/>
+                                                                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                                            </textField>
+                                                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="K5U-60-kuq">
+                                                                                <rect key="frame" x="0.0" y="56" width="384" height="1"/>
+                                                                                <color key="backgroundColor" systemColor="systemGray3Color"/>
+                                                                                <constraints>
+                                                                                    <constraint firstAttribute="height" constant="1" id="Swb-sn-gQf"/>
+                                                                                </constraints>
+                                                                            </imageView>
+                                                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="addHang" translatesAutoresizingMaskIntoConstraints="NO" id="zNz-sL-SX1">
+                                                                                <rect key="frame" x="330" y="18" width="27" height="27"/>
+                                                                                <constraints>
+                                                                                    <constraint firstAttribute="width" constant="27" id="r8o-W9-J1O"/>
+                                                                                    <constraint firstAttribute="height" constant="27" id="vfI-yt-d7R"/>
+                                                                                </constraints>
+                                                                            </imageView>
+                                                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SNJ-9F-x2w">
+                                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="57"/>
+                                                                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                                <state key="normal">
+                                                                                    <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                                </state>
+                                                                                <connections>
+                                                                                    <action selector="addRunningAct:" destination="8du-rY-XTx" eventType="touchUpInside" id="24a-MT-iLd"/>
+                                                                                </connections>
+                                                                            </button>
+                                                                        </subviews>
+                                                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                                        <constraints>
+                                                                            <constraint firstAttribute="bottom" secondItem="SNJ-9F-x2w" secondAttribute="bottom" id="0Xa-lm-sqT"/>
+                                                                            <constraint firstItem="oyf-68-IQb" firstAttribute="top" secondItem="qBd-6S-45c" secondAttribute="top" id="2fk-Vr-AAZ"/>
+                                                                            <constraint firstItem="K5U-60-kuq" firstAttribute="leading" secondItem="qBd-6S-45c" secondAttribute="leading" id="46R-IU-8Sk"/>
+                                                                            <constraint firstItem="SNJ-9F-x2w" firstAttribute="top" secondItem="qBd-6S-45c" secondAttribute="top" id="5xq-wc-a9u"/>
+                                                                            <constraint firstAttribute="trailing" secondItem="SNJ-9F-x2w" secondAttribute="trailing" id="NTU-Xx-oY6"/>
+                                                                            <constraint firstItem="JFd-Bh-U5y" firstAttribute="leading" secondItem="qBd-6S-45c" secondAttribute="leading" id="PFH-Of-zuK"/>
+                                                                            <constraint firstItem="JFd-Bh-U5y" firstAttribute="top" secondItem="oyf-68-IQb" secondAttribute="bottom" constant="8" symbolic="YES" id="Ps8-eR-zeV"/>
+                                                                            <constraint firstAttribute="trailing" secondItem="zNz-sL-SX1" secondAttribute="trailing" constant="27" id="Q9n-Lf-X4n"/>
+                                                                            <constraint firstItem="zNz-sL-SX1" firstAttribute="leading" secondItem="JFd-Bh-U5y" secondAttribute="trailing" constant="8" id="VH7-10-WC9"/>
+                                                                            <constraint firstAttribute="trailing" secondItem="K5U-60-kuq" secondAttribute="trailing" id="WGC-eU-OoH"/>
+                                                                            <constraint firstAttribute="bottom" secondItem="zNz-sL-SX1" secondAttribute="bottom" constant="12" id="efe-km-LvP"/>
+                                                                            <constraint firstAttribute="trailing" secondItem="oyf-68-IQb" secondAttribute="trailing" id="f8k-Em-s5Y"/>
+                                                                            <constraint firstItem="oyf-68-IQb" firstAttribute="leading" secondItem="qBd-6S-45c" secondAttribute="leading" id="fh9-IZ-was"/>
+                                                                            <constraint firstItem="SNJ-9F-x2w" firstAttribute="leading" secondItem="qBd-6S-45c" secondAttribute="leading" id="tfp-7L-cgD"/>
+                                                                            <constraint firstAttribute="bottom" secondItem="JFd-Bh-U5y" secondAttribute="bottom" id="uZb-DU-HsH"/>
+                                                                            <constraint firstAttribute="bottom" secondItem="K5U-60-kuq" secondAttribute="bottom" id="wdx-qD-9cU"/>
+                                                                        </constraints>
+                                                                    </view>
                                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hiK-RC-kyG">
-                                                                        <rect key="frame" x="0.0" y="0.0" width="384" height="60"/>
+                                                                        <rect key="frame" x="0.0" y="89" width="384" height="57"/>
                                                                         <subviews>
                                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="DATE" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jNc-EL-7Lb">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="17.5"/>
+                                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="15"/>
                                                                                 <fontDescription key="fontDescription" name="Averta-Bold" family="Averta-Bold" pointSize="15"/>
                                                                                 <color key="textColor" red="0.0" green="0.40784313725490196" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                                                 <nil key="highlightedColor"/>
                                                                             </label>
                                                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Date" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="eWm-Zn-qVK" customClass="customTextField" customModule="Flazhed" customModuleProvider="target">
-                                                                                <rect key="frame" x="0.0" y="25.5" width="384" height="34.5"/>
+                                                                                <rect key="frame" x="0.0" y="23" width="384" height="34"/>
                                                                                 <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                 <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="15"/>
                                                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                                                             </textField>
                                                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="E7L-kS-LbI">
-                                                                                <rect key="frame" x="0.0" y="59" width="384" height="1"/>
+                                                                                <rect key="frame" x="0.0" y="56" width="384" height="1"/>
                                                                                 <color key="backgroundColor" systemColor="systemGray3Color"/>
                                                                                 <constraints>
                                                                                     <constraint firstAttribute="height" constant="1" id="KiS-R6-nI2"/>
                                                                                 </constraints>
                                                                             </imageView>
                                                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Date" translatesAutoresizingMaskIntoConstraints="NO" id="kfy-aX-euN">
-                                                                                <rect key="frame" x="340" y="31" width="17" height="17"/>
+                                                                                <rect key="frame" x="340" y="28" width="17" height="17"/>
                                                                                 <constraints>
                                                                                     <constraint firstAttribute="width" constant="17" id="p8B-qg-dFF"/>
                                                                                     <constraint firstAttribute="height" constant="17" id="riu-OY-vTa"/>
@@ -1486,30 +1657,30 @@ A Hangout will expire after hangout created date.</string>
                                                                         </constraints>
                                                                     </view>
                                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UiI-4F-MxG">
-                                                                        <rect key="frame" x="0.0" y="92" width="384" height="60"/>
+                                                                        <rect key="frame" x="0.0" y="178" width="384" height="57"/>
                                                                         <subviews>
                                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="TIME" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TMt-au-HHO">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="17.5"/>
+                                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="15"/>
                                                                                 <fontDescription key="fontDescription" name="Averta-Bold" family="Averta-Bold" pointSize="15"/>
                                                                                 <color key="textColor" red="0.0" green="0.40784313729999999" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                                                 <nil key="highlightedColor"/>
                                                                             </label>
                                                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Time" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="O5t-Kb-kzv" customClass="customTextField" customModule="Flazhed" customModuleProvider="target">
-                                                                                <rect key="frame" x="0.0" y="25.5" width="384" height="34.5"/>
+                                                                                <rect key="frame" x="0.0" y="23" width="384" height="34"/>
                                                                                 <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                 <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="15"/>
                                                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                                                             </textField>
                                                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="fZQ-cd-rgs">
-                                                                                <rect key="frame" x="0.0" y="59" width="384" height="1"/>
+                                                                                <rect key="frame" x="0.0" y="56" width="384" height="1"/>
                                                                                 <color key="backgroundColor" systemColor="systemGray3Color"/>
                                                                                 <constraints>
                                                                                     <constraint firstAttribute="height" constant="1" id="Gh3-fO-S3O"/>
                                                                                 </constraints>
                                                                             </imageView>
                                                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Clock" translatesAutoresizingMaskIntoConstraints="NO" id="eQR-eg-QMs">
-                                                                                <rect key="frame" x="340" y="31" width="17" height="17"/>
+                                                                                <rect key="frame" x="340" y="28" width="17" height="17"/>
                                                                                 <constraints>
                                                                                     <constraint firstAttribute="width" constant="17" id="2S0-H0-9U0"/>
                                                                                     <constraint firstAttribute="height" constant="17" id="zTc-90-8dS"/>
@@ -1533,36 +1704,36 @@ A Hangout will expire after hangout created date.</string>
                                                                         </constraints>
                                                                     </view>
                                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TCX-eV-Crj">
-                                                                        <rect key="frame" x="0.0" y="184" width="384" height="60"/>
+                                                                        <rect key="frame" x="0.0" y="267" width="384" height="57"/>
                                                                         <subviews>
                                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PLACE" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fPW-fN-rfd">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="17.5"/>
+                                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="15"/>
                                                                                 <fontDescription key="fontDescription" name="Averta-Bold" family="Averta-Bold" pointSize="15"/>
                                                                                 <color key="textColor" red="0.0" green="0.40784313729999999" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                                                 <nil key="highlightedColor"/>
                                                                             </label>
                                                                             <textField opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Place" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="JwX-tg-7zI">
-                                                                                <rect key="frame" x="0.0" y="25.5" width="332" height="34.5"/>
+                                                                                <rect key="frame" x="0.0" y="23" width="332" height="34"/>
                                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                 <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="15"/>
                                                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                                                             </textField>
                                                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Ufg-Fx-ZlL">
-                                                                                <rect key="frame" x="0.0" y="59" width="384" height="1"/>
+                                                                                <rect key="frame" x="0.0" y="56" width="384" height="1"/>
                                                                                 <color key="backgroundColor" systemColor="systemGray3Color"/>
                                                                                 <constraints>
                                                                                     <constraint firstAttribute="height" constant="1" id="SUF-SO-gVr"/>
                                                                                 </constraints>
                                                                             </imageView>
                                                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Redlocation" translatesAutoresizingMaskIntoConstraints="NO" id="UY9-Kh-pGi">
-                                                                                <rect key="frame" x="340" y="31" width="17" height="17"/>
+                                                                                <rect key="frame" x="340" y="28" width="17" height="17"/>
                                                                                 <constraints>
                                                                                     <constraint firstAttribute="width" constant="17" id="nRi-MG-ufu"/>
                                                                                     <constraint firstAttribute="height" constant="17" id="vKB-CW-Kk8"/>
                                                                                 </constraints>
                                                                             </imageView>
                                                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vOI-qC-0gO">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="60"/>
+                                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="57"/>
                                                                                 <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                 <state key="normal">
                                                                                     <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -1599,26 +1770,27 @@ A Hangout will expire after hangout created date.</string>
                                                         <constraints>
                                                             <constraint firstItem="22W-YI-pXf" firstAttribute="leading" secondItem="sZM-HV-Qti" secondAttribute="leading" constant="30" id="BK4-S7-tyt"/>
                                                             <constraint firstAttribute="bottom" secondItem="22W-YI-pXf" secondAttribute="bottom" id="J2X-Td-j2n"/>
-                                                            <constraint firstAttribute="height" constant="244" id="RZ8-vt-QaH"/>
+                                                            <constraint firstAttribute="height" constant="324" id="RZ8-vt-QaH"/>
                                                             <constraint firstAttribute="trailing" secondItem="22W-YI-pXf" secondAttribute="trailing" id="U5L-Ol-sCN"/>
                                                             <constraint firstItem="22W-YI-pXf" firstAttribute="top" secondItem="sZM-HV-Qti" secondAttribute="top" id="sC4-YH-5fj"/>
                                                         </constraints>
                                                     </view>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8nB-ww-nxk">
-                                                        <rect key="frame" x="30" y="324" width="384" height="59"/>
+                                                        <rect key="frame" x="30" y="404" width="384" height="56.5"/>
                                                         <subviews>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ADDITIONAL DESCRIPTION " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nCh-WT-FLp">
-                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="17.5"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="15"/>
                                                                 <fontDescription key="fontDescription" name="Averta-Bold" family="Averta-Bold" pointSize="15"/>
                                                                 <color key="textColor" red="0.0" green="0.40784313729999999" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                                 <nil key="highlightedColor"/>
                                                             </label>
                                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Qf5-BF-Pe0">
-                                                                <rect key="frame" x="-6" y="25.5" width="355" height="33.5"/>
+                                                                <rect key="frame" x="-6" y="23" width="355" height="33.5"/>
                                                                 <subviews>
                                                                     <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" minimumZoomScale="0.0" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="dUp-3I-aqN">
                                                                         <rect key="frame" x="0.0" y="0.0" width="355" height="33.5"/>
                                                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                                        <color key="tintColor" red="0.4431372549" green="0.17254901959999999" blue="0.65490196079999996" alpha="1" colorSpace="calibratedRGB"/>
                                                                         <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                         <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="14"/>
                                                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -1633,8 +1805,8 @@ A Hangout will expire after hangout created date.</string>
                                                                     <constraint firstItem="dUp-3I-aqN" firstAttribute="leading" secondItem="Qf5-BF-Pe0" secondAttribute="leading" id="jex-G3-irn"/>
                                                                 </constraints>
                                                             </view>
-                                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8U4-SZ-Uji">
-                                                                <rect key="frame" x="0.0" y="62" width="384" height="1"/>
+                                                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8U4-SZ-Uji">
+                                                                <rect key="frame" x="0.0" y="59.5" width="384" height="1"/>
                                                                 <color key="backgroundColor" systemColor="systemGray3Color"/>
                                                                 <constraints>
                                                                     <constraint firstAttribute="height" constant="1" id="D0V-vn-Xez"/>
@@ -1656,16 +1828,16 @@ A Hangout will expire after hangout created date.</string>
                                                         </constraints>
                                                     </view>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="47f-RV-fDt">
-                                                        <rect key="frame" x="20" y="398.5" width="374" height="207"/>
+                                                        <rect key="frame" x="20" y="476" width="374" height="207"/>
                                                         <subviews>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="LOOKING FOR" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vvZ-74-GCd">
-                                                                <rect key="frame" x="10" y="32" width="102" height="17.5"/>
+                                                                <rect key="frame" x="10" y="32" width="105" height="15"/>
                                                                 <fontDescription key="fontDescription" name="Averta-Bold" family="Averta-Bold" pointSize="15"/>
                                                                 <color key="textColor" red="0.0" green="0.40784313729999999" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                                 <nil key="highlightedColor"/>
                                                             </label>
                                                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="43" translatesAutoresizingMaskIntoConstraints="NO" id="tnH-FU-WxZ">
-                                                                <rect key="frame" x="97" y="69.5" width="180" height="128"/>
+                                                                <rect key="frame" x="97" y="67" width="180" height="128"/>
                                                                 <subviews>
                                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dRF-Kd-gFY">
                                                                         <rect key="frame" x="0.0" y="0.0" width="68.5" height="128"/>
@@ -1702,7 +1874,7 @@ A Hangout will expire after hangout created date.</string>
                                                                                 </userDefinedRuntimeAttributes>
                                                                             </view>
                                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Female" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jxp-cu-AyE">
-                                                                                <rect key="frame" x="0.0" y="82" width="68.5" height="17.5"/>
+                                                                                <rect key="frame" x="0.0" y="82" width="68.5" height="15"/>
                                                                                 <fontDescription key="fontDescription" name="Averta-Semibold" family="Averta-Semibold" pointSize="15"/>
                                                                                 <color key="textColor" red="0.0" green="0.40784313729999999" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                                                 <nil key="highlightedColor"/>
@@ -1761,7 +1933,7 @@ A Hangout will expire after hangout created date.</string>
                                                                                 </constraints>
                                                                             </view>
                                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Male" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="FbK-Bg-TKM">
-                                                                                <rect key="frame" x="0.0" y="82" width="68.5" height="17.5"/>
+                                                                                <rect key="frame" x="0.0" y="82" width="68.5" height="15"/>
                                                                                 <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="15"/>
                                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                 <nil key="highlightedColor"/>
@@ -1807,25 +1979,25 @@ A Hangout will expire after hangout created date.</string>
                                                         </constraints>
                                                     </view>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qtk-dM-dnK">
-                                                        <rect key="frame" x="20" y="605.5" width="374" height="70"/>
+                                                        <rect key="frame" x="20" y="683" width="374" height="76"/>
                                                         <subviews>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AGE" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="diJ-pE-Me3">
-                                                                <rect key="frame" x="10" y="0.0" width="28.5" height="16.5"/>
+                                                                <rect key="frame" x="10" y="0.0" width="28.5" height="14"/>
                                                                 <fontDescription key="fontDescription" name="Averta-Bold" family="Averta-Bold" pointSize="14"/>
                                                                 <color key="textColor" red="0.0" green="0.40784313729999999" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                                 <nil key="highlightedColor"/>
                                                             </label>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="18-100" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kSM-hz-rAk">
-                                                                <rect key="frame" x="295.5" y="0.0" width="44.5" height="16.5"/>
+                                                                <rect key="frame" x="299" y="0.0" width="41" height="14"/>
                                                                 <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="14"/>
                                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <nil key="highlightedColor"/>
                                                             </label>
                                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ybP-Pg-Jix" customClass="RangeSlider" customModule="SwiftRangeControl">
-                                                                <rect key="frame" x="28" y="36.5" width="318" height="24"/>
+                                                                <rect key="frame" x="28" y="34" width="318" height="30"/>
                                                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                                 <constraints>
-                                                                    <constraint firstAttribute="height" constant="24" id="6x7-iL-Lwq"/>
+                                                                    <constraint firstAttribute="height" constant="30" id="6x7-iL-Lwq"/>
                                                                 </constraints>
                                                                 <userDefinedRuntimeAttributes>
                                                                     <userDefinedRuntimeAttribute type="number" keyPath="minimumValue">
@@ -1859,7 +2031,7 @@ A Hangout will expire after hangout created date.</string>
                                                                         <color key="value" red="0.84705882349999995" green="0.84705882349999995" blue="0.84705882349999995" alpha="1" colorSpace="calibratedRGB"/>
                                                                     </userDefinedRuntimeAttribute>
                                                                     <userDefinedRuntimeAttribute type="color" keyPath="trackHighlightColor">
-                                                                        <color key="value" red="0.0" green="0.48627450980392156" blue="0.96078431372549022" alpha="1" colorSpace="calibratedRGB"/>
+                                                                        <color key="value" red="0.4431372549" green="0.17254901959999999" blue="0.65490196079999996" alpha="1" colorSpace="calibratedRGB"/>
                                                                     </userDefinedRuntimeAttribute>
                                                                     <userDefinedRuntimeAttribute type="number" keyPath="upperControlBorderWidth">
                                                                         <real key="value" value="2.5"/>
@@ -1868,13 +2040,13 @@ A Hangout will expire after hangout created date.</string>
                                                                         <real key="value" value="12.5"/>
                                                                     </userDefinedRuntimeAttribute>
                                                                     <userDefinedRuntimeAttribute type="color" keyPath="lowerControlBorderColor">
-                                                                        <color key="value" red="0.0" green="0.48627450980392156" blue="0.96078431372549022" alpha="1" colorSpace="calibratedRGB"/>
+                                                                        <color key="value" red="0.4431372549" green="0.17254901959999999" blue="0.65490196079999996" alpha="1" colorSpace="calibratedRGB"/>
                                                                     </userDefinedRuntimeAttribute>
                                                                     <userDefinedRuntimeAttribute type="color" keyPath="upperControlTintColor">
                                                                         <color key="value" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                     </userDefinedRuntimeAttribute>
                                                                     <userDefinedRuntimeAttribute type="color" keyPath="upperControlBorderColor">
-                                                                        <color key="value" red="0.0" green="0.48627450980392156" blue="0.96078431372549022" alpha="1" colorSpace="calibratedRGB"/>
+                                                                        <color key="value" red="0.4431372549" green="0.17254901959999999" blue="0.65490196079999996" alpha="1" colorSpace="calibratedRGB"/>
                                                                     </userDefinedRuntimeAttribute>
                                                                     <userDefinedRuntimeAttribute type="number" keyPath="controlWidth">
                                                                         <real key="value" value="25"/>
@@ -1884,6 +2056,12 @@ A Hangout will expire after hangout created date.</string>
                                                                     </userDefinedRuntimeAttribute>
                                                                     <userDefinedRuntimeAttribute type="number" keyPath="trackHighlightCornerRadius">
                                                                         <real key="value" value="0.0"/>
+                                                                    </userDefinedRuntimeAttribute>
+                                                                    <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                                                                        <real key="value" value="0.0"/>
+                                                                    </userDefinedRuntimeAttribute>
+                                                                    <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                                                                        <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                     </userDefinedRuntimeAttribute>
                                                                 </userDefinedRuntimeAttributes>
                                                                 <connections>
@@ -1899,12 +2077,12 @@ A Hangout will expire after hangout created date.</string>
                                                             <constraint firstAttribute="trailing" secondItem="kSM-hz-rAk" secondAttribute="trailing" constant="34" id="gfB-SG-rbw"/>
                                                             <constraint firstItem="ybP-Pg-Jix" firstAttribute="leading" secondItem="qtk-dM-dnK" secondAttribute="leading" constant="28" id="lVt-6l-014"/>
                                                             <constraint firstAttribute="trailing" secondItem="ybP-Pg-Jix" secondAttribute="trailing" constant="28" id="nk6-Ob-lJB"/>
-                                                            <constraint firstAttribute="height" constant="70" id="o9t-d3-cDn"/>
+                                                            <constraint firstAttribute="height" constant="76" id="o9t-d3-cDn"/>
                                                             <constraint firstItem="diJ-pE-Me3" firstAttribute="top" secondItem="qtk-dM-dnK" secondAttribute="top" id="otS-ai-xkm"/>
                                                         </constraints>
                                                     </view>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qaB-Zg-5h4">
-                                                        <rect key="frame" x="32" y="722.5" width="350" height="44"/>
+                                                        <rect key="frame" x="32" y="806" width="350" height="44"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="44" id="Kc2-2G-9wg"/>
                                                         </constraints>
@@ -1973,20 +2151,37 @@ A Hangout will expire after hangout created date.</string>
                     </view>
                     <size key="freeformSize" width="414" height="1100"/>
                     <connections>
+                        <outlet property="ImgAddHang" destination="zNz-sL-SX1" id="nDZ-gW-bRK"/>
                         <outlet property="addDescConst" destination="IX6-MG-HsN" id="iac-mS-Wl4"/>
+                        <outlet property="additionalLbl" destination="nCh-WT-FLp" id="ZuS-hY-XCO"/>
+                        <outlet property="ageLbl" destination="diJ-pE-Me3" id="v45-Tb-hvI"/>
+                        <outlet property="btnOpenPremium" destination="SNJ-9F-x2w" id="nf5-7S-gAs"/>
                         <outlet property="btnPost" destination="qaB-Zg-5h4" id="k2a-at-Qwv"/>
+                        <outlet property="dateLbl" destination="jNc-EL-7Lb" id="dLe-ZK-e2F"/>
                         <outlet property="imgMale" destination="Umw-pL-3AJ" id="lTm-xQ-wyG"/>
                         <outlet property="imgfemale" destination="tJQ-3P-cyu" id="Le6-gk-boN"/>
                         <outlet property="lblFemale" destination="Jxp-cu-AyE" id="OhX-w9-sp5"/>
                         <outlet property="lblMale" destination="FbK-Bg-TKM" id="xBp-Tn-2F0"/>
                         <outlet property="lblRange" destination="kSM-hz-rAk" id="xyf-eg-Hb8"/>
+                        <outlet property="lblRunningDay" destination="JFd-Bh-U5y" id="AqQ-Nv-6io"/>
                         <outlet property="lbltitle" destination="7MG-4B-gJ8" id="tlv-s0-b40"/>
+                        <outlet property="lookingFor" destination="vvZ-74-GCd" id="j7t-0J-Ve9"/>
+                        <outlet property="placeLbl" destination="fPW-fN-rfd" id="AlG-z4-Ro7"/>
+                        <outlet property="runsForLbl" destination="oyf-68-IQb" id="wSc-EK-B6p"/>
                         <outlet property="slider" destination="ybP-Pg-Jix" id="K17-f3-Ri4"/>
+                        <outlet property="timeLbl" destination="TMt-au-HHO" id="f1q-Ca-V76"/>
                         <outlet property="topConst" destination="Xfe-qT-Igf" id="6Hf-bC-KpW"/>
                         <outlet property="txtAdditionDes" destination="dUp-3I-aqN" id="Cel-Qc-ACY"/>
                         <outlet property="txtDate" destination="eWm-Zn-qVK" id="PZ2-NE-ph5"/>
                         <outlet property="txtPlace" destination="JwX-tg-7zI" id="KCp-2U-Orc"/>
                         <outlet property="txtTime" destination="O5t-Kb-kzv" id="ncu-r5-rTb"/>
+                        <outlet property="viewAddDesc" destination="8nB-ww-nxk" id="eRb-qe-icN"/>
+                        <outlet property="viewAge" destination="qtk-dM-dnK" id="QPk-Rt-Ya5"/>
+                        <outlet property="viewDate" destination="hiK-RC-kyG" id="p8a-BO-p3O"/>
+                        <outlet property="viewLoging" destination="47f-RV-fDt" id="tT1-rF-TeY"/>
+                        <outlet property="viewPlace" destination="TCX-eV-Crj" id="4xi-Gr-rje"/>
+                        <outlet property="viewRunningFor" destination="qBd-6S-45c" id="G0o-8b-7gw"/>
+                        <outlet property="viewTime" destination="UiI-4F-MxG" id="nLh-lC-kLf"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1sb-HF-q7Q" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -2178,6 +2373,9 @@ A Hangout will expire after hangout created date.</string>
                                                     <constraint firstAttribute="height" constant="25" id="8PT-fY-0X4"/>
                                                     <constraint firstAttribute="width" constant="25" id="DfW-9M-UPq"/>
                                                 </constraints>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                </userDefinedRuntimeAttributes>
                                             </imageView>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zP3-ZK-5gx">
                                                 <rect key="frame" x="32" y="9.5" width="25" height="25"/>
@@ -2185,6 +2383,9 @@ A Hangout will expire after hangout created date.</string>
                                                 <state key="normal" image="BackArrow">
                                                     <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 </state>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                </userDefinedRuntimeAttributes>
                                                 <connections>
                                                     <action selector="BackAct:" destination="9Bb-5k-mIX" eventType="touchUpInside" id="LdG-h7-IZu"/>
                                                 </connections>
@@ -2194,6 +2395,9 @@ A Hangout will expire after hangout created date.</string>
                                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="28"/>
                                                 <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <nil key="highlightedColor"/>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                </userDefinedRuntimeAttributes>
                                             </label>
                                         </subviews>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -2208,6 +2412,9 @@ A Hangout will expire after hangout created date.</string>
                                             <constraint firstItem="zP3-ZK-5gx" firstAttribute="top" secondItem="WXk-S2-aSX" secondAttribute="top" id="rFl-PJ-PWS"/>
                                             <constraint firstItem="zP3-ZK-5gx" firstAttribute="leading" secondItem="WXk-S2-aSX" secondAttribute="leading" id="vTQ-tM-mt1"/>
                                         </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
                                     </view>
                                     <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Qaj-zM-TOd">
                                         <rect key="frame" x="0.0" y="44" width="414" height="856"/>
@@ -2219,17 +2426,23 @@ A Hangout will expire after hangout created date.</string>
                                                         <rect key="frame" x="0.0" y="48" width="414" height="256"/>
                                                         <subviews>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="HANGOUT IMAGE" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="J4p-25-9Sd">
-                                                                <rect key="frame" x="30" y="-1.5" width="125" height="17.5"/>
+                                                                <rect key="frame" x="30" y="1" width="128" height="15"/>
                                                                 <fontDescription key="fontDescription" name="Averta-Bold" family="Averta-Bold" pointSize="15"/>
                                                                 <color key="textColor" red="0.0" green="0.40784313729999999" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                                 <nil key="highlightedColor"/>
+                                                                <userDefinedRuntimeAttributes>
+                                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                </userDefinedRuntimeAttributes>
                                                             </label>
-                                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="NewcreateBack" translatesAutoresizingMaskIntoConstraints="NO" id="rgp-v1-ni2">
+                                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="NewAddImage" translatesAutoresizingMaskIntoConstraints="NO" id="rgp-v1-ni2">
                                                                 <rect key="frame" x="144.5" y="48" width="125" height="176"/>
                                                                 <constraints>
                                                                     <constraint firstAttribute="width" constant="125" id="XrY-fm-vux"/>
                                                                     <constraint firstAttribute="height" constant="176" id="gfk-c0-hPR"/>
                                                                 </constraints>
+                                                                <userDefinedRuntimeAttributes>
+                                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                </userDefinedRuntimeAttributes>
                                                             </imageView>
                                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Dv6-qS-haE">
                                                                 <rect key="frame" x="182" y="103" width="50" height="50"/>
@@ -2237,9 +2450,12 @@ A Hangout will expire after hangout created date.</string>
                                                                     <constraint firstAttribute="width" constant="50" id="dOF-I6-FcV"/>
                                                                     <constraint firstAttribute="height" constant="50" id="kwf-M6-1Xf"/>
                                                                 </constraints>
-                                                                <state key="normal" image="plusIcon" backgroundImage="plusBack">
+                                                                <state key="normal" image="NewEditPlusIcon">
                                                                     <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 </state>
+                                                                <userDefinedRuntimeAttributes>
+                                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                </userDefinedRuntimeAttributes>
                                                                 <connections>
                                                                     <action selector="addImageAct:" destination="9Bb-5k-mIX" eventType="touchUpInside" id="uZV-eW-Jce"/>
                                                                 </connections>
@@ -2255,6 +2471,9 @@ A Hangout will expire after hangout created date.</string>
                                                             <constraint firstItem="J4p-25-9Sd" firstAttribute="leading" secondItem="ivM-Z6-LJN" secondAttribute="leading" constant="30" id="swG-45-z61"/>
                                                             <constraint firstAttribute="height" constant="256" id="tEe-PL-sWM"/>
                                                         </constraints>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                        </userDefinedRuntimeAttributes>
                                                     </view>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oQx-mX-amu">
                                                         <rect key="frame" x="0.0" y="304" width="414" height="168"/>
@@ -2266,16 +2485,22 @@ A Hangout will expire after hangout created date.</string>
                                                                         <rect key="frame" x="0.0" y="0.0" width="384" height="68"/>
                                                                         <subviews>
                                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="HANGOUT TYPE" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cEK-Wp-Bbp">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="17.5"/>
+                                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="15"/>
                                                                                 <fontDescription key="fontDescription" name="Averta-Bold" family="Averta-Bold" pointSize="15"/>
                                                                                 <color key="textColor" red="0.0" green="0.40784313729999999" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                                                 <nil key="highlightedColor"/>
+                                                                                <userDefinedRuntimeAttributes>
+                                                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                                </userDefinedRuntimeAttributes>
                                                                             </label>
                                                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Hangout Type" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="LpC-sn-vFo" customClass="customTextField" customModule="Flazhed" customModuleProvider="target">
-                                                                                <rect key="frame" x="0.0" y="25.5" width="384" height="42.5"/>
+                                                                                <rect key="frame" x="0.0" y="23" width="384" height="45"/>
                                                                                 <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                                 <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="15"/>
                                                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                                                <userDefinedRuntimeAttributes>
+                                                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                                </userDefinedRuntimeAttributes>
                                                                                 <connections>
                                                                                     <outlet property="delegate" destination="9Bb-5k-mIX" id="jv0-Zd-wk4"/>
                                                                                 </connections>
@@ -2285,13 +2510,19 @@ A Hangout will expire after hangout created date.</string>
                                                                                 <constraints>
                                                                                     <constraint firstAttribute="height" constant="1" id="xtm-7Z-Asa"/>
                                                                                 </constraints>
+                                                                                <userDefinedRuntimeAttributes>
+                                                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                                </userDefinedRuntimeAttributes>
                                                                             </imageView>
                                                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="dropDown" translatesAutoresizingMaskIntoConstraints="NO" id="ID9-Jw-xwm">
-                                                                                <rect key="frame" x="345" y="41" width="12" height="12"/>
+                                                                                <rect key="frame" x="345" y="39.5" width="12" height="12"/>
                                                                                 <constraints>
                                                                                     <constraint firstAttribute="height" constant="12" id="9Lp-5O-a6c"/>
                                                                                     <constraint firstAttribute="width" constant="12" id="jE3-Sh-xTh"/>
                                                                                 </constraints>
+                                                                                <userDefinedRuntimeAttributes>
+                                                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                                </userDefinedRuntimeAttributes>
                                                                             </imageView>
                                                                         </subviews>
                                                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -2309,20 +2540,30 @@ A Hangout will expire after hangout created date.</string>
                                                                             <constraint firstAttribute="bottom" secondItem="Gh2-Ps-f2I" secondAttribute="bottom" id="uol-jh-RRq"/>
                                                                             <constraint firstAttribute="trailing" secondItem="Gh2-Ps-f2I" secondAttribute="trailing" id="yne-de-WAs"/>
                                                                         </constraints>
+                                                                        <userDefinedRuntimeAttributes>
+                                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                        </userDefinedRuntimeAttributes>
                                                                     </view>
                                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6px-df-uwf">
                                                                         <rect key="frame" x="0.0" y="100" width="384" height="68"/>
                                                                         <subviews>
                                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="HEADING" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ElA-OX-2FN">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="17.5"/>
+                                                                                <rect key="frame" x="0.0" y="0.0" width="384" height="15"/>
                                                                                 <fontDescription key="fontDescription" name="Averta-Bold" family="Averta-Bold" pointSize="15"/>
                                                                                 <color key="textColor" red="0.0" green="0.40784313729999999" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                                                 <nil key="highlightedColor"/>
+                                                                                <userDefinedRuntimeAttributes>
+                                                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                                </userDefinedRuntimeAttributes>
                                                                             </label>
                                                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Heading" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Pja-nc-OQ0">
-                                                                                <rect key="frame" x="0.0" y="25.5" width="349" height="42.5"/>
+                                                                                <rect key="frame" x="0.0" y="23" width="349" height="45"/>
+                                                                                <color key="tintColor" red="0.4431372549" green="0.17254901959999999" blue="0.65490196079999996" alpha="1" colorSpace="calibratedRGB"/>
                                                                                 <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="15"/>
                                                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                                                <userDefinedRuntimeAttributes>
+                                                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                                </userDefinedRuntimeAttributes>
                                                                                 <connections>
                                                                                     <outlet property="delegate" destination="9Bb-5k-mIX" id="gpE-Vl-9iN"/>
                                                                                 </connections>
@@ -2332,6 +2573,9 @@ A Hangout will expire after hangout created date.</string>
                                                                                 <constraints>
                                                                                     <constraint firstAttribute="height" constant="1" id="OsU-Bb-aEV"/>
                                                                                 </constraints>
+                                                                                <userDefinedRuntimeAttributes>
+                                                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                                </userDefinedRuntimeAttributes>
                                                                             </imageView>
                                                                         </subviews>
                                                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -2347,6 +2591,9 @@ A Hangout will expire after hangout created date.</string>
                                                                             <constraint firstAttribute="trailing" secondItem="ElA-OX-2FN" secondAttribute="trailing" id="koT-07-C8m"/>
                                                                             <constraint firstItem="ElA-OX-2FN" firstAttribute="leading" secondItem="6px-df-uwf" secondAttribute="leading" id="pYS-vp-QAH"/>
                                                                         </constraints>
+                                                                        <userDefinedRuntimeAttributes>
+                                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                        </userDefinedRuntimeAttributes>
                                                                     </view>
                                                                 </subviews>
                                                             </stackView>
@@ -2359,22 +2606,32 @@ A Hangout will expire after hangout created date.</string>
                                                             <constraint firstItem="O5z-qQ-gPs" firstAttribute="top" secondItem="oQx-mX-amu" secondAttribute="top" id="hLR-tA-fn4"/>
                                                             <constraint firstItem="O5z-qQ-gPs" firstAttribute="leading" secondItem="oQx-mX-amu" secondAttribute="leading" constant="30" id="jJm-lB-4hG"/>
                                                         </constraints>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                        </userDefinedRuntimeAttributes>
                                                     </view>
                                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="icZ-K7-Vy2">
                                                         <rect key="frame" x="20" y="472" width="394" height="93"/>
                                                         <subviews>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="DESCRIPTION" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qEw-md-iGY">
-                                                                <rect key="frame" x="8" y="32" width="99" height="17.5"/>
+                                                                <rect key="frame" x="8" y="32" width="100.5" height="15"/>
                                                                 <fontDescription key="fontDescription" name="Averta-Bold" family="Averta-Bold" pointSize="15"/>
                                                                 <color key="textColor" red="0.0" green="0.40784313729999999" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                                 <nil key="highlightedColor"/>
+                                                                <userDefinedRuntimeAttributes>
+                                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                </userDefinedRuntimeAttributes>
                                                             </label>
                                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="lbp-Ib-D1t">
-                                                                <rect key="frame" x="4" y="61.5" width="355" height="31.5"/>
+                                                                <rect key="frame" x="4" y="59" width="355" height="34"/>
                                                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                                <color key="tintColor" red="0.4431372549" green="0.17254901959999999" blue="0.65490196079999996" alpha="1" colorSpace="calibratedRGB"/>
                                                                 <color key="textColor" systemColor="labelColor"/>
                                                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                                <userDefinedRuntimeAttributes>
+                                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                </userDefinedRuntimeAttributes>
                                                                 <connections>
                                                                     <outlet property="delegate" destination="9Bb-5k-mIX" id="qeK-9f-30w"/>
                                                                 </connections>
@@ -2384,6 +2641,9 @@ A Hangout will expire after hangout created date.</string>
                                                                 <constraints>
                                                                     <constraint firstAttribute="height" constant="1" id="dWO-20-dU0"/>
                                                                 </constraints>
+                                                                <userDefinedRuntimeAttributes>
+                                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                                </userDefinedRuntimeAttributes>
                                                             </imageView>
                                                         </subviews>
                                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -2399,6 +2659,9 @@ A Hangout will expire after hangout created date.</string>
                                                             <constraint firstItem="bcw-BW-9Cf" firstAttribute="trailing" secondItem="lbp-Ib-D1t" secondAttribute="trailing" constant="32" id="oR4-sP-zsZ"/>
                                                             <constraint firstItem="qEw-md-iGY" firstAttribute="leading" secondItem="icZ-K7-Vy2" secondAttribute="leading" constant="8" id="vFf-q8-qn2"/>
                                                         </constraints>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                        </userDefinedRuntimeAttributes>
                                                     </view>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0Zv-XS-oiz">
                                                         <rect key="frame" x="30" y="612" width="354" height="44"/>
@@ -2410,6 +2673,9 @@ A Hangout will expire after hangout created date.</string>
                                                         <state key="normal" title="NEXT" backgroundImage="createBack">
                                                             <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         </state>
+                                                        <userDefinedRuntimeAttributes>
+                                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                        </userDefinedRuntimeAttributes>
                                                         <connections>
                                                             <action selector="nextAct:" destination="9Bb-5k-mIX" eventType="touchUpInside" id="foi-9F-dvh"/>
                                                         </connections>
@@ -2431,6 +2697,9 @@ A Hangout will expire after hangout created date.</string>
                                                     <constraint firstAttribute="bottom" secondItem="0Zv-XS-oiz" secondAttribute="bottom" constant="32" id="kDw-6b-Shf"/>
                                                     <constraint firstAttribute="trailing" secondItem="ivM-Z6-LJN" secondAttribute="trailing" id="ykj-Iu-QeZ"/>
                                                 </constraints>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                                </userDefinedRuntimeAttributes>
                                             </view>
                                         </subviews>
                                         <constraints>
@@ -2440,6 +2709,9 @@ A Hangout will expire after hangout created date.</string>
                                             <constraint firstItem="ykH-FT-NnX" firstAttribute="leading" secondItem="Qaj-zM-TOd" secondAttribute="leading" id="hl8-0W-5tN"/>
                                             <constraint firstItem="ykH-FT-NnX" firstAttribute="top" secondItem="Qaj-zM-TOd" secondAttribute="top" id="pnQ-br-pkm"/>
                                         </constraints>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
                                     </scrollView>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -2452,6 +2724,9 @@ A Hangout will expire after hangout created date.</string>
                                     <constraint firstAttribute="trailing" secondItem="3Wb-qn-jx2" secondAttribute="trailing" id="wqS-N1-547"/>
                                     <constraint firstItem="3Wb-qn-jx2" firstAttribute="top" secondItem="Rx3-Re-mos" secondAttribute="top" id="y8B-LR-YX3"/>
                                 </constraints>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                                </userDefinedRuntimeAttributes>
                             </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="4YT-tY-5L5"/>
@@ -2462,243 +2737,68 @@ A Hangout will expire after hangout created date.</string>
                             <constraint firstItem="Rx3-Re-mos" firstAttribute="leading" secondItem="4YT-tY-5L5" secondAttribute="leading" id="ekO-df-Nic"/>
                             <constraint firstItem="Rx3-Re-mos" firstAttribute="top" secondItem="vuO-Ox-3ru" secondAttribute="top" id="mp2-Zf-dJb"/>
                         </constraints>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="boolean" keyPath="isSkeletonable" value="YES"/>
+                        </userDefinedRuntimeAttributes>
                     </view>
                     <size key="freeformSize" width="414" height="900"/>
                     <connections>
+                        <outlet property="btnAddimg" destination="Dv6-qS-haE" id="xNw-bw-oPg"/>
+                        <outlet property="btnNext" destination="0Zv-XS-oiz" id="vjG-LN-AZJ"/>
                         <outlet property="descHeightConst" destination="nhB-Yf-Cx6" id="4cY-4d-EnH"/>
+                        <outlet property="descriptionLbl" destination="qEw-md-iGY" id="VYQ-YN-dr5"/>
+                        <outlet property="hangoutTypeLbl" destination="cEK-Wp-Bbp" id="D3x-zY-dsB"/>
+                        <outlet property="headingLbl" destination="ElA-OX-2FN" id="fmK-bi-uzE"/>
                         <outlet property="imgView" destination="rgp-v1-ni2" id="z4T-qd-iKR"/>
+                        <outlet property="lblHangoutImg" destination="J4p-25-9Sd" id="1tt-U0-aSz"/>
                         <outlet property="lblTitle" destination="wkQ-SQ-MYq" id="cMM-oA-Gvq"/>
+                        <outlet property="scrollPost" destination="Qaj-zM-TOd" id="PB2-oz-z3a"/>
                         <outlet property="topConst" destination="y8B-LR-YX3" id="18l-ks-bNc"/>
                         <outlet property="txtDesc" destination="lbp-Ib-D1t" id="he0-hS-LxH"/>
                         <outlet property="txtHeading" destination="Pja-nc-OQ0" id="sN5-e4-aIs"/>
                         <outlet property="txtType" destination="LpC-sn-vFo" id="2p5-5W-LwR"/>
+                        <outlet property="viewDesc" destination="icZ-K7-Vy2" id="G7I-zM-7R8"/>
+                        <outlet property="viewHangoutType" destination="V2Z-j5-HyX" id="zqT-Af-TbT"/>
+                        <outlet property="viewhangoutHeading" destination="6px-df-uwf" id="vQD-em-QsM"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gYy-WD-5sx" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2434.7826086956525" y="886.60714285714278"/>
         </scene>
-        <!--No HangoutVC-->
-        <scene sceneID="XnU-2e-pFc">
-            <objects>
-                <viewController storyboardIdentifier="NoHangoutVC" useStoryboardIdentifierAsRestorationIdentifier="YES" id="8zP-IB-4YY" customClass="NoHangoutVC" customModule="Flazhed" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="3Yc-gp-Qub" customClass="IQPreviousNextView" customModule="IQKeyboardManagerSwift">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="v9y-q4-CM6">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                                <subviews>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hLe-a9-ayW">
-                                        <rect key="frame" x="0.0" y="100" width="414" height="44"/>
-                                        <subviews>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mwX-x3-8Tt">
-                                                <rect key="frame" x="32" y="14.5" width="25" height="25"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="25" id="9hh-Sk-Y0h"/>
-                                                    <constraint firstAttribute="height" constant="25" id="qju-Ds-20e"/>
-                                                </constraints>
-                                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                <state key="normal" image="BackArrow">
-                                                    <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                </state>
-                                                <connections>
-                                                    <action selector="BackAct:" destination="8zP-IB-4YY" eventType="touchUpInside" id="4uc-v3-ds4"/>
-                                                </connections>
-                                            </button>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="My Hangouts" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WfZ-2H-wv4">
-                                                <rect key="frame" x="120" y="10.5" width="174" height="33.5"/>
-                                                <fontDescription key="fontDescription" type="boldSystem" pointSize="28"/>
-                                                <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                <nil key="highlightedColor"/>
-                                            </label>
-                                        </subviews>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                        <constraints>
-                                            <constraint firstItem="mwX-x3-8Tt" firstAttribute="leading" secondItem="hLe-a9-ayW" secondAttribute="leading" constant="32" id="29p-Xa-V7b"/>
-                                            <constraint firstItem="WfZ-2H-wv4" firstAttribute="centerY" secondItem="mwX-x3-8Tt" secondAttribute="centerY" id="Bew-UT-mqo"/>
-                                            <constraint firstItem="mwX-x3-8Tt" firstAttribute="top" secondItem="hLe-a9-ayW" secondAttribute="top" constant="14.5" id="TXq-9J-fju"/>
-                                            <constraint firstItem="WfZ-2H-wv4" firstAttribute="centerX" secondItem="hLe-a9-ayW" secondAttribute="centerX" id="fG5-pR-kej"/>
-                                            <constraint firstAttribute="height" constant="44" id="jTT-nX-Hwt"/>
-                                        </constraints>
-                                    </view>
-                                    <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="q6d-ix-0Tg">
-                                        <rect key="frame" x="0.0" y="144" width="414" height="752"/>
-                                        <subviews>
-                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MfF-Pg-dna">
-                                                <rect key="frame" x="0.0" y="0.0" width="414" height="710"/>
-                                                <subviews>
-                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="G8R-BR-dqN">
-                                                        <rect key="frame" x="0.0" y="62" width="414" height="100"/>
-                                                        <subviews>
-                                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="noPhoneBack" translatesAutoresizingMaskIntoConstraints="NO" id="VfM-oa-mAZ">
-                                                                <rect key="frame" x="157" y="0.0" width="100" height="100"/>
-                                                                <constraints>
-                                                                    <constraint firstAttribute="height" constant="100" id="W2T-0n-i47"/>
-                                                                    <constraint firstAttribute="width" constant="100" id="qUQ-VK-GVk"/>
-                                                                </constraints>
-                                                            </imageView>
-                                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="noBack" translatesAutoresizingMaskIntoConstraints="NO" id="8K5-6M-dmZ">
-                                                                <rect key="frame" x="181" y="24" width="52" height="52"/>
-                                                                <constraints>
-                                                                    <constraint firstAttribute="width" constant="52" id="dUv-k0-SXm"/>
-                                                                    <constraint firstAttribute="height" constant="52" id="jTb-7s-buC"/>
-                                                                </constraints>
-                                                            </imageView>
-                                                        </subviews>
-                                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                                        <constraints>
-                                                            <constraint firstItem="8K5-6M-dmZ" firstAttribute="centerY" secondItem="G8R-BR-dqN" secondAttribute="centerY" id="1BF-Kt-SjF"/>
-                                                            <constraint firstItem="VfM-oa-mAZ" firstAttribute="centerY" secondItem="G8R-BR-dqN" secondAttribute="centerY" id="jBq-Zz-egl"/>
-                                                            <constraint firstItem="VfM-oa-mAZ" firstAttribute="centerX" secondItem="G8R-BR-dqN" secondAttribute="centerX" id="lrk-cz-ZBO"/>
-                                                            <constraint firstAttribute="height" constant="100" id="y6s-4t-GFR"/>
-                                                            <constraint firstItem="8K5-6M-dmZ" firstAttribute="centerX" secondItem="G8R-BR-dqN" secondAttribute="centerX" id="z3H-li-Jvr"/>
-                                                        </constraints>
-                                                    </view>
-                                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="JyN-Un-XLx">
-                                                        <rect key="frame" x="53" y="220" width="308" height="127.5"/>
-                                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                                        <string key="text">A Hangout is your way of creating an event and invite people to join. You set the place, date and time and type of event. It's a great way of meeting new friends and dates.
-A Hangout will expire after x days.</string>
-                                                        <color key="textColor" red="0.69019607843137254" green="0.72549019607843135" blue="0.78431372549019607" alpha="1" colorSpace="calibratedRGB"/>
-                                                        <fontDescription key="fontDescription" name="Averta-Regular" family="Averta-Regular" pointSize="15"/>
-                                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                                    </textView>
-                                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qcW-HN-3bW">
-                                                        <rect key="frame" x="30" y="635" width="354" height="45"/>
-                                                        <subviews>
-                                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="continueBack" translatesAutoresizingMaskIntoConstraints="NO" id="QgK-Kz-SN8">
-                                                                <rect key="frame" x="0.0" y="0.0" width="354" height="45"/>
-                                                            </imageView>
-                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="CREATE HANGOUT" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tIi-Ob-f3O">
-                                                                <rect key="frame" x="77" y="14.5" width="200" height="16"/>
-                                                                <constraints>
-                                                                    <constraint firstAttribute="width" constant="200" id="034-8r-zZJ"/>
-                                                                </constraints>
-                                                                <fontDescription key="fontDescription" name="Averta-Bold" family="Averta-Bold" pointSize="16"/>
-                                                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                                <nil key="highlightedColor"/>
-                                                            </label>
-                                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Pg5-X2-eQW">
-                                                                <rect key="frame" x="0.0" y="0.0" width="354" height="45"/>
-                                                                <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                                <state key="normal">
-                                                                    <color key="titleColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                                </state>
-                                                                <connections>
-                                                                    <action selector="nextAct:" destination="8zP-IB-4YY" eventType="touchUpInside" id="taF-Iz-hkl"/>
-                                                                </connections>
-                                                            </button>
-                                                        </subviews>
-                                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                        <constraints>
-                                                            <constraint firstItem="tIi-Ob-f3O" firstAttribute="centerX" secondItem="qcW-HN-3bW" secondAttribute="centerX" id="2Aj-zM-KDy"/>
-                                                            <constraint firstAttribute="bottom" secondItem="QgK-Kz-SN8" secondAttribute="bottom" id="94U-iF-ZEb"/>
-                                                            <constraint firstItem="QgK-Kz-SN8" firstAttribute="leading" secondItem="qcW-HN-3bW" secondAttribute="leading" id="Fo2-bc-OPr"/>
-                                                            <constraint firstItem="tIi-Ob-f3O" firstAttribute="centerY" secondItem="qcW-HN-3bW" secondAttribute="centerY" id="MNw-e9-gYP"/>
-                                                            <constraint firstItem="Pg5-X2-eQW" firstAttribute="top" secondItem="qcW-HN-3bW" secondAttribute="top" id="Pnt-Ga-6hy"/>
-                                                            <constraint firstAttribute="trailing" secondItem="QgK-Kz-SN8" secondAttribute="trailing" id="ZOY-aw-PTv"/>
-                                                            <constraint firstItem="QgK-Kz-SN8" firstAttribute="top" secondItem="qcW-HN-3bW" secondAttribute="top" id="jRb-G0-Rsj"/>
-                                                            <constraint firstAttribute="bottom" secondItem="Pg5-X2-eQW" secondAttribute="bottom" id="k06-DH-b4x"/>
-                                                            <constraint firstAttribute="trailing" secondItem="Pg5-X2-eQW" secondAttribute="trailing" id="lny-tf-aLE"/>
-                                                            <constraint firstAttribute="height" constant="45" id="qpt-D3-NkE"/>
-                                                            <constraint firstItem="Pg5-X2-eQW" firstAttribute="leading" secondItem="qcW-HN-3bW" secondAttribute="leading" id="yYD-kM-H0W"/>
-                                                        </constraints>
-                                                    </view>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Nothing Here" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nNH-rn-81W">
-                                                        <rect key="frame" x="153.5" y="180" width="107" height="17"/>
-                                                        <fontDescription key="fontDescription" name="Averta-Bold" family="Averta-Bold" pointSize="17"/>
-                                                        <color key="textColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
-                                                </subviews>
-                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                <constraints>
-                                                    <constraint firstItem="qcW-HN-3bW" firstAttribute="leading" secondItem="MfF-Pg-dna" secondAttribute="leading" constant="30" id="3PH-om-eNS"/>
-                                                    <constraint firstAttribute="bottom" secondItem="qcW-HN-3bW" secondAttribute="bottom" constant="30" id="3Rz-lB-Ykj"/>
-                                                    <constraint firstItem="nNH-rn-81W" firstAttribute="top" secondItem="G8R-BR-dqN" secondAttribute="bottom" constant="18" id="8DR-pO-4Ea"/>
-                                                    <constraint firstAttribute="trailing" secondItem="G8R-BR-dqN" secondAttribute="trailing" id="9VV-ow-btX"/>
-                                                    <constraint firstAttribute="trailing" secondItem="JyN-Un-XLx" secondAttribute="trailing" constant="53" id="GRY-wQ-Mbn"/>
-                                                    <constraint firstItem="G8R-BR-dqN" firstAttribute="top" secondItem="MfF-Pg-dna" secondAttribute="top" constant="62" id="HnT-cf-4W3"/>
-                                                    <constraint firstItem="JyN-Un-XLx" firstAttribute="top" secondItem="nNH-rn-81W" secondAttribute="bottom" constant="23" id="Ike-YM-7jI"/>
-                                                    <constraint firstItem="nNH-rn-81W" firstAttribute="centerX" secondItem="MfF-Pg-dna" secondAttribute="centerX" id="L0i-eZ-31n"/>
-                                                    <constraint firstItem="JyN-Un-XLx" firstAttribute="leading" secondItem="MfF-Pg-dna" secondAttribute="leading" constant="53" id="RFr-zF-AOG"/>
-                                                    <constraint firstAttribute="trailing" secondItem="qcW-HN-3bW" secondAttribute="trailing" constant="30" id="bk8-nQ-BQ1"/>
-                                                    <constraint firstItem="G8R-BR-dqN" firstAttribute="leading" secondItem="MfF-Pg-dna" secondAttribute="leading" id="dZS-AM-u7F"/>
-                                                    <constraint firstAttribute="trailing" secondItem="qcW-HN-3bW" secondAttribute="trailing" constant="30" id="pgX-qS-c4V"/>
-                                                    <constraint firstItem="qcW-HN-3bW" firstAttribute="leading" secondItem="MfF-Pg-dna" secondAttribute="leading" constant="30" id="s9H-XL-ToD"/>
-                                                </constraints>
-                                            </view>
-                                        </subviews>
-                                        <constraints>
-                                            <constraint firstItem="MfF-Pg-dna" firstAttribute="width" secondItem="q6d-ix-0Tg" secondAttribute="width" id="DRc-Qu-buQ"/>
-                                            <constraint firstAttribute="bottom" secondItem="MfF-Pg-dna" secondAttribute="bottom" id="JNb-qx-X8E"/>
-                                            <constraint firstItem="MfF-Pg-dna" firstAttribute="leading" secondItem="q6d-ix-0Tg" secondAttribute="leading" id="Kt1-Bf-Q9e"/>
-                                            <constraint firstAttribute="trailing" secondItem="MfF-Pg-dna" secondAttribute="trailing" id="hXD-dW-Ng2"/>
-                                            <constraint firstItem="MfF-Pg-dna" firstAttribute="top" secondItem="q6d-ix-0Tg" secondAttribute="top" id="prg-ho-9Aa"/>
-                                        </constraints>
-                                    </scrollView>
-                                </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="bottom" secondItem="q6d-ix-0Tg" secondAttribute="bottom" id="4NK-hU-2OJ"/>
-                                    <constraint firstItem="hLe-a9-ayW" firstAttribute="leading" secondItem="v9y-q4-CM6" secondAttribute="leading" id="CKC-u2-Z4D"/>
-                                    <constraint firstAttribute="trailing" secondItem="q6d-ix-0Tg" secondAttribute="trailing" id="Csm-md-Fi2"/>
-                                    <constraint firstItem="q6d-ix-0Tg" firstAttribute="top" secondItem="hLe-a9-ayW" secondAttribute="bottom" id="YQY-uH-yYm"/>
-                                    <constraint firstAttribute="trailing" secondItem="hLe-a9-ayW" secondAttribute="trailing" id="aYc-OG-kEu"/>
-                                    <constraint firstItem="q6d-ix-0Tg" firstAttribute="leading" secondItem="v9y-q4-CM6" secondAttribute="leading" id="sw6-7L-mnO"/>
-                                    <constraint firstItem="hLe-a9-ayW" firstAttribute="top" secondItem="v9y-q4-CM6" secondAttribute="top" constant="100" id="zF4-of-rVJ"/>
-                                </constraints>
-                            </view>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="Tvt-Yj-VfS"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <constraints>
-                            <constraint firstAttribute="bottom" secondItem="v9y-q4-CM6" secondAttribute="bottom" id="H3Z-4D-8Cv"/>
-                            <constraint firstItem="v9y-q4-CM6" firstAttribute="top" secondItem="3Yc-gp-Qub" secondAttribute="top" id="Nzk-Tm-OE9"/>
-                            <constraint firstItem="v9y-q4-CM6" firstAttribute="leading" secondItem="Tvt-Yj-VfS" secondAttribute="leading" id="YOq-wE-aYf"/>
-                            <constraint firstItem="v9y-q4-CM6" firstAttribute="trailing" secondItem="Tvt-Yj-VfS" secondAttribute="trailing" id="jiR-e9-YJy"/>
-                            <constraint firstItem="MfF-Pg-dna" firstAttribute="height" secondItem="3Yc-gp-Qub" secondAttribute="height" multiplier="0.792411" id="pF2-tH-pJx"/>
-                        </constraints>
-                    </view>
-                    <connections>
-                        <outlet property="txtViewDesc" destination="JyN-Un-XLx" id="OIB-Eq-m4w"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="HKg-4h-z3E" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3272" y="886"/>
-        </scene>
     </scenes>
     <designables>
         <designable name="LpC-sn-vFo">
-            <size key="intrinsicContentSize" width="93.5" height="19"/>
+            <size key="intrinsicContentSize" width="98" height="16.5"/>
         </designable>
         <designable name="O5t-Kb-kzv">
-            <size key="intrinsicContentSize" width="33" height="19"/>
+            <size key="intrinsicContentSize" width="34" height="16.5"/>
         </designable>
         <designable name="eWm-Zn-qVK">
-            <size key="intrinsicContentSize" width="31.5" height="19"/>
+            <size key="intrinsicContentSize" width="33.5" height="16.5"/>
         </designable>
     </designables>
     <resources>
         <image name="BackArrow" width="9" height="15.5"/>
         <image name="Clock" width="17" height="17"/>
         <image name="Date" width="17" height="17"/>
+        <image name="HangouPeople" width="40" height="40"/>
         <image name="Message" width="18" height="18"/>
-        <image name="NewcreateBack" width="126" height="177"/>
+        <image name="NewAddImage" width="90" height="125"/>
+        <image name="NewEditPlusIcon" width="21" height="21"/>
         <image name="Rectangle 898" width="103" height="102"/>
         <image name="Redlocation" width="17" height="17"/>
         <image name="ShortIcon" width="13" height="13"/>
         <image name="Timeback" width="337" height="33"/>
+        <image name="addHang" width="48" height="48"/>
         <image name="backWhite" width="9" height="15.5"/>
         <image name="ball-(2)" width="19" height="19"/>
-        <image name="continueBack" width="318" height="44"/>
         <image name="createBack" width="318" height="44"/>
         <image name="createLine" width="345" height="0.5"/>
-        <image name="detailsBack" width="375" height="872"/>
+        <image name="detailsBack" width="375" height="323"/>
         <image name="dropDown" width="11" height="7"/>
-        <image name="femaleSelected" width="61" height="61"/>
+        <image name="femaleSelected" width="43" height="43"/>
+        <image name="hangout-Blue" width="30" height="29"/>
         <image name="job" width="23" height="23"/>
         <image name="learnBack" width="113" height="34"/>
         <image name="maleUnselected" width="61" height="61"/>
@@ -2707,9 +2807,8 @@ A Hangout will expire after x days.</string>
         <image name="pin-(2)" width="18" height="18"/>
         <image name="placeholderImage" width="235" height="215"/>
         <image name="plane-(2)" width="21" height="21"/>
-        <image name="plusBack" width="55" height="55"/>
-        <image name="plusIcon" width="15" height="15"/>
         <image name="socialIcon" width="11" height="11"/>
+        <image name="threedot_white" width="3" height="17"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

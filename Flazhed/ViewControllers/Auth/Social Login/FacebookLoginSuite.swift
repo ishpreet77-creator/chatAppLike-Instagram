@@ -17,16 +17,16 @@ let kFBEmail = "email"
 let kFBImageUrl = "picture.type(large)"
 let kFBUser_posts = "photos"
 let kInstagram_basic = "instagram_basic"
-let kBirthday = "birthday"
+let kBirthday = "user_birthday"
 let kFBGender = "user_gender"
 
 let kfeed = "feed.limit(3)"
 
-//MARK:- Available read permissions
+//MARK: - Available read permissions
 enum ReadPermission : String  {
-    case  public_profile, email,user_photos//, public_actions, user_videos, user_photos
+    case  public_profile, email,user_photos,user_birthday,user_gender//, public_actions, user_videos, user_photos
     
-    static let allValues = [public_profile, email, user_photos]//,user_photos] // ,public_actions,user_videos,user_photos
+    static let allValues = [public_profile, email, user_photos, user_birthday,user_gender]//,user_photos] // ,public_actions,user_videos,user_photos
     
     static func defaultPermissions() -> [String] {
         var permissions = [String]()
@@ -39,10 +39,10 @@ enum ReadPermission : String  {
     }
 }
 
-//MARK:- Class
+//MARK: - Class
 class FacebookLoginSuite {
     
-    //MARK:- Variables
+    //MARK: - Variables
     var permissions : [String]
     
     var accessToken : AccessToken? {
@@ -52,7 +52,7 @@ class FacebookLoginSuite {
     private var fbLoginManager = LoginManager()
     private var graphConnection=GraphRequestConnection()
     
-    //MARK:- Intializers
+    //MARK: - Intializers
     init(permissions: [String]) {
         self.permissions = permissions
     }
@@ -62,7 +62,7 @@ class FacebookLoginSuite {
     
     }
     
-    //MARK:- Account
+    //MARK: - Account
     
     func hasLoggedIn() -> Bool {
         return AccessToken.current != nil
@@ -107,7 +107,7 @@ class FacebookLoginSuite {
     }
     
     
-    //MARK:- Graph Requests
+    //MARK: - Graph Requests
     func userProfile(success: @escaping FacebookSuiteSuccessClosure, error1: @escaping FacebookSuiteFailureClosure) {
         
         guard hasLoggedIn() else {
@@ -116,16 +116,17 @@ class FacebookLoginSuite {
         }
         Indicator.sharedInstance.showIndicator()
         //me
-        let graphRequest = GraphRequest(graphPath: "me", parameters: ["fields":"\(kFBName),\(kFBID),\(kFBEmail),\(kFBUser_posts),\(kFBImageUrl)"])
+        let graphRequest = GraphRequest(graphPath: "me", parameters: ["fields":"\(kFBName),\(kFBID),\(kFBEmail),\(kFBUser_posts),\(kFBImageUrl),birthday,gender"])
        //
         graphConnection.add(graphRequest, completionHandler: { (connection, result, err) -> Void in
             Indicator.sharedInstance.hideIndicator()
             if err != nil {
+                debugPrint("Facebook error =  \(err?.localizedDescription)")
                 error1((err?.localizedDescription)!, err)
                 return
             }
            let userData = result as? Dictionary<String,AnyObject>
-            print(userData)
+            debugPrint("Facebook data =  \(userData)")
             Indicator.sharedInstance.hideIndicator()
             success(true, userData)
         })
@@ -137,7 +138,7 @@ class FacebookLoginSuite {
 //                return
 //            }
 //
-//            print(result)
+//            debugPrint(result)
 //            // Handle vars
 //            if let result = result as? [String:String],
 //                let email: String = result["email"],
@@ -158,39 +159,40 @@ class FacebookLoginSuite {
 //                return
 //            }
 //           let userData = result as? Dictionary<String,AnyObject>
-//            print(userData)
+//            debugPrint(userData)
 //            let id = userData?[ApiKey.kId] as! String
 //            self.requestWithPath(path: "/\(id)/photos") { (sucees, dic) in
-//                print(dic)
+//                debugPrint(dic)
 //            } error: { (er, error) in
-//                print(error)
+//                debugPrint(error)
 //            }
 //            self.requestWithPath(path: "/\(id)") { (sucees, dic) in
-//                print(dic)
+//                debugPrint(dic)
 //            } error: { (er, error) in
-//                print(error)
+//                debugPrint(error)
 //            }
         //    success(true, userData)
       //  })
         
+        /*
         let accessToken = AccessToken.current?.tokenString
             let params = ["access_token" : accessToken ?? ""]
         
-        print("Facebook login token = \(accessToken)")
+        debugPrint("Facebook login token = \(String(describing: accessToken))")
         let request = GraphRequest(graphPath: "albums", parameters: params, httpMethod: .get)
 
            request.start(completionHandler: { (test, result, error) in
                if(error == nil)
                {
-                  print(result!)
+                  debugPrint(result!)
                }
            })
         GraphRequest(graphPath: "/me/albums", parameters: ["fields":"id,name,user_photos"], httpMethod: HTTPMethod(rawValue: "GET")).start(completionHandler: {  (connection, result, error) in
-print("result = ")
+debugPrint("result = ")
             
             
 
-                print(result!)
+                debugPrint(result!)
         })
         
         let connection = GraphRequestConnection()
@@ -200,18 +202,19 @@ print("result = ")
                 NSLog(error.debugDescription)
                 return
             }
-            print(result)
+            debugPrint(result ?? kEmptyString)
 
            
 
         }
+        */
     
         
         
 //        self.requestWithPath(path: "photos") { (sucees, dic) in
-//            print(dic)
+//            debugPrint(dic)
 //        } error: { (er, error) in
-//            print(error)
+//            debugPrint(error)
 //        }
         
        
@@ -219,7 +222,7 @@ print("result = ")
     }
     
     
-    //MARK:- Makes a GET request to specified path.
+    //MARK: - Makes a GET request to specified path.
     func requestWithPath(path : String, success: @escaping FacebookSuiteSuccessClosure, error: @escaping FacebookSuiteFailureClosure) {
         
         guard hasLoggedIn() else {
@@ -227,7 +230,7 @@ print("result = ")
             return
         }
         
-        let graphRequest = GraphRequest(graphPath: path)
+      //  let graphRequest = GraphRequest(graphPath: path)
         
 //        graphConnection = graphRequest.start(completionHandler: { (connection, result, err) -> Void in
 //            if err != nil {

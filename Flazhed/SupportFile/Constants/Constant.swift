@@ -13,6 +13,13 @@ let SCREENHEIGHT =  UIScreen.main.bounds.height
 let SCREENWIDTH =  UIScreen.main.bounds.width
 let APPSTATE = UIApplication.shared.applicationState
 
+let TIMEZONE = TimeZone.current.identifier
+var CALENDER = Calendar.current
+let ADSWIDTH = CGFloat(300)//250//500
+var checkIsOnGoing = false
+// 300 x 600
+//336 x 280
+//300 x 250
 var TOPSPACING =  CGFloat(22)
 var NAVIHEIGHT =  CGFloat(44)
 var STATUSBARHEIGHT =  CGFloat(20)
@@ -21,11 +28,41 @@ var BLUR_ALPHA:CGFloat =  0.95
 
 var CURRENTLAT =  30.69951335
 var CURRENTLONG =  76.69104083
+var BOTTOMSPACING:CGFloat =  159+45
+let kNudityCheck = 0.3
+let kImagePercent:CGFloat = 45.0
+let kLongImagePercent:CGFloat = 65.0
+
+let kImageCompressLessThan500:CGFloat = 1.0
+let kImageCompressGreaterThan500:CGFloat = 0.5//0.05
+
+let kMinAge = 18
+let kMaxAge = 100
+let kTimeRing48 = 72
+
+let kTimeRing = 4320
+let kTimeRing24 = 1440
+
+let kTimeLeft48 = 2880
+let kButtonDisableSec = 0.5
+let kButtonLikeDuration = 0.2
+let kBioCount = 500//150
+
+let kListImageHeight = CGFloat(350)//150 // 390 // 375
+
+
+
+
+let kCurrentCountryCode = "+45"
 
 var COUNTRYCODE =  Locale.current.regionCode
 
+var LANG_CODE_EN =  "en"
+var LANG_CODE_DA =  "da"
 
 var CURRENTUNIT =  "Centimeters"
+let FEMALECOLOR = UIColor.init(red: 178/255, green: 29/255, blue: 184/255, alpha: 1)
+let MALECOLOR = UIColor.init(red: 0/255, green: 156/255, blue: 193/255, alpha: 1)
 
 let APPCOLOR = UIColor.init(red: 29/255, green: 121/255, blue: 255/255, alpha: 1) //
 
@@ -42,6 +79,7 @@ let TEXTFILEDPLACEHOLDERCOLOR = UIColor.init(red: 176/255, green: 185/255, blue:
 
 let SEEKERCOLOR = UIColor.init(red: 243/255, green: 244/255, blue: 245/255, alpha: 1)
 
+//NEW APP color
 let LINECOLOR = UIColor.init(red: 0/255, green: 104/255, blue: 255/255, alpha: 1) //
 
 let NOTPLAYCOLOR = UIColor.init(red: 250/255, green: 251/255, blue: 252/255, alpha: 1) //
@@ -89,9 +127,29 @@ let BUSSINESSTEXRT = UIColor.init(red: 187/255, green: 220/255, blue: 173/255, a
 
 let WAVECOLOR = UIColor.init(red: 211/255, green: 211/255, blue: 211/255, alpha: 1)
 
+//MARK: - New color
+let ENABLECOLOR = UIColor.black.withAlphaComponent(1)
+let DISABLECOLOR = UIColor.black.withAlphaComponent(0.5)
+let PURPLECOLOR = UIColor.colorWithHexString(hex: "712CA7")
+let LESSPURPLECOLOR = UIColor.colorWithHexString(hex: "CEBFDA")
+
+
+
+
+
 
 
 let APPDEL = UIApplication.shared.delegate as! AppDelegate
 
 @available(iOS 13.0, *)
 let SCENEDEL =  UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate
+
+
+struct PermissonType
+{
+    static let kLocationEnable="Location Enable"
+    static let kCameraEnable="Camera Enable"
+    static let kMicrophoneEnable="Microphone Enable"
+    static let kLibraryEnable="Library Enable"
+    static let kMicrophoneCamera="Microphone Camera"
+}

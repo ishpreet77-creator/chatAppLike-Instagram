@@ -1,10 +1,9 @@
 //
 //  NetworkInterface.swift
 //
-//  Created by Manish Gumbal on 08/08/18.
+//  Updated by Manish Gumbal on 15/12/21.
 //  Copyright © 2018 Manish. All rights reserved.
 //
-
 
 /*
  STATUS CODES:
@@ -18,6 +17,8 @@
 
 import Foundation
 import Alamofire
+import UIKit
+import ListPlaceholder
 
 //MARK: Call Backs
 typealias JSONDictionary = [String:Any]
@@ -31,13 +32,14 @@ typealias responseWithData = ((String?, Error?, Any?) -> ())
 
 //MARK: Constants
 var myRequest: Alamofire.Request?
-var ALAMOFIRE_TIMEOUT: Double = 250
+var ALAMOFIRE_TIMEOUT: Double = 500//250
 let manager = Alamofire.Session.default
 
 //MARK: Enums
 public enum NetworkErrorReason: Error {
     case FailureErrorCode(code: Int, message: String)
     case InternetNotReachable
+    case ServerNotReachable
     case Other
 }
 
@@ -57,13 +59,15 @@ class APIManager {
     
     //MARK: Variables
     static let kMessage = "message"
-    static let NO_INTERNET = "No Internet"
-    static let INTERNET_ERROR = "Your internet connection appears to be offline. Please try again."
-    static let SERVER_ERROR = "Server Error"
-    static let OTHER_ERROR = "Unable to connect with server. Please try again."
-    static let ERROR = "Error"
-    static let SOMETHING_WRONG = "Something went wrong. Please try again"
-    static let UNAUTHORIZED = "Session expired. Please login again."
+    static let NO_INTERNET = "No Internet".localized()
+    static let INTERNET_ERROR = kError//"Your internet connection appears to be offline. Please try again."
+    static let SERVER_ERROR = "Server Error".localized()
+    static let OTHER_ERROR = "Unable to connect with server. Please try again.".localized()
+    static let ERROR = "Error".localized()
+    static let SOMETHING_WRONG = "Something went wrong. Please try again.".localized()
+    static let UNAUTHORIZED = "Session expired. Please login again.".localized()
+    static let SERVER_NOT_CONNECTED = "Could not connect to the server, please check your internet connection and try again.".localized()
+   
     
     class func errorForNetworkErrorReason(errorReason: NetworkErrorReason) -> (NSError) {
         var error: NSError!
@@ -80,6 +84,8 @@ class APIManager {
             default:
                 error = NSError(domain: APIManager.OTHER_ERROR, code: code, userInfo: [APIManager.kMessage : message])
             }
+        case .ServerNotReachable :
+            error = NSError(domain: APIManager.SERVER_NOT_CONNECTED, code: 0, userInfo: [APIManager.kMessage : APIManager.SERVER_NOT_CONNECTED])
         case .Other :
             error = NSError(domain: APIManager.OTHER_ERROR, code: 0, userInfo: [APIManager.kMessage : APIManager.SOMETHING_WRONG])
         }
@@ -132,10 +138,10 @@ extension APIService {
 
         //Create Request
         AF.upload((urlRequest?.1)!, with: (urlRequest?.0)!).uploadProgress(closure: { (progress) in
-            //print(progress.localizedDescription ?? "0")
+            //debugPrint(progress.localizedDescription ?? "0")
             //let dict = Int(progress.localizedDescription ?? "0")
-            print("Progress: %d",progress.fractionCompleted)
-            let dictValue = ["value": progress.fractionCompleted]
+            debugPrint("Progress: %d",progress.fractionCompleted)
+         //   let dictValue = ["value": progress.fractionCompleted]
         }).responseJSON(completionHandler: { (response) in
 
             //Handle Indicators
@@ -144,9 +150,9 @@ extension APIService {
             myRequest = nil
 
             //Show Response Details
-            print("*** API RESPONSE START ***")
-            print("\(response))")
-            print("*** API RESPONSE END ***")
+            debugPrint("*** API RESPONSE START ***")
+            debugPrint("\(response))")
+            debugPrint("*** API RESPONSE END ***")
 
             //Handle Response
             self.handleResponse(response: response, responseSuccess: { (responseSuccess) in
@@ -163,7 +169,7 @@ extension APIService {
     private func jsonRequest(showIndiacter:Bool=true,jsonSuccess: @escaping APIServiceSuccessCallback, jsonFailure: @escaping APIServiceFailureCallback) {
         do {
             
-            print("Show indicator := \(showIndiacter)")
+            debugPrint("Show indicator := \(showIndiacter)")
 //            if
 //            {
 //
@@ -206,6 +212,8 @@ extension APIService {
             
             // let manager = Alamofire.SessionManager.default
             manager.session.configuration.timeoutIntervalForRequest = ALAMOFIRE_TIMEOUT
+            manager.session.configuration.timeoutIntervalForResource = ALAMOFIRE_TIMEOUT
+            
             myRequest = manager.request(request)
                 .responseJSON { response in
                     
@@ -214,10 +222,13 @@ extension APIService {
                     UIApplication.shared.isNetworkActivityIndicatorVisible = false
                     myRequest = nil
                     
+                    
+                   
+                    
                     //Show Response Details
-                    print("*** API RESPONSE START ***")
-                    print("\(response))")
-                    print("*** API RESPONSE END ***")
+                    debugPrint("*** API RESPONSE START ***")
+                    debugPrint("\(response))")
+                    debugPrint("*** API RESPONSE END ***")
                     
                     //Handle Response
                     self.handleResponse(response: response, responseSuccess: { (success) in
@@ -376,7 +387,7 @@ extension APIService {
             headers: headers)
             .responseJSON { (resp) in
                 
-                print("resp is \(resp)")
+                debugPrint("resp is \(resp)")
                 if let status = (resp.value as? NSDictionary)?.value(forKey: "status") as? String
                 {
                     
@@ -405,17 +416,37 @@ extension APIService {
     func handleResponse(response: AFDataResponse<Any>, responseSuccess: @escaping APIServiceSuccessCallback, responseFailure: @escaping APIServiceFailureCallback) {
         
 //        //Show Response Details
-//        print("*** API RESPONSE START ***")
-//        print("\(response))")
-//        print("*** API RESPONSE END ***")
+//        debugPrint("*** API RESPONSE START ***")
+//        debugPrint("\(response))")
+//        debugPrint("*** API RESPONSE END ***")
 //
-        
+    
         let code  = response.response?.statusCode ?? 0
-        print("*** API RESPONSE CODE: \(code) ***")
+        debugPrint("*** API RESPONSE CODE: \(code) ***")
+        
+        switch (response.result) {
+                    case .success: // succes path
+            print("Sucess")
+                    case .failure(let error):
+                        if error._code == NSURLErrorTimedOut {
+                            print("Request timeout!")
+                        }
+                    }
+        
+        
         switch code {
         case 200:
             responseSuccess(response.value as AnyObject)
         default:
+            
+//            switch (response.result) {
+//                              case .success: // succes path
+//                      print("Sucess")
+//                              case .failure(let error):
+//                                  if error._code == NSURLErrorTimedOut {
+//                                      print("Request timeout!")
+//                                  }
+//                              }
             self.handleError(response: response, error: response.error, callback: responseFailure)
         }
     }
@@ -426,7 +457,7 @@ extension APIService {
         if let errorCode = response?.response?.statusCode {
             guard let responseJSON = self.JSONFromData(data: (response?.data)! as NSData) else {
                 callback(NetworkErrorReason.FailureErrorCode(code: errorCode, message:""), error)
-                print("Couldn't read the data")
+                debugPrint("Couldn't read the data")
                 return
             }
             let message = (responseJSON as? NSDictionary)?["message"] as? String ?? "Something went wrong. Please try again."
@@ -434,23 +465,38 @@ extension APIService {
         }
         else {
             let customError = NSError(domain: "Network Error", code: (error! as NSError).code, userInfo: (error! as NSError).userInfo)
-            if let errorCode = response?.error?.localizedDescription , errorCode == "The Internet connection appears to be offline." {
-                callback(NetworkErrorReason.InternetNotReachable, customError)
+            
+            
+//          debugPrint("customError \(customError)")
+//            debugPrint("customError2 \(response) \(error)")
+            if customError.code ==  13
+            {
+               // callback(NetworkErrorReason.InternetNotReachable, customError)
+                callback(NetworkErrorReason.ServerNotReachable, customError)
             }
-            else {
-                callback(NetworkErrorReason.Other, customError)
+            else
+            {
+                if let errorCode = response?.error?.localizedDescription , errorCode == "The Internet connection appears to be offline." {
+                    callback(NetworkErrorReason.InternetNotReachable, customError)
+                }
+                
+                else {
+                    callback(NetworkErrorReason.Other, customError)
+                }
             }
+                
+            
         }
     }
     
     //MARK: Show Console Data
     func showRequest() {
-        print("*** API REQUEST START ***")
-        print("Request URL: \(path)")
-        print("Request HTTP Method: \(resource.method)")
-        print("Request Parameters: \(String(describing: resource.parameters)))")
-        print("Request Headers: \(String(describing: resource.headers)))")
-        print("*** API REQUEST END ***")
+        debugPrint("*** API REQUEST START ***")
+        debugPrint("Request URL: \(path)")
+        debugPrint("Request HTTP Method: \(resource.method)")
+        debugPrint("Request Parameters: \(String(describing: resource.parameters)))")
+        debugPrint("Request Headers: \(String(describing: resource.headers)))")
+        debugPrint("*** API REQUEST END ***")
     }
     
     func showIndicator() {
@@ -458,7 +504,10 @@ extension APIService {
         {
             Indicator.sharedInstance.showIndicator()
         }
-        UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        DispatchQueue.main.async {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
+        }
+       //
     }
     
     //MARK: Data Handling
@@ -466,7 +515,7 @@ extension APIService {
         do {
             return try JSONSerialization.jsonObject(with: data as Data, options: .mutableContainers)
         } catch let myJSONError {
-            print(myJSONError)
+            debugPrint(myJSONError)
         }
         return nil
     }
@@ -476,7 +525,7 @@ extension APIService {
         do {
             return try JSONSerialization.data(withJSONObject: json, options: JSONSerialization.WritingOptions.prettyPrinted) as NSData?
         } catch let myJSONError {
-            print(myJSONError)
+            debugPrint(myJSONError)
         }
         return nil;
     }
@@ -491,39 +540,135 @@ public class Indicator {
     static var isEnabledIndicator = true
     static var isUserInteractionEnabled = true
     
+    //MARK: - new
+      var container: UIView = UIView()
+      var loadingView: UIView = UIView()
+      var activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView()
+    
     private init() {
         blurImg.frame = UIScreen.main.bounds
         if Indicator.isUserInteractionEnabled {
-            blurImg.backgroundColor = UIColor.black
+            blurImg.backgroundColor = UIColor.clear
             blurImg.isUserInteractionEnabled = true
             blurImg.alpha = 0.3
         }
-        indicator.style = .whiteLarge
-        indicator.center = blurImg.center
-        indicator.startAnimating()
-        indicator.color = UIColor(red: 255.0/255.0, green: 255.0/255.0, blue: 255.0/255.0, alpha: 1.0)
+        
+       // indicator.style = .whiteLarge
+        //indicator.center = blurImg.center
+        //indicator.startAnimating()
+       // indicator.color = UIColor.white//UIColor(red: 255.0/255.0, green: 255.0/255.0, blue: 255.0/255.0, alpha: 1.0) //APPCOLOR/
     }
     
     func showIndicator(){
-        DispatchQueue.main.async( execute: {
-            if Indicator.isUserInteractionEnabled {
-                UIApplication.shared.keyWindow?.addSubview(self.blurImg)
-            }
-            UIApplication.shared.keyWindow?.addSubview(self.indicator)
-        })
+//        DispatchQueue.main.async( execute: {
+//            if Indicator.isUserInteractionEnabled {
+//                UIApplication.shared.keyWindow?.addSubview(self.blurImg)
+//            }
+//            UIApplication.shared.keyWindow?.addSubview(self.indicator)
+//        })
     }
     
     func hideIndicator(){
-        DispatchQueue.main.async( execute: {
-            self.blurImg.removeFromSuperview()
-            self.indicator.removeFromSuperview()
-        })
-        self.blurImg.removeFromSuperview()
-        self.indicator.removeFromSuperview()
+//        DispatchQueue.main.async( execute: {
+//            self.blurImg.removeFromSuperview()
+//            self.indicator.removeFromSuperview()
+//        })
+//        self.blurImg.removeFromSuperview()
+//        self.indicator.removeFromSuperview()
+        
+        self.hideIndicator2()
+        
     }
     func hideImageLoader(VC:UIViewController?){
         VC?.dismiss(animated: true, completion: nil)
     }
+    
+    func showIndicator2(){
+        
+       
+        DispatchQueue.main.async( execute: {
+            if Indicator.isUserInteractionEnabled {
+                UIApplication.shared.keyWindow?.addSubview(self.blurImg)
+            }
+            //UIApplication.shared.keyWindow?.addSubview(self.indicator)
+            self.showActivityIndicator(uiView: self.blurImg)
+        })
+    }
+    func showIndicator3(views:[UIView])
+    {
+        for view in views
+        {
+            view.clipsToBounds=true
+            view.showLoader()
+
+        }
+    }
+    func hideIndicator3(views:[UIView])
+    {
+        for view in views
+        {
+            view.hideLoader()
+
+        }
+    }
+    
+    func hideIndicator2(){
+        DispatchQueue.main.async( execute: {
+            self.blurImg.removeFromSuperview()
+            self.indicator.removeFromSuperview()
+        })
+        self.hideActivityIndicator(uiView: self.blurImg)
+        self.blurImg.removeFromSuperview()
+        self.indicator.removeFromSuperview()
+        
+        
+    }
+    
+    
+    func showActivityIndicator(uiView: UIView) {
+           container.frame = uiView.frame
+           container.center = uiView.center
+        container.backgroundColor = UIColorFromHex(rgbValue: 0xffffff, alpha: 0.3)
+       
+        loadingView.frame = CGRect(x: 0, y: 0, width: 80, height: 80)
+           loadingView.center = uiView.center
+        loadingView.backgroundColor = UIColor.black//UIColorFromHex(rgbValue: 0x444444, alpha: 0.7)
+           loadingView.clipsToBounds = true
+           loadingView.layer.cornerRadius = 10
+       
+        activityIndicator.frame = CGRect(x: 0.0, y: 0.0, width: 40.0, height: 40.0);
+        activityIndicator.style = UIActivityIndicatorView.Style.whiteLarge
+        activityIndicator.center = CGPoint(x: loadingView.frame.size.width / 2, y: loadingView.frame.size.height / 2);
+    
+           loadingView.addSubview(activityIndicator)
+           container.addSubview(loadingView)
+           uiView.addSubview(container)
+           activityIndicator.startAnimating()
+       }
+
+       /*
+           Hide activity indicator
+           Actually remove activity indicator from its super view
+       
+           @param uiView - remove activity indicator from this view
+       */
+       func hideActivityIndicator(uiView: UIView) {
+           activityIndicator.stopAnimating()
+           container.removeFromSuperview()
+       }
+
+       /*
+           Define UIColor from hex value
+           
+           @param rgbValue - hex color value
+           @param alpha - transparency level
+       */
+       func UIColorFromHex(rgbValue:UInt32, alpha:Double=1.0)->UIColor {
+           let red = CGFloat((rgbValue & 0xFF0000) >> 16)/256.0
+           let green = CGFloat((rgbValue & 0xFF00) >> 8)/256.0
+           let blue = CGFloat(rgbValue & 0xFF)/256.0
+           return UIColor(red:red, green:green, blue:blue, alpha:CGFloat(alpha))
+       }
     
 }
 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct UserListModel {
+struct HomeUserListModel {
     var profile_data:ProfileData?
     
     var second_table_like_dislike:SecondTableLikeDislikeModel?
@@ -32,11 +32,183 @@ struct UserListModel {
     var device_type:String?
     var device_token:String?
     var is_shake_count:Int?
+   // var post_details:[PostdetailModel]?
+   // var hangout_details:[HangoutDataModel]?
+    var unit_settings:unitDataModel?
+
+
+   // var Insta_data:InstaDataModel?
+    
+    var Single_Hangout_Details:HangoutDataModel?
+    var Single_Story_Details:PostdetailModel?
+    
+    var like_dislikeData:Like_DisLike_Model?
+    //var arrAllPostCollection:[AllPostModel]!
+    var story_like_by_self:Int?
+    var hangout_like_by_self:Int?
+    
+    var response_other_user:Int?
+    var response_self_user:Int?
+    var continue_chat_status_other_user:Int?
+    var is_read_by_second_user:Int?
+    var is_continue_from_user:Int?
+    var is_continue_to_user:Int?
+    var self_send_message:Int?
+    var prolong_subscription_is_active:Int?
+    var continue_chat_status:Int?
+    var chat_room_details:chat_room_Id_Model?
+    var other_user_inactive_state:Int?
+    
+    
+    init(detail:JSONDictionary) {
+        self.chat_room_details =  chat_room_Id_Model.init(detail: (detail["chat_room_details"] as? JSONDictionary) ?? [:])
+        self.second_table_like_dislike = SecondTableLikeDislikeModel.init(detail: (detail["second_table_like_dislike"] as? JSONDictionary) ?? [:])
+        self.profile_data = ProfileData.init(detail: (detail["profile_data"] as? JSONDictionary) ?? [:])
+        self.like_dislike = detail[ApiKey.kName] as? String
+        
+        self.like_mode_by_self = detail["like_mode_by_self"] as? String
+        self.like_mode_by_other_user = detail["like_mode_by_other_user"] as? String
+        self.more_profile_details = MoreProfileDataModel.init(detail: (detail["more_profile_details"] as? JSONDictionary) ?? [:])
+        self.user_id = detail["user_id"] as? String
+        self.is_liked_by_self_user = detail["is_liked_by_self_user"] as? Int
+        self.is_liked_by_other_user_id = detail["is_liked_by_other_user_id"] as? Int
+        self.other_user_inactive_state = detail["other_user_inactive_state"] as? Int
+        
+        //self.is_liked_by_other_user_id = detail["is_liked_by_other_user_id"] as? Int
+        self.enable_red_dot = detail["enable_red_dot"] as? Int
+        
+        
+        self.phone_number = detail["phone_number"] as? Int
+        self.country_code = detail["country_code"] as? String
+        self.social_id = detail["social_id"] as? String
+        self.social_type = detail["social_type"] as? String
+        self.email = detail["email"] as? String
+        
+        self.device_type = detail["device_type"] as? String
+        self.device_token = detail["device_token"] as? String
+        self.is_shake_count = detail["is_shake_count"] as? Int
+        self.story_like_by_self = detail["story_like_by_self"] as? Int
+        self.hangout_like_by_self = detail["hangout_like_by_self"] as? Int
+        
+        self.is_block = detail["is_block"] as? Int
+        //MARK: - for match
+        self.response_other_user = detail["response_other_user"] as? Int
+        self.response_self_user = detail["response_self_user"] as? Int
+        self.continue_chat_status_other_user = detail["continue_chat_status_other_user"] as? Int
+        self.is_read_by_second_user = detail["is_read_by_second_user"] as? Int
+        self.continue_chat_status_other_user = detail["continue_chat_status_other_user"] as? Int
+        self.is_continue_from_user = detail["is_continue_from_user"] as? Int
+        self.is_continue_to_user = detail["is_continue_to_user"] as? Int
+        self.self_send_message = detail["self_send_message"] as? Int
+        self.prolong_subscription_is_active = detail["prolong_subscription_is_active"] as? Int
+        self.continue_chat_status = detail["continue_chat_status"] as? Int
+
+        
+        
+        
+        
+        self.Single_Hangout_Details = HangoutDataModel.init(detail: (detail["single_hangout_details"] as? JSONDictionary) ?? [:])
+        
+        self.Single_Story_Details = PostdetailModel.init(detail: (detail["story_details"] as? JSONDictionary) ?? [:])
+        
+       // hangout_details = [HangoutDataModel]()
+       
+        
+//        for hangout in detail["hangout_details"] as? JSONArray ?? []
+//        {
+//           let post = HangoutDataModel(detail: hangout)
+//            self.hangout_details?.append(post)
+//        }
+        
+     //   post_details = [PostdetailModel]()
+        
+        
+//        for posts in detail["post_details"] as? JSONArray ?? []
+//        {
+//           let post = PostdetailModel(detail: posts)
+//            self.post_details?.append(post)
+//        }
+//
+        
+        self.unit_settings = unitDataModel.init(detail: (detail["unit_settings"] as? JSONDictionary) ?? [:])
+        
+
+        
+      //  self.Insta_data = InstaDataModel.init(detail: (detail["instagram_data"] as? JSONDictionary) ?? [:])
+        
+        self.like_dislikeData = Like_DisLike_Model.init(detail: (detail["like_dislike"] as? JSONDictionary) ?? [:])
+        
+       // self.arrAllPostCollection = self.createAllPostArr()
+    }
+    
+//    func createAllPostArr() -> [AllPostModel]{
+//
+//        var arr = [AllPostModel]()
+//
+//
+//
+//        if let postDetails = post_details{
+//            for post in postDetails{
+//                if post._id != nil
+//                {
+//                arr.append(
+//                    AllPostModel.init(type: .story, PostData: post))
+//                }
+//            }
+//        }
+//        if let HangDetails = hangout_details{
+//            for hang in HangDetails{
+//                if hang._id != nil
+//                {
+//                arr.append(
+//                    AllPostModel.init(type: .hangout,hangoutData: hang))
+//                }
+//            }
+//        }
+//
+//        return arr
+//    }
+}
+
+
+
+
+
+
+
+
+
+
+struct UserListModel {
+    var profile_data:ProfileData?
+    
+    var second_table_like_dislike:SecondTableLikeDislikeModel?
+    
+    var like_dislike:String?
+    var like_mode_by_other_user:String?
+    var like_mode_by_self:String?
+    
+    var more_profile_details:MoreProfileDataModel?
+    var user_id:String?
+    var is_liked_by_other_user_id:Int?
+    var other_user_inactive_state:Int?
+    
+    var is_liked_by_self_user:Int?
+    //var is_liked_by_other_user_id:Int?
+    var phone_number:Int?
+    var country_code:String?
+    var social_id:String?
+    var social_type:String?
+    var email:String?
+    var is_block:Int?
+    var enable_red_dot:Int?
+    var device_type:String?
+    var device_token:String?
+    var is_shake_count:Int?
     var post_details:[PostdetailModel]?
     var hangout_details:[HangoutDataModel]?
     var unit_settings:unitDataModel?
     
-    var facebook_data:FacebookDataModel?
 
     var Insta_data:InstaDataModel?
     
@@ -58,8 +230,15 @@ struct UserListModel {
     var prolong_subscription_is_active:Int?
     var continue_chat_status:Int?
     
+    var facebook_Profile_data:Facebook_login_Model?
+    
+    var chat_room_details:chat_room_Id_Model?
+    
     init(detail:JSONDictionary) {
         self.second_table_like_dislike = SecondTableLikeDislikeModel.init(detail: (detail["second_table_like_dislike"] as? JSONDictionary) ?? [:])
+        
+        self.facebook_Profile_data = Facebook_login_Model.init(detail: (detail["facebook_data"] as? JSONDictionary) ?? [:])
+        
         self.profile_data = ProfileData.init(detail: (detail["profile_data"] as? JSONDictionary) ?? [:])
         self.like_dislike = detail[ApiKey.kName] as? String
         
@@ -69,11 +248,12 @@ struct UserListModel {
         self.user_id = detail["user_id"] as? String
         self.is_liked_by_self_user = detail["is_liked_by_self_user"] as? Int
         self.is_liked_by_other_user_id = detail["is_liked_by_other_user_id"] as? Int
-        
+        self.other_user_inactive_state = detail["other_user_inactive_state"] as? Int
         
         //self.is_liked_by_other_user_id = detail["is_liked_by_other_user_id"] as? Int
         self.enable_red_dot = detail["enable_red_dot"] as? Int
         
+    
         
         self.phone_number = detail["phone_number"] as? Int
         self.country_code = detail["country_code"] as? String
@@ -88,7 +268,7 @@ struct UserListModel {
         self.hangout_like_by_self = detail["hangout_like_by_self"] as? Int
         
         self.is_block = detail["is_block"] as? Int
-        //MARK:- for match
+        //MARK: - for match
         self.response_other_user = detail["response_other_user"] as? Int
         self.response_self_user = detail["response_self_user"] as? Int
         self.continue_chat_status_other_user = detail["continue_chat_status_other_user"] as? Int
@@ -99,7 +279,7 @@ struct UserListModel {
         self.self_send_message = detail["self_send_message"] as? Int
         self.prolong_subscription_is_active = detail["prolong_subscription_is_active"] as? Int
         self.continue_chat_status = detail["continue_chat_status"] as? Int
-
+        self.chat_room_details =  chat_room_Id_Model.init(detail: (detail["chat_room_details2"] as? JSONDictionary) ?? [:])
         
         
         
@@ -129,8 +309,7 @@ struct UserListModel {
         
         self.unit_settings = unitDataModel.init(detail: (detail["unit_settings"] as? JSONDictionary) ?? [:])
         
-        self.facebook_data = FacebookDataModel.init(detail: (detail["facebook_data"] as? JSONDictionary) ?? [:])
-        
+       
         self.Insta_data = InstaDataModel.init(detail: (detail["instagram_data"] as? JSONDictionary) ?? [:])
         
         self.like_dislikeData = Like_DisLike_Model.init(detail: (detail["like_dislike"] as? JSONDictionary) ?? [:])
@@ -198,24 +377,41 @@ struct ProfileData {
            let img = ImageDataModel(detail: imag)
             self.images?.append(img)
         }
-       
     }
+    
+    private init() {}
+    
+    func json() -> Dictionary<String,Any> {
+        var dict = [String: Any]()
+        dict["_id"] = self._id
+        dict["image0"] = HangoutVM.shared.stringToData(string: self.images?[0].image ?? kEmptyString)
+        dict["image1"] = HangoutVM.shared.stringToData(string: self.images?[1].image ?? kEmptyString)
+        dict["image2"] = HangoutVM.shared.stringToData(string: self.images?[2].image ?? kEmptyString)
+        dict["image3"] = HangoutVM.shared.stringToData(string: self.images?[3].image ?? kEmptyString)
+        dict["image4"] = HangoutVM.shared.stringToData(string: self.images?[4].image ?? kEmptyString)
+        dict["image5"] = HangoutVM.shared.stringToData(string: self.images?[5].image ?? kEmptyString)
+        dict["image6"] = HangoutVM.shared.stringToData(string: self.images?[6].image ?? kEmptyString)
+        dict["image7"] = HangoutVM.shared.stringToData(string: self.images?[7].image ?? kEmptyString)
+        dict["image8"] = HangoutVM.shared.stringToData(string: self.images?[8].image ?? kEmptyString)
+        return dict
+    }
+    
 }
 
 //ImageDataModel
 struct ImageDataModel {
     
-    var _id:String?
+    //var _id:String?
     var image:String?
-    var updatedAt:String?
-    var createdAt:String?
+    //var updatedAt:String?
+   // var createdAt:String?
 
 
     init(detail:JSONDictionary) {
-        self._id = detail["_id"] as? String
+       // self._id = detail["_id"] as? String
         self.image = detail["image"] as? String
-        self.updatedAt = detail["updatedAt"] as? String
-        self.createdAt = detail["createdAt"] as? String
+        //self.updatedAt = detail["updatedAt"] as? String
+       // self.createdAt = detail["createdAt"] as? String
 
     }
 }
@@ -343,7 +539,8 @@ struct childrensDataModel {
     var image:String?
     var is_selected:Bool?
     var children_name:String?
-   
+    var children_name_da:String?
+    
     
     
     init(detail:JSONDictionary) {
@@ -352,7 +549,8 @@ struct childrensDataModel {
         self.image = detail["image"] as? String
         self.is_selected = detail["is_selected"] as? Bool
         self.children_name = detail["children_name"] as? String
-    
+        self.children_name_da = detail["children_name_da"] as? String
+
 }
 }
 
@@ -362,13 +560,14 @@ struct educationsDataModel {
     var _id:String?
     var is_selected:Bool?
     var education_name:String?
-    
-    init(detail:JSONDictionary) {
+    var education_name_da:String?
+    init(detail:JSONDictionary)
+    {
         self._id = detail["_id"] as? String
         self.is_selected = detail["is_selected"] as? Bool
         self.education_name = detail["education_name"] as? String
-    
-}
+        self.education_name_da = detail["education_name_da"] as? String
+   }
 }
 
 
@@ -378,12 +577,13 @@ struct hairsDataModel {
     var _id:String?
     var is_selected:Bool?
     var hair_name:String?
+    var hair_name_da:String?
     
     init(detail:JSONDictionary) {
         self._id = detail["_id"] as? String
         self.is_selected = detail["is_selected"] as? Bool
         self.hair_name = detail["hair_name"] as? String
-    
+        self.hair_name_da = detail["hair_name_da"] as? String
 }
 }
 
@@ -391,30 +591,15 @@ struct hairsDataModel {
 
 struct unitDataModel {
     var _id:String?
-    var deletedAt:String?
+    //var deletedAt:String?
     var unit:String?
-    var user_id:String?
+    //var user_id:String?
     init(detail:JSONDictionary) {
         self._id = detail["_id"] as? String
-        self.deletedAt = detail["deletedAt"] as? String
-        self.user_id = detail["user_id"] as? String
+       // self.deletedAt = detail["deletedAt"] as? String
+       // self.user_id = detail["user_id"] as? String
         self.unit = detail["unit"] as? String
     
-}
-}
-
-
-struct FacebookDataModel {
-    var _id:String?
-    var deletedAt:String?
-    var facebook_data:String?
-    var user_id:String?
-    
-    init(detail:JSONDictionary) {
-        self._id = detail["_id"] as? String
-        self.deletedAt = detail["deletedAt"] as? String
-        self.facebook_data = detail["facebook_data"] as? String
-        self.user_id = detail["user_id"] as? String
 }
 }
 
@@ -463,7 +648,6 @@ enum PostType{
 struct ProfAttributeModel{
     
     var type:ProfAttributeType!
-    
     var height:Int?
     var education_selected:educationsDataModel?
     var hair_selected:hairsDataModel?
@@ -484,7 +668,7 @@ struct InstaDataModel {
     var deletedAt:String?
     var instagram_data:String?//InstaSendModel?
     var user_id:String?
-    var images:[String]?
+    var images:[String]? = []
     
     init(detail:JSONDictionary) {
         self._id = detail["_id"] as? String
@@ -492,15 +676,17 @@ struct InstaDataModel {
         self.instagram_data = detail["instagram_data"] as? String//InstaSendModel
         self.user_id = detail["user_id"] as? String
         
-        images = [String]()
+        self.images = detail["images"] as? [String]
         
-        for imag in detail["images"] as? NSArray ?? []
-        {
-            let imgStr = imag as? String ?? ""
-               
-         
-            self.images?.append(imgStr)
-        }
+        //images = [String]()
+        
+//        for imag in detail["images"] as? NSArray ?? []
+//        {
+//            let imgStr = imag as? String ?? ""
+//
+//
+//            self.images?.append(imgStr)
+//        }
 }
 }
 
@@ -510,3 +696,6 @@ struct InstagramPostModel {
     var imageUrl:String = ""
     var PostType:String = ""
 }
+
+
+

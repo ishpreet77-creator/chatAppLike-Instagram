@@ -25,7 +25,7 @@ class OnBoardingVM {
     func callApiSocialLoginAPI(data: JSONDictionary,  response: @escaping responseCallBack)
     {
         APIManager.callApiSocialLogin(data:data, successCallback: { (responseDict) in
-            print(responseDict)
+            debugPrint(responseDict)
             let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
            self.parseUserLoginData(response:responseDict)
             response(message, nil)
@@ -38,7 +38,7 @@ class OnBoardingVM {
     func callApiForSendOTPAPI(data: JSONDictionary,  response: @escaping responseCallBack)
     {
         APIManager.callApiSendOTP(data:data, successCallback: { (responseDict) in
-            print(responseDict)
+            debugPrint(responseDict)
             let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
            self.parseSendOTPData(response:responseDict)
             response(message, nil)
@@ -50,7 +50,7 @@ class OnBoardingVM {
     {
        
         APIManager.callApiverifyOTP(data:data, successCallback: { (responseDict) in
-            print(responseDict)
+            debugPrint(responseDict)
             let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
            self.parseVerifyOTPData(response:responseDict)
             response(message, nil)
@@ -63,7 +63,7 @@ class OnBoardingVM {
     {
        
         APIManager.callApiCompleteProfile(data: data, imageDict: mediaArray, successCallback: { (responseDict) in
-            print(responseDict)
+            debugPrint(responseDict)
             let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
            //self.parseSendOTPData(response:responseDict)
             response(message, nil)
@@ -77,14 +77,14 @@ class OnBoardingVM {
 extension APIManager {
     
     
-    //MARK:- call Api Social Login Facebook, google,apple
+    //MARK: - call Api Social Login Facebook, google,apple
     
     class func callApiSocialLogin(data: JSONDictionary, successCallback: @escaping JSONDictionaryResponseCallback, failureCallback: @escaping APIServiceFailureCallback) {
         OnBoardingApiServices.SocialLogin(data: data).request(isJsonRequest: true,success: { (response) in
             
             if let responseDict = response as? JSONDictionary {
                 successCallback(responseDict)
-                print(responseDict)
+                debugPrint(responseDict)
             }
             else {
                 successCallback([:])
@@ -92,14 +92,14 @@ extension APIManager {
         }, failure: failureCallback)
     }
     
-    //MARK:- call Api Send OTP
+    //MARK: - call Api Send OTP
     
     class func callApiSendOTP(data: JSONDictionary, successCallback: @escaping JSONDictionaryResponseCallback, failureCallback: @escaping APIServiceFailureCallback) {
         OnBoardingApiServices.sendOTP(data: data).request(isJsonRequest: true,success: { (response) in
             
             if let responseDict = response as? JSONDictionary {
                 successCallback(responseDict)
-                print(responseDict)
+                debugPrint(responseDict)
             }
             else {
                 successCallback([:])
@@ -107,14 +107,14 @@ extension APIManager {
         }, failure: failureCallback)
     }
     
-    //MARK:- call Api verify OTP
+    //MARK: - call Api verify OTP
    
     class func callApiverifyOTP(data: JSONDictionary, successCallback: @escaping JSONDictionaryResponseCallback, failureCallback: @escaping APIServiceFailureCallback) {
         OnBoardingApiServices.verifyOTP(data: data).request(isJsonRequest: true,success: { (response) in
             
             if let responseDict = response as? JSONDictionary {
                 successCallback(responseDict)
-                print(responseDict)
+                debugPrint(responseDict)
             }
             else {
                 successCallback([:])
@@ -123,7 +123,7 @@ extension APIManager {
     }
     
     
-    //MARK:- call Api Complete Profile
+    //MARK: - call Api Complete Profile
     
     class func callApiCompleteProfile(data: JSONDictionary,imageDict:[Data]?,  successCallback: @escaping JSONDictionaryResponseCallback, failureCallback: @escaping APIServiceFailureCallback) {
         OnBoardingApiServices.CompleteProfile(data: data).request(mediaArray: imageDict,mediaName: "images", success: { (response) in
@@ -140,7 +140,7 @@ extension APIManager {
 }
 
 
-//MARK:- Parsing the data
+//MARK: - Parsing the data
 
 
 extension OnBoardingVM {
@@ -148,7 +148,7 @@ extension OnBoardingVM {
     func parseUserLoginData(response: JSONDictionary){
         if let data = response[ApiKey.kData] as? JSONDictionary
         {
-            print(data)
+            debugPrint(data)
             if let id = data["send_shake_id"] as? String
             {
                 DataManager.ShakeId=id
@@ -198,8 +198,7 @@ extension OnBoardingVM {
     func parseSendOTPData(response: JSONDictionary){
         if let data = response[ApiKey.kOTPDATA] as? JSONDictionary
         {
-            print(data)
-         
+            debugPrint(data)
              sendOTPData=data
             
         }
@@ -208,7 +207,7 @@ extension OnBoardingVM {
     func parseVerifyOTPData(response: JSONDictionary){
         if let data = response[ApiKey.kData] as? JSONDictionary
         {
-            print(data)
+            debugPrint(data)
             if let id = data["send_shake_id"] as? String
             {
                 DataManager.ShakeId=id
@@ -256,7 +255,7 @@ extension OnBoardingVM {
     func parseUpdateProfileData(response: JSONDictionary){
         if let data = response[ApiKey.kData] as? JSONDictionary
         {
-            print(data)
+            debugPrint(data)
             if let id = data["send_shake_id"] as? String
             {
                 DataManager.ShakeId=id

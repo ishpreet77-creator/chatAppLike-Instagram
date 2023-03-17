@@ -29,7 +29,7 @@ class ReverseGeocoding {
         }
 
         let place = placemarks as [CLPlacemark]
-        print(place)
+        debugPrint(place)
         if place.count > 0 {
             let place = placemarks[0]
             var addressString : String = ""

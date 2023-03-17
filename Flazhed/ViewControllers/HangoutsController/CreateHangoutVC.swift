@@ -9,8 +9,28 @@ import UIKit
 import SwiftRangeControl
 import IQKeyboardManagerSwift
 import CoreLocation
+import SkeletonView
+
 class CreateHangoutVC: BaseVC {
 
+    @IBOutlet weak var additionalLbl: UILabel!
+    @IBOutlet weak var ageLbl: UILabel!
+    @IBOutlet weak var lookingFor: UILabel!
+    
+    @IBOutlet weak var placeLbl: UILabel!
+    @IBOutlet weak var timeLbl: UILabel!
+    @IBOutlet weak var dateLbl: UILabel!
+    @IBOutlet weak var runsForLbl: UILabel!
+    @IBOutlet weak var btnOpenPremium: UIButton!
+    @IBOutlet weak var ImgAddHang: UIImageView!
+    @IBOutlet weak var viewRunningFor: UIView!
+    @IBOutlet weak var lblRunningDay: UITextField!
+    @IBOutlet weak var viewAge: UIView!
+    @IBOutlet weak var viewLoging: UIView!
+    @IBOutlet weak var viewAddDesc: UIView!
+    @IBOutlet weak var viewPlace: UIView!
+    @IBOutlet weak var viewTime: UIView!
+    @IBOutlet weak var viewDate: UIView!
     @IBOutlet weak var btnPost: UIButton!
     @IBOutlet weak var lbltitle: UILabel!
     @IBOutlet weak var addDescConst: NSLayoutConstraint!
@@ -52,13 +72,22 @@ class CreateHangoutVC: BaseVC {
     var currentDate = ""
     var hangoutSelectedTime = Date()
     var hangoutSelectedDate = Date()
+    var comeFrom = ""
+    var view_user_id = ""
+    var hangout_id = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-       
+      
         txtAdditionDes.delegate = self
-        
+        if Connectivity.isConnectedToInternet {
+
+            self.getMySubscriptionApi()
+        } else {
+
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
         
         // Do any additional setup after loading the view.
         
@@ -72,6 +101,21 @@ class CreateHangoutVC: BaseVC {
     
     func setUI()
     {
+        // set color
+        runsForLbl.textColor = PURPLECOLOR
+        dateLbl.textColor = PURPLECOLOR
+        timeLbl.textColor = PURPLECOLOR
+        placeLbl.textColor = PURPLECOLOR
+        additionalLbl.textColor = PURPLECOLOR
+        lookingFor.textColor = PURPLECOLOR
+        ageLbl.textColor = PURPLECOLOR
+        runsForLbl.text = kRUNSFOR
+        dateLbl.text = kDate
+        timeLbl.text = kTime
+        placeLbl.text = kPlace
+        additionalLbl.text = kAdditional
+        lookingFor.text = kLooking
+        ageLbl.text = kAge
         
      
         
@@ -141,7 +185,7 @@ class CreateHangoutVC: BaseVC {
             if  kMale.equalsIgnoreCase(string: self.HangoutDetail?.looking_for ?? "")
             {
                 self.imgMale.image = UIImage(named: "maleSelected")
-                self.lblMale.textColor = LINECOLOR
+                self.lblMale.textColor = PURPLECOLOR//LINECOLOR
                 lblMale.font = UIFont(name: AppFontName.Semibold, size: 14)
                 hangoutLookingFor = kMale
                 self.lookingForArray.append(kMale)
@@ -157,12 +201,12 @@ class CreateHangoutVC: BaseVC {
             else if  kBothGender.equalsIgnoreCase(string: self.HangoutDetail?.looking_for ?? "")
             {
                 self.imgfemale.image = UIImage(named: "femaleSelected")
-                self.lblFemale.textColor = LINECOLOR
+                self.lblFemale.textColor = PURPLECOLOR//LINECOLOR
                 lblFemale.font = UIFont(name: AppFontName.Semibold, size: 14)
            
                 
                 self.imgMale.image = UIImage(named: "maleSelected")
-                self.lblMale.textColor = LINECOLOR
+                self.lblMale.textColor = PURPLECOLOR//LINECOLOR
                 lblMale.font = UIFont(name: AppFontName.Semibold, size: 14)
                
                 self.lookingForArray.append(kMale)
@@ -173,7 +217,7 @@ class CreateHangoutVC: BaseVC {
             else
             {
                 self.imgfemale.image = UIImage(named: "femaleSelected")
-                self.lblFemale.textColor = LINECOLOR
+                self.lblFemale.textColor = PURPLECOLOR//LINECOLOR
                 lblFemale.font = UIFont(name: AppFontName.Semibold, size: 14)
                 hangoutLookingFor = kFemale
                 self.lookingForArray.append(kFemale)
@@ -215,7 +259,7 @@ class CreateHangoutVC: BaseVC {
         {
             self.imgfemale.image = UIImage(named: "femaleSelected")
             self.imgMale.image = UIImage(named: "maleUnselected")
-                self.lblFemale.textColor = LINECOLOR
+                self.lblFemale.textColor = PURPLECOLOR//LINECOLOR
             lookingForArray.append(hangoutLookingFor)
             self.lbltitle.text = "Create Hangout"
             self.btnPost.setTitle("POST", for: .normal)
@@ -247,19 +291,31 @@ class CreateHangoutVC: BaseVC {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
-//
-//        if  STATUSBARHEIGHT == 0
-//        {
-//            self.topConst.constant = 40
-//        }
-//        else
-//        {
-//            self.topConst.constant = STATUSBARHEIGHT
-//        }
+        if STATUSBARHEIGHT>40.0
+        {
+            self.topConst.constant = STATUSBARHEIGHT
+        }
+        else
+        {
+            self.topConst.constant = 44.0
+        }
         
-        self.topConst.constant = STATUSBARHEIGHT
+        
+//                if self.getDeviceModel() == "iPhone 6"
+//                {
+//                    self.topConst.constant = STATUSBARHEIGHT+20
+//                }
+//                else if self.getDeviceModel() == "iPhone 8+"
+//                {
+//                    self.topConst.constant = TOPSPACING+STATUSBARHEIGHT
+//                }
+//                else
+//                {
+//                    self.topConst.constant = TOPSPACING+STATUSBARHEIGHT
+//                }
+        
     }
+
     @IBAction func BackAct(_ sender: UIButton)
     {
         self.navigationController?.popViewController(animated: true)
@@ -277,13 +333,33 @@ class CreateHangoutVC: BaseVC {
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
+    @IBAction func addRunningAct(_ sender: UIButton)
+    {
+    
+        let destVC = NewPremiumVC.instantiate(fromAppStoryboard: .Account)
+        destVC.type = .Hangout
+        destVC.subscription_type=kHangout
+        destVC.delegate=self
+        destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+        destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+        
+        if let tab = self.tabBarController
+        {
+            tab.present(destVC, animated: true, completion: nil)
+        }
+        else
+        {
+            self.present(destVC, animated: true, completion: nil)
+        }
+        
+    }
     
     @IBAction func postAct(_ sender: UIButton)
     {
-        print(self.lookingForArray)
+        debugPrint(self.lookingForArray)
         
         var gender1=""
-        var gender2=""
+        //var gender2=""
         
         if self.lookingForArray.count>0
         {
@@ -292,11 +368,11 @@ class CreateHangoutVC: BaseVC {
         }
         if self.lookingForArray.count>1
         {
-            gender2=self.lookingForArray[1]
+            //gender2=self.lookingForArray[1]
             
             self.hangoutLookingFor=kBothGender
         }
-        print(hangoutLookingFor)
+        debugPrint(hangoutLookingFor)
      
         
         
@@ -323,8 +399,8 @@ class CreateHangoutVC: BaseVC {
           dateFormatter2.dateFormat = "yyyy-MM-dd"
           let hangDate=dateFormatter2.string(from: date)
             
-            let time2 = hangDate.dateFromString(format: .StoryDateFormat, type: .local)
-            let date12 = time2.string(format: .ymdDate, type: .gmt)
+           // let time2 = hangDate.dateFromString(format: .StoryDateFormat, type: .local)
+           // let date12 = time2.string(format: .ymdDate, type: .gmt)
             
             
             data[ApiKey.kDate] = hangDate
@@ -361,9 +437,10 @@ class CreateHangoutVC: BaseVC {
             data[ApiKey.kLatitude] = self.hangoutLat
             data[ApiKey.kLongitude] = self.hangoutLong
             
-            print(data)
+            debugPrint(data)
                 if Connectivity.isConnectedToInternet
                 {
+                    self.showLoader()
                     if fromEdit
                     {
                         self.UpdateHangoutApi(image: self.imageData, data: data, HangoutId: self.HangoutDetail?._id ?? "")
@@ -389,7 +466,7 @@ class CreateHangoutVC: BaseVC {
         if  self.imgMale.image == UIImage(named: "maleUnselected")
         {
                         self.imgMale.image = UIImage(named: "maleSelected")
-                        self.lblMale.textColor = LINECOLOR
+                        self.lblMale.textColor = PURPLECOLOR//LINECOLOR//LINECOLOR
                         lblMale.font = UIFont(name: AppFontName.Semibold, size: 14)
    
             hangoutLookingFor = kMale
@@ -422,7 +499,7 @@ class CreateHangoutVC: BaseVC {
         if  self.imgfemale.image == UIImage(named: "femaleUnselected")
         {
                         self.imgfemale.image = UIImage(named: "femaleSelected")
-                        self.lblFemale.textColor = LINECOLOR
+                        self.lblFemale.textColor = PURPLECOLOR//LINECOLOR
                  
                         lblFemale.font = UIFont(name: AppFontName.Semibold, size: 14)
 
@@ -474,7 +551,7 @@ class CreateHangoutVC: BaseVC {
        {
            let dateFormatter = DateFormatter()
            dateFormatter.dateFormat = "hh:mm a"
-           var time = dateFormatter.string(from: datePicker.date)
+            let time = dateFormatter.string(from: datePicker.date)
 
             self.txtTime.text=time
            self.hangoutSelectedTime = dateFormatter.date(from: time) ?? Date()
@@ -552,6 +629,56 @@ class CreateHangoutVC: BaseVC {
     }
     
     
+    func showLoader()
+    {
+        self.viewRunningFor.clipsToBounds=true
+        self.viewDate.clipsToBounds=true
+        self.viewTime.clipsToBounds=true
+        self.viewAge.clipsToBounds=true
+        self.viewPlace.clipsToBounds=true
+        
+        self.viewLoging.clipsToBounds=true
+        //self.viewAddDesc.clipsToBounds=true
+        self.btnPost.clipsToBounds=true
+        
+        
+        self.viewRunningFor.isSkeletonable=true
+        self.viewDate.isSkeletonable=true
+        self.viewTime.isSkeletonable=true
+        self.viewAge.isSkeletonable=true
+        self.viewPlace.isSkeletonable=true
+        
+        self.viewLoging.isSkeletonable=true
+        self.viewAddDesc.isSkeletonable=true
+        self.btnPost.isSkeletonable=true
+       
+        self.viewRunningFor.showAnimatedGradientSkeleton()
+        self.viewDate.showAnimatedGradientSkeleton()
+        self.viewTime.showAnimatedGradientSkeleton()
+        self.viewAge.showAnimatedGradientSkeleton()
+        self.viewPlace.showAnimatedGradientSkeleton()
+        
+        self.viewLoging.showAnimatedGradientSkeleton()
+        self.viewAddDesc.showAnimatedGradientSkeleton()
+        self.btnPost.showAnimatedGradientSkeleton()
+
+    }
+    func hideLoader()
+    {
+    
+        self.viewRunningFor.hideSkeleton()
+        self.viewDate.hideSkeleton()
+        self.viewTime.hideSkeleton()
+        self.viewAge.hideSkeleton()
+        self.viewPlace.hideSkeleton()
+        
+        self.viewLoging.hideSkeleton()
+        self.viewAddDesc.hideSkeleton()
+        self.btnPost.hideSkeleton()
+    
+    }
+    
+    
  
     // MARK:- validateData Functions
     private func validateData () -> String?
@@ -591,29 +718,47 @@ class CreateHangoutVC: BaseVC {
 extension CreateHangoutVC: UITextFieldDelegate,UITextViewDelegate {
     
     func textFieldDidBeginEditing(_ textField: UITextField) {
-
+       
+        
+        debugPrint(#function)
+        
         if textField == txtDate {
 
             setDatePicker2(textField: textField, datePickerMode: .date, maximunDate: nil, minimumDate: Date())
             
             let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "dd MMMM, yyyy" 
+            dateFormatter.dateFormat = "dd MMMM, yyyy"
             let date = dateFormatter.date(from: textField.text!) ?? Date()
             
             self.hangoutSelectedDate=date
         }
         else if textField == txtTime
         {
-            setDatePicker3(textField: textField, datePickerMode: .time, maximunDate: nil, minimumDate: Date())
+       
+    
+           let date2 = Date().string(format: .StoryDateFormat, type: .local)
+            if date2.equalsIgnoreCase(string: self.txtDate.text ?? kEmptyString)
+            {
+                debugPrint("datw = equal")
+                setDatePicker3(textField: textField, datePickerMode: .time, maximunDate: nil, minimumDate: Date())
+            }
+            else
+            {
+                setDatePicker3(textField: textField, datePickerMode: .time, maximunDate: nil, minimumDate: nil)
+            }
+            
+            
         }
 
     }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder() // dismiss keyboard
+        debugPrint(#function)
         return true
     }
     
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        debugPrint(#function)
         let newText = (textView.text as NSString).replacingCharacters(in: range, with: text)
         let numberOfChars = newText.count // for Swift use count(newText)
 
@@ -659,7 +804,7 @@ extension CreateHangoutVC: CLLocationManagerDelegate
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
            if let location = locations.first
            {
-               print("Found user's location: \(location)")
+               debugPrint("Found user's location: \(location)")
             CURRENTLAT=location.coordinate.latitude
             CURRENTLONG=location.coordinate.longitude
           
@@ -668,7 +813,7 @@ extension CreateHangoutVC: CLLocationManagerDelegate
 
        func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
        {
-           print("Failed to find user's location: \(error.localizedDescription)")
+           debugPrint("Failed to find user's location: \(error.localizedDescription)")
        }
 }
 
@@ -681,7 +826,7 @@ extension CreateHangoutVC
     func CreateHangoutApi(image : Data, data: JSONDictionary)
     {
         APIManager.callApiForImage(image1: image, imageParaName1: ApiKey.kImage, api: "create-hangout", data: data) { (responseDict) in
-            print(responseDict)
+            debugPrint(responseDict)
 
             if  kSucess.equalsIgnoreCase(string: responseDict[ApiKey.kStatus] as? String ?? "")
             {
@@ -692,21 +837,26 @@ extension CreateHangoutVC
 //                vc.hagoutTYpe=self.hangoutType
 //                self.navigationController?.pushViewController(vc, animated: true)
 //
-                
-                let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-                let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+                self.hideLoader()
+                let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
                 vc.selectedIndex=0
                 DataManager.comeFromTag=5
+                DataManager.comeFrom=kShare
+                self.appDelegate?.hangoutVisitCount=0
                 self.navigationController?.pushViewController(vc, animated: true)
             }
             else
             {
+                self.hideLoader()
                 let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
-                self.openSimpleAlert(message: message)
+               // self.openSimpleAlert(message: message)
+                self.showNewErrorMessage(error: message)
             }
             
         } failureCallback: { (errorReason, error) in
-            print(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+            self.hideLoader()
+            debugPrint(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
             self.navigationController?.popViewController(animated: true)
         }
 
@@ -716,10 +866,11 @@ extension CreateHangoutVC
     func UpdateHangoutApi(image : Data, data: JSONDictionary,HangoutId:String)
     {
         APIManager.callApiForImage(image1: image, imageParaName1: ApiKey.kImage, api: ("update-hangout/"+HangoutId), data: data) { (responseDict) in
-            print(responseDict)
+            debugPrint(responseDict)
 
             if  kSucess.equalsIgnoreCase(string: responseDict[ApiKey.kStatus] as? String ?? "")
             {
+                self.hideLoader()
 //                let storyBoard = UIStoryboard.init(name: "Hangouts", bundle: nil)
 //                let vc = storyBoard.instantiateViewController(withIdentifier: "MyHangoutVC") as! MyHangoutVC
 //                vc.fromCreateHangout=true
@@ -727,24 +878,203 @@ extension CreateHangoutVC
 //                DataManager.fromHangout=kCreate
 //                self.navigationController?.pushViewController(vc, animated: true)
                 
-                let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-                let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+                let vc = TabbarWithOutStoryHangout.instantiate(fromAppStoryboard: .CustomTabar)
+
                 vc.selectedIndex=0
                 DataManager.comeFromTag=5
+                DataManager.comeFrom=kShare
+                self.appDelegate?.hangoutVisitCount=0
                 self.navigationController?.pushViewController(vc, animated: true)
             }
             else
             {
+                self.hideLoader()
                 let message = responseDict[ApiKey.kMessage] as? String ?? kSomethingWentWrong
-                self.openSimpleAlert(message: message)
+               // self.openSimpleAlert(message: message)
+                
+                self.showNewErrorMessage(error: message)//showErrorMessage(message: message)
             }
             
         } failureCallback: { (errorReason, error) in
-            print(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
+            self.hideLoader()
+            debugPrint(APIManager.errorForNetworkErrorReason(errorReason: errorReason!))
             self.navigationController?.popViewController(animated: true)
         }
 
         
     }
     
+    
+    
+    func getMySubscriptionApi()
+    {
+        self.showLoader()
+        AccountVM.shared.callApiGetMySubscription(response: { (message, error) in
+            
+            if error != nil
+            {
+                self.hideLoader()
+                self.showErrorMessage(error: error)
+            }
+            else{
+               
+                
+                let ActiveDay = AccountVM.shared.Hangout_Subsription_Data?.hangout_days_active ?? 5
+
+                if ActiveDay==kPInfinity
+                {
+                    self.lblRunningDay.text = "\(kInfinitySign) days"
+                    self.btnOpenPremium.isEnabled=false
+                    self.ImgAddHang.isHidden=true
+                }
+                else
+                {
+                    self.lblRunningDay.text = "\(ActiveDay) days"
+                    self.btnOpenPremium.isEnabled=true
+                    self.ImgAddHang.isHidden=false
+                }
+                self.hideLoader()
+            }
+        })
+    }
+    
+    func showNewErrorMessage(error:String)
+    {
+
+        
+        if error.contains(kRunningOut)
+        {
+           
+            let vc = DeleteAccountPopUpVC.instantiate(fromAppStoryboard: .Account)
+            vc.comeFrom = kRunningOut
+            vc.message=error
+            vc.messageTitle=kHangoutTypes
+            vc.delegate=self
+            vc.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+            vc.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+            if let tab = self.tabBarController
+            {
+                tab.present(vc, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(vc, animated: true, completion: nil)
+            }
+            
+        }
+        else
+        {
+            self.openSimpleAlert(message: error)
+        }
+        
+       
+    }
+    
+}
+
+extension CreateHangoutVC:paymentScreenOpenFrom,deleteAccountDelegate
+{
+    func FromScreenName(name: String, ActiveDay: Int) {
+        
+        if ActiveDay==kPInfinity
+        {
+            self.lblRunningDay.text = "\(kInfinitySign) days"
+            self.btnOpenPremium.isEnabled=false
+            self.ImgAddHang.isHidden=true
+        }
+        else
+        {
+            self.lblRunningDay.text = "\(ActiveDay) days"
+            self.btnOpenPremium.isEnabled=true
+            self.ImgAddHang.isHidden=false
+        }
+                debugPrint("Payment come from \(name) \(ActiveDay)")
+        
+              
+    }
+    
+    
+    
+    func deleteAccountFunc(name: String) {
+        
+        
+        if name.equalsIgnoreCase(string: kRunningOut)
+        {
+          
+            let destVC = NewPremiumVC.instantiate(fromAppStoryboard: .Account)
+
+            destVC.type = .Hangout
+            destVC.subscription_type=kHangout
+          //  destVC.delegate=self
+            destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+            destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+            
+            if let tab = self.tabBarController
+            {
+                tab.present(destVC, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(destVC, animated: true, completion: nil)
+            }
+            
+        }
+    }
+
+
+
+}
+
+
+// MARK:- Extension Api Calls
+extension CreateHangoutVC
+{
+    
+    func callGetHangoutLimitApi(hangoutId: String=kEmptyString)
+    {
+      
+        var data = JSONDictionary()
+        data[ApiKey.kHangout_type] = hangoutId
+        data[ApiKey.kTimezone] = TIMEZONE
+        data[ApiKey.kHangout_id] = hangoutId
+        if self.fromEdit
+        {
+            data[ApiKey.kAction_type] = "Change"
+        }
+        else
+        {
+            data[ApiKey.kAction_type] = "Addition"
+        }
+        
+            if Connectivity.isConnectedToInternet {
+           
+                self.callApiForHangoutLimt(data: data)
+             } else {
+          
+                self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+            }
+        
+    }
+    
+    func callApiForHangoutLimt(data:JSONDictionary)
+    {
+        self.showLoader()
+        HangoutVM.shared.callApiGetHangoutLimit(data: data, response: { (message, error) in
+            
+            if error != nil
+            {
+                self.hideLoader()
+                self.showErrorMessage(error: error)
+            }
+            else
+            {
+            
+                self.HangoutDetail=HangoutVM.shared.hangoutDetail?.hangout_details
+                
+                self.setUI()
+                self.hideLoader()
+            }
+        })
+    }
+
 }

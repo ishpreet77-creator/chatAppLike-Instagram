@@ -29,6 +29,7 @@ class ActiveInactiveTCell: UITableViewCell {
         // Initialization code
         
         self.userNameLabel.numberOfLines=1
+        self.circularProgressView.isHidden=true
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

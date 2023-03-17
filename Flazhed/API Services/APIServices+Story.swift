@@ -11,7 +11,7 @@ enum APIServicesStories:APIService {
     
     case getStories(data: JSONDictionary)
     case storyDetails(data: JSONDictionary)
-    case reportBlock(data: JSONDictionary)
+    case reportBlock(data: JSONDictionary,type:PostType)
     case deletePost(data: JSONDictionary)
     case likeStory(data: JSONDictionary)
     var path: String {
@@ -21,8 +21,15 @@ enum APIServicesStories:APIService {
             path = BASE_URL.appending("get-all-post")
         case .storyDetails:
             path = BASE_URL.appending("story-details")
-        case .reportBlock:
+        case let .reportBlock(_,type):
+            if type == .hangout
+            {
+                path = BASE_URL.appending("report-hangout")
+            }
+            else
+            {
             path = BASE_URL.appending("report-post")
+            }
         case .deletePost:
             path = BASE_URL.appending("delete-post-api")
         case .likeStory:
@@ -40,7 +47,7 @@ enum APIServicesStories:APIService {
             
         case let .storyDetails(data):
             resource = Resource(method: .post, parameters: data, headers:headerDict)
-        case let .reportBlock(data):
+        case let .reportBlock(data,_):
             resource = Resource(method: .post, parameters: data, headers:headerDict)
             
         case let .deletePost(data):

@@ -10,7 +10,7 @@ import UIKit
 import UIKit
 
 class FootView: UITableViewCell {
-     //MARK:- IBOutlets
+     //MARK: - IBOutlets
 
     @IBOutlet weak var btnPremium: UIButton!
     @IBOutlet weak var btnNoThanks: UIButton!

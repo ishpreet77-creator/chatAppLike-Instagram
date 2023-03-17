@@ -10,13 +10,24 @@ import GoogleMobileAds
 import AVKit
 import CoreLocation
 import AgoraRtmKit
-import FaveButton
+import SkeletonView
+import GoogleAnalytics
+import Firebase
+import AppTrackingTransparency
+import AdSupport
 
 class HomeVC: BaseVC {
     
-    //MARK:- All outlets
+    @IBOutlet weak var viewLoaderTop: UIView!
+    @IBOutlet weak var view4Loader: UIView!
+    @IBOutlet weak var view3Loader: UIView!
+    @IBOutlet weak var view2Loader: UIView!
+    @IBOutlet weak var view1Loader: UIView!
+    @IBOutlet weak var viewLoaderButtom: UIView!
+    //MARK: - All outlets
+    @IBOutlet weak var viewLoaderBack: UIView!
+    @IBOutlet weak var viewLoader: UIView!
     
-    @IBOutlet weak var fvBtn: FaveButton!
     @IBOutlet weak var viewTableBack: UIView!
    // @IBOutlet weak var btnLikeCard: UIButton!
     @IBOutlet weak var imgCardLike: UIImageView!
@@ -37,11 +48,18 @@ class HomeVC: BaseVC {
     @IBOutlet weak var likeView: UIView!
     @IBOutlet weak var changeModeView: UIView!
     
-    @IBOutlet weak var btnLike: FaveButton!
-    @IBOutlet weak var btnDisLike: FaveButton!
+    @IBOutlet weak var btnLike: UIButton!
+    @IBOutlet weak var btnDisLike: UIButton!
     @IBOutlet weak var btnMessage: UIButton!
     
-    //MARK:- All Variable
+    @IBOutlet weak var btnHearVoice: UIButton!
+    @IBOutlet weak var imgNewRegret: UIImageView!
+    
+    @IBOutlet weak var imgNewVoice: UIImageView!
+    @IBOutlet weak var imgNewDislike: UIImageView!
+    
+    @IBOutlet weak var imgNewAno: UIImageView!
+    //MARK: - All Variable
     var permissionLocationCheck:Bool = false
     var toShow = ""
     var toShowAno = ""
@@ -55,7 +73,7 @@ class HomeVC: BaseVC {
     
     var currentPage = ""
     
-    var UserData:UserListModel?
+    var UserData:HomeUserListModel?
     var bannerView: GADBannerView!
     var other_user_id = ""
    
@@ -65,8 +83,8 @@ class HomeVC: BaseVC {
     var voiceUrl = ""
     
     var currentUserIndex = 0
-    var currentUserDetails:UserListModel?
-    var AllUserDataArray:[UserListModel] = []
+    var currentUserDetails:HomeUserListModel?
+    var AllUserDataArray:[HomeUserListModel] = []
     var page = 0
     
     var fromLikeDisLike=false
@@ -83,11 +101,12 @@ class HomeVC: BaseVC {
     var cellHeight = SCREENHEIGHT
     var swipeRight = UISwipeGestureRecognizer()
     var swipeDown = UISwipeGestureRecognizer()
-    //MARK:- View Lifecycle
+    //MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         self.page = 0
-        
+      
+        self.BackgroundDataCall()
         SocketIOManager.shared.initializeSocket()
         if DataManager.comeFromTag == 100
         {
@@ -98,7 +117,9 @@ class HomeVC: BaseVC {
        
         
         self.cardView.isHidden=true
+
         self.shakeView.isHidden=false
+
         self.addsView.isHidden=true
         locationmanager.requestAlwaysAuthorization()
         locationmanager.delegate = self
@@ -107,20 +128,24 @@ class HomeVC: BaseVC {
         
         self.adsSetup()
         
-        //MARK:- Hide load view
+        //MARK: - Hide load view
         self.regretView.isHidden=true
         
         
-        self.selfJoinSocketEmit()
-        self.updateLocationAPI()
+        //self.selfJoinSocketEmit()
+       
         self.setUI()
+        NotificationCenter.default.addObserver(self, selector: #selector(self.profileAudioStopedReceivedNotification(notification:)), name: Notification.Name("profileAudioStoped"), object: nil)
         
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
+        self.hideLoader()
+        self.viewLoader.isHidden=true
         SocketIOManager.shared.initializeSocket()
-        self.selfJoinSocketEmit()
+       // self.selfJoinSocketEmit()
+       
         self.setUpTable()
         
         
@@ -129,9 +154,9 @@ class HomeVC: BaseVC {
         locationmanager.requestLocation()
         //  locationmanager.startMonitoringSignificantLocationChanges()
         
-//MARK:-  data manager 5- show initial two card, 4- show shake user, 3- Show card anonyous user
+//MARK: -  data manager 5- show initial two card, 4- show shake user, 3- Show card anonyous user
         
-        print("current comefrom tag = \(DataManager.comeFromTag)")
+        debugPrint("current comefrom tag = \(DataManager.comeFromTag)")
         
         
         if DataManager.HomeRefresh//.equalsIgnoreCase(string: "true")
@@ -152,7 +177,7 @@ class HomeVC: BaseVC {
                 
                 self.getAnonymousUser(page: 0)
                 
-                imgChangeCard.image = UIImage(named: "phoneRotate")
+                imgChangeCard.image = UIImage(named: "NewPhoneRotate")
                 
             }
             
@@ -167,17 +192,20 @@ class HomeVC: BaseVC {
                 
                 //self.getShakeSentUser()
                 DataManager.comeFromTag=0
-                let storyboard: UIStoryboard = UIStoryboard(name: "Stories", bundle: Bundle.main)
-                let destVC = storyboard.instantiateViewController(withIdentifier: "StoryDiscardVC") as!  StoryDiscardVC
+                let destVC = StoryDiscardVC.instantiate(fromAppStoryboard: .Stories)
                 destVC.delegate=self
-                
                 destVC.type = .shakeSent
                 destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                 destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
                 
-                self.present(destVC, animated: true, completion: nil)
-                
-                
+                if let tab = self.tabBarController
+                {
+                    tab.present(destVC, animated: true, completion: nil)
+                }
+                else
+                {
+                    self.present(destVC, animated: true, completion: nil)
+                }
                 
             }
             
@@ -233,6 +261,7 @@ class HomeVC: BaseVC {
                 {
                     self.cardView.isHidden=true
                     self.shakeView.isHidden=false
+                 
                 }
             }
         }
@@ -265,39 +294,72 @@ class HomeVC: BaseVC {
         {
             switch CLLocationManager.authorizationStatus() {
             case .notDetermined, .restricted, .denied:
-                print("No access")
+                debugPrint("No access")
                 self.permissionLocationCheck=false
             //self.openSettings(message: kLocation)
             case .authorizedAlways, .authorizedWhenInUse:
-                print("Access")
+                debugPrint("Access")
                 self.permissionLocationCheck=true
             @unknown default:
                 break
             }
         } else {
-            print("Location services are not enabled")
+            debugPrint("Location services are not enabled")
             self.permissionLocationCheck=false
             //self.openSettings(message: kLocation)
         }
         if self.permissionLocationCheck==false
         {
-            self.openSettings(message: kLocation)
+            self.openSettings(message: PermissonType.kLocationEnable)
         }
         
-        
+        self.navigationController?.navigationBar.isHidden=true
      //   self.getRTMTokenApi()
         
     }
-    //MARK:- Stop audio
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+       
+       
+        DispatchQueue.global(qos: .background).async {
+            if Connectivity.isConnectedToInternet {
+                
+                debugPrint("self.appDelegate?.homeVisitCount \(self.appDelegate?.homeVisitCount)")
+                
+                if self.appDelegate?.homeVisitCount == 0 {
+                    
+                    // var data = JSONDictionary()
+                   //
+                   //            data[ApiKey.kTimezone] = TIMEZONE
+                   //
+                   //            if Connectivity.isConnectedToInternet {
+                   //
+                   //                self.callApiForRegretShake(data: data)
+                   //            } else {
+                   //
+                   //                self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+                   //            }
+                    
+                    self.getMySubscriptionApi(MySubscriptiontype: kDidAppear)
+                    self.updateLocationAPI()
+                }
+                self.appDelegate?.homeVisitCount += 1
+            }
+        }
+    }
+    //MARK: - Stop audio
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
-        MusicPlayer.instance.pause()
-        
+        self.stopVoice()
+       // DispatchQueue.global().suspend()
     }
+    
+
     
     func setUI()
     {
+        /*
         self.btnLike.tag = 1
         
         self.btnLike.normalColor = UIColor.black
@@ -316,30 +378,30 @@ class HomeVC: BaseVC {
         self.btnDisLike.delegate=self
         self.btnDisLike.setSelected(selected: false, animated: true)
         
+        */
     
-        
     }
     
-    //MARK:- Message Button action
+    //MARK: - Message Button action
 
     @IBAction func messageBtnAct (_ sender:UIButton)
     {
         
             
-            let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-            let vc = storyboard.instantiateViewController(withIdentifier: "MessageVC") as! MessageVC
-        vc.screenType = kHome
+        let vc = MessageVC.instantiate(fromAppStoryboard: .Chat)
+            vc.screenType = kHome
             DataManager.HomeRefresh = false
             if self.AllUserDataArray.count==1
             {
                 self.currentUserDetails = self.AllUserDataArray[0]
             }
             
-            MusicPlayer.instance.pause()
+             self.stopVoice()
        
             
             let mode = self.currentUserDetails?.second_table_like_dislike?.by_like_mode ?? ""
             let cellData = self.currentUserDetails
+              vc.chat_room_id=cellData?.chat_room_details?._id ?? ""
             if kStory.equalsIgnoreCase(string: mode)
             {
                 
@@ -365,6 +427,7 @@ class HomeVC: BaseVC {
             }
             else if kHangout.equalsIgnoreCase(string: mode)
             {
+                
                 vc.view_user_id=cellData?.user_id ?? ""
                 vc.profileName=(cellData?.profile_data?.username ?? "").capitalized
                 vc.comfrom=kHangout
@@ -372,18 +435,18 @@ class HomeVC: BaseVC {
                 vc.commentImage=cellData?.Single_Hangout_Details?.image ?? ""
                 vc.commentPostId=cellData?.Single_Hangout_Details?._id ?? ""
             }
-           
+        DataManager.comeFrom = kEmptyString
             
             self.navigationController?.pushViewController(vc, animated: true)
         
         
     }
-    //MARK:- respond ToSwipe Gesture action
+    //MARK: - respond ToSwipe Gesture action
     
     @objc func respondToSwipeGesture(_ sender: UISwipeGestureRecognizer)
     {
-        print("DataManager.purchasePlan \(DataManager.purchasePlan)")
-//        print("AllUserDataArray.count \(self.AllUserDataArray.count)")
+        debugPrint("DataManager.purchasePlan \(DataManager.purchasePlan)")
+//        debugPrint("AllUserDataArray.count \(self.AllUserDataArray.count)")
 //
         if DataManager.purchasePlan
         {
@@ -393,12 +456,12 @@ class HomeVC: BaseVC {
         {
         if sender.direction == .up
         {
-            print("swipe up")
+            debugPrint("swipe up")
             self.tableAllUser.isScrollEnabled=true
         }
         else if sender.direction == .down
         {
-            print("swipe down")
+            debugPrint("swipe down")
             self.tableAllUser.isScrollEnabled=false
         }
         }
@@ -407,16 +470,16 @@ class HomeVC: BaseVC {
     }
     
     
-    //MARK:- Bottom Five (Like , dislike...) Act
+    //MARK: - Bottom Five (Like , dislike...) Act
     
     
-    //MARK:- Regret swipe action
+    //MARK: - Regret swipe action
     
     @IBAction func shareAct(_ sender: UIButton)
     {
         //         IAPHandler.shared.validatePurchase(success: { (status) in
         //
-        //            print("Purchase Status = \(status)")
+        //            debugPrint("Purchase Status = \(status)")
         //
         //        })
         
@@ -447,10 +510,10 @@ class HomeVC: BaseVC {
         
         //}
         
-        //MARK:- For payment check api
+        //MARK: - For payment check api
         if self.regretPaymentChecked
         {
-            let active = AccountVM.shared.Swiping_Subsription_Data?.subscription_is_active ?? 0
+            let active = AccountVM.shared.Shake_Subsription_Data?.subscription_is_active ?? 0
             
             if active == 1
             {
@@ -480,13 +543,18 @@ class HomeVC: BaseVC {
             else
             {
                 DataManager.purchasePlan=false
-                let storyboard: UIStoryboard = UIStoryboard(name: "Account", bundle: Bundle.main)
-                let destVC = storyboard.instantiateViewController(withIdentifier: "RegretPopUpVC") as!  RegretPopUpVC
-                destVC.type = .Regret
-                destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
-                destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+//                let storyboard: UIStoryboard = UIStoryboard(name: "Account", bundle: Bundle.main)
+//                let destVC = storyboard.instantiateViewController(withIdentifier: "RegretPopUpVC") as!  RegretPopUpVC
+//                destVC.type = .Regret
+//                destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+//                destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+//
+//                self.present(destVC, animated: true, completion: nil)
+//
                 
-                self.present(destVC, animated: true, completion: nil)
+                self.runOutPremiumPopup()
+                
+                
             }
 
         }
@@ -502,7 +570,7 @@ class HomeVC: BaseVC {
         }
         }
         
-//        //MARK:- To show popup
+//        //MARK: - To show popup
 //
 //        let storyboard: UIStoryboard = UIStoryboard(name: "Account", bundle: Bundle.main)
 //        let destVC = storyboard.instantiateViewController(withIdentifier: "RegretPopUpVC") as!  RegretPopUpVC
@@ -514,26 +582,31 @@ class HomeVC: BaseVC {
         
     }
     
-    //MARK:- Hear voice action
+    //MARK: - Hear voice action
     
     @IBAction func soundPlayAct(_ sender: UIButton)
     {
         
+        debugPrint("Voice url \(self.voiceUrl)")
         self.voiceUrl = self.currentUserDetails?.profile_data?.voice ?? ""
         
         
         if  self.voiceUrl != ""
         {
-            MusicPlayer.instance.initPlayer(url:self.voiceUrl, tag: 0)
-            if sender.isSelected
+            MusicPlayer.instance.initPlayer(url:self.voiceUrl, tag: 10)
+            if self.btnHearVoice.isSelected
             {
-                sender.isSelected=false
                 MusicPlayer.instance.pause()
+                self.btnHearVoice.isSelected=false
+                self.imgNewVoice.image = UIImage(named: "NewVoicePlay")
             }
             else
             {
-                sender.isSelected=true
+                self.imgNewVoice.image = UIImage(named: "NewImgVoiceFill")
+                self.btnHearVoice.isSelected=true
+                //self.lightUp(imageName: self.imgNewVoice)
                 MusicPlayer.instance.play()
+               
             }
             
         }
@@ -541,12 +614,136 @@ class HomeVC: BaseVC {
         
     }
     
-    //MARK:- Dislike user action
+    //MARK: - Dislike user action
     
     @IBAction func DisLikeAct(_ sender: UIButton)
     {
+        self.imgNewDislike.image = UIImage(named: "NewImgDislikeFill")
+        Timer.scheduledTimer(withTimeInterval: kButtonLikeDuration, repeats: false, block: { _ in
+            self.imgNewDislike.image = UIImage(named: "NewDislikeImg")
+        })
         
-//MARK:- tage 0- card, 2- user details, 3- ads
+
+        //self.lightUp(imageName: self.imgNewDislike)
+        
+        self.regretView.isHidden=false
+        //MARK: - tage 0- card, 2- user details, 3- ads
+                if self.AllUserDataArray.count==1
+                {
+                    self.currentUserDetails = self.AllUserDataArray[0]
+                }
+             
+        self.stopVoice()
+                self.other_user_id = self.currentUserDetails?.user_id ?? ""
+           
+        debugPrint("user name Like: = \(String(describing: self.currentUserDetails?.profile_data?.username))")
+                
+                
+                 
+        let index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+                 
+                 if list.user_id == self.other_user_id
+                 {
+                 return true
+                 }
+                 else
+                 {
+                 return false
+                 }
+                 
+                 
+                 } ?? 0
+                 
+                 
+                 debugPrint("Index at id = \(index)")
+                 
+                 if (self.AllUserDataArray.count>index)
+                 {
+                 self.AllUserDataArray.remove(at: index)
+                 }
+                self.currentUserDetails?.user_id = nil
+                
+                if self.isAnoModeOn
+                {
+                    
+                    self.imgChangeCard.image = UIImage(named: "NewPhoneRotate")
+                    
+                    if self.AllUserDataArray.count == 0
+                    {
+                        self.AllUserDataArray.removeAll()
+                        
+                        self.getAnonymousUser(page: self.page)
+                    }
+                    else
+                    {
+                        tableAllUser.reloadData()
+        //                UIView.performWithoutAnimation {
+        //
+        //                    self.tableAllUser.layoutIfNeeded()
+        //                    self.tableAllUser.setContentOffset(CGPoint.zero, animated: true)
+        //                    self.tableAllUser.scroll(to: .top, animated: true)
+        //                }
+                    }
+                    self.regretView.isHidden=false
+                    self.fromLikeDisLike=false
+                 
+                   
+                    
+                    let mode = self.currentUserDetails?.second_table_like_dislike?.by_like_mode ?? ""
+                     
+                     if (kHangout.equalsIgnoreCase(string: mode))//kStory.equalsIgnoreCase(string: mode) ||
+                     {
+                         let id = self.currentUserDetails?.second_table_like_dislike?._id ?? ""
+                         
+                         self.RemoveStoryHangoutAPI(listId: id)
+                     }
+                     else
+                     {
+                        self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "2", like_mode: kAnonymous, type: kAnonymous,showIndicator: false)
+                     }
+                   
+                }
+                else
+                {
+                    self.regretView.isHidden=false
+                    self.imgChangeCard.image = UIImage(named: "NewAnoImg")
+                    self.fromLikeDisLike=false
+                    
+                    if self.AllUserDataArray.count == 0
+                    {
+                        self.AllUserDataArray.removeAll()
+                        
+                        self.getShakeSentUser(page: self.page)
+                    }
+                    else
+                    {
+                        tableAllUser.reloadData()
+
+                    }
+                    
+                    
+                    let mode = self.currentUserDetails?.second_table_like_dislike?.by_like_mode ?? ""
+                     
+                     if (kHangout.equalsIgnoreCase(string: mode)) || kStory.equalsIgnoreCase(string: mode)// ||
+                     {
+                         let id = self.currentUserDetails?.second_table_like_dislike?._id ?? ""
+                         
+                         self.RemoveStoryHangoutAPI(listId: id)
+                     }
+                     else
+                     {
+                        self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "2", like_mode: kShake, type: kShake,showIndicator: false)
+                     }
+                
+                    
+
+                }
+                
+        
+        
+        
+        /*
+//MARK: - tage 0- card, 2- user details, 3- ads
         if self.AllUserDataArray.count==1
         {
             self.currentUserDetails = self.AllUserDataArray[0]
@@ -555,11 +752,11 @@ class HomeVC: BaseVC {
         MusicPlayer.instance.pause()
         self.other_user_id = self.currentUserDetails?.user_id ?? ""
    
-        print("user name Like: = \(self.currentUserDetails?.profile_data?.username)")
+        debugPrint("user name Like: = \(String(describing: self.currentUserDetails?.profile_data?.username))")
         
         
          
-         var index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+        let index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
          
          if list.user_id == self.other_user_id
          {
@@ -574,7 +771,7 @@ class HomeVC: BaseVC {
          } ?? 0
          
          
-         print("Index at id = \(index)")
+         debugPrint("Index at id = \(index)")
          
          if (self.AllUserDataArray.count>index)
          {
@@ -659,27 +856,199 @@ class HomeVC: BaseVC {
 
         }
         
-       
+       */
         
     }
     
-    //MARK:- Like user action
+    //MARK: - Like user action
     
     @IBAction func LikeAct(_ sender: UIButton)
     {
+        self.imgCardLike.image = UIImage(named: "NewLikeImg")
+        
+        Timer.scheduledTimer(withTimeInterval: kButtonLikeDuration, repeats: false, block: { _ in
+            self.imgCardLike.image = UIImage(named: "NewLikeImgNotFill")
+        })
+        
+       
+        //self.lightUp(imageName: self.imgCardLike)
+         self.regretView.isHidden=false
+            if self.AllUserDataArray.count==1
+            {
+                self.currentUserDetails = self.AllUserDataArray[0]
+            }
+            
+        self.stopVoice()
+            self.other_user_id = self.currentUserDetails?.user_id ?? ""
+       
+            debugPrint("user name Like: = \(String(describing: self.currentUserDetails?.profile_data?.username))")
+            
+            
+             
+            let index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+             
+             if list.user_id == self.other_user_id
+             {
+             return true
+             }
+             else
+             {
+             return false
+             }
+             
+             
+             } ?? 0
+             
+             
+             debugPrint("Index at id = \(index)")
+             
+             if (self.AllUserDataArray.count>index)
+             {
+             self.AllUserDataArray.remove(at: index)
+             }
+            self.currentUserDetails?.user_id = nil
+            
+            if self.isAnoModeOn
+            {
+                
+                self.imgChangeCard.image = UIImage(named: "NewPhoneRotate") //NewPhoneRotate
+                
+                if self.AllUserDataArray.count == 0
+                {
+                    self.AllUserDataArray.removeAll()
+                    
+                    self.getAnonymousUser(page: self.page)
+                }
+                else
+                {
+                    tableAllUser.reloadData()
+    //                UIView.performWithoutAnimation {
+    //
+    //                    self.tableAllUser.layoutIfNeeded()
+    //                    self.tableAllUser.setContentOffset(CGPoint.zero, animated: true)
+    //                    self.tableAllUser.scroll(to: .top, animated: true)
+    //                }
+                }
+                self.regretView.isHidden=false
+                self.fromLikeDisLike=false
+             
+               
+                
+                let mode = self.currentUserDetails?.second_table_like_dislike?.by_like_mode ?? ""
+                 
+                 if (kHangout.equalsIgnoreCase(string: mode))//kStory.equalsIgnoreCase(string: mode) ||
+                 {
+                     let id = self.currentUserDetails?.second_table_like_dislike?._id ?? ""
+                     
+                     self.RemoveStoryHangoutAPI(listId: id)
+                 }
+                 else
+                 {
+                    self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kAnonymous, type: kAnonymous,showIndicator: false)
+                 }
+               
+            }
+            else
+            {
+                self.regretView.isHidden=false
+                self.imgChangeCard.image = UIImage(named: "NewAnoImg")
+                self.fromLikeDisLike=false
+                
+                if self.AllUserDataArray.count == 0
+                {
+                    self.AllUserDataArray.removeAll()
+                    
+                    self.getShakeSentUser(page: self.page)
+                }
+                else
+                {
+                    tableAllUser.reloadData()
+    //                UIView.performWithoutAnimation {
+    //
+    //                    self.tableAllUser.layoutIfNeeded()
+    //                    self.tableAllUser.setContentOffset(CGPoint.zero, animated: true)
+    //                    self.tableAllUser.scroll(to: .top, animated: true)
+    //                }
+                }
+                
+                
+             
+                
+                
+                let mode = self.currentUserDetails?.second_table_like_dislike?.by_like_mode ?? ""
+                 
+                 if (kHangout.equalsIgnoreCase(string: mode)) //kStory.equalsIgnoreCase(string: mode) ||
+                 {
+                     let id = self.currentUserDetails?.second_table_like_dislike?._id ?? ""
+                     
+                     self.RemoveStoryHangoutAPI(listId: id)
+                 }
+                 else
+                 {
+                    
+                    if kStory.equalsIgnoreCase(string: mode)
+                    {
+                        let storyId = self.currentUserDetails?.Single_Story_Details?._id ?? ""
+                        
+                        self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kStory, type: kStory,showIndicator: false,story_id: storyId)
+                    }
+                    else
+                    {
+                        self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kShake, type: kShake,showIndicator: false)
+                    }
+                   
+                 }
+
+            }
+            
+           
+             
+            /*
+            
+            
+            if self.isAnoModeOn//currentTag == 3
+            {
+                self.lightUp(button: sender)
+                self.fromLikeDisLike=true
+                self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kAnonymous, type: kAnonymous,showIndicator: false)
+            }
+            else
+            {
+                self.fromLikeDisLike=true
+                self.lightUp(button: sender)
+                if likeViewProfile
+                {
+
+                    self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kShake, type: kShake,showIndicator: false)
+                }
+                else
+                {
+                    self.likeUnlikeAPI(other_user_id: self.other_user_id, action: "1", like_mode: kShake, type: kShake,showIndicator: false)
+                }
+
+
+            }
+     */
+            
+            
+        
+        
+        
+        
+        /*
         if self.AllUserDataArray.count==1
         {
             self.currentUserDetails = self.AllUserDataArray[0]
         }
-        self.lightUp(button: sender)
+        self.lightUp(imageName: self.imgCardLike)
         MusicPlayer.instance.pause()
         self.other_user_id = self.currentUserDetails?.user_id ?? ""
    
-        print("user name Like: = \(self.currentUserDetails?.profile_data?.username)")
+        debugPrint("user name Like: = \(String(describing: self.currentUserDetails?.profile_data?.username))")
         
         
          
-         var index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+        let index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
          
          if list.user_id == self.other_user_id
          {
@@ -694,7 +1063,7 @@ class HomeVC: BaseVC {
          } ?? 0
          
          
-         print("Index at id = \(index)")
+         debugPrint("Index at id = \(index)")
          
          if (self.AllUserDataArray.count>index)
          {
@@ -811,29 +1180,37 @@ class HomeVC: BaseVC {
  */
         
         
+        */
+        
     }
     
     
-    //MARK:- Shake send to user action
+    //MARK: - Shake send to user action
     
     @IBAction func shakeSendAct(_ sender: UIButton)
     {
-        MusicPlayer.instance.pause()
-        let storyBoard = UIStoryboard.init(name: "Home", bundle: nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "ShakeSentVC") as!  ShakeSentVC
+        self.stopVoice()
+        let vc = ShakeSentVC.instantiate(fromAppStoryboard: .Shake)
+
         vc.delegate=self
         vc.comeFrom="Home"
-        self.present(vc, animated: true, completion: nil)
-        // self.navigationController?.pushViewController(vc, animated: true)
+        if let tab = self.tabBarController
+        {
+            tab.present(vc, animated: true, completion: nil)
+        }
+        else
+        {
+            self.present(vc, animated: true, completion: nil)
+        }        // self.navigationController?.pushViewController(vc, animated: true)
     }
     
-    //MARK:- Show ano user action
+    //MARK: - Show ano user action
     
     @IBAction func playCardAnoAct(_ sender: UIButton)
     {
         
         // self.tableAllUser.isPagingEnabled=true
-        MusicPlayer.instance.pause()
+        self.stopVoice()
         DataManager.comeFromTag=3
         self.AllUserDataArray.removeAll()
         self.fromLikeDisLike=false
@@ -844,21 +1221,21 @@ class HomeVC: BaseVC {
         
         self.addsView.isHidden=true
         
-        imgChangeCard.image = UIImage(named: "phoneRotate")
+        imgChangeCard.image = UIImage(named: "NewPhoneRotate")
         self.tableAllUser.scrollToTop(animated: false)
       
         
     }
     
-    //MARK:- Change mode (Ano,Shake) Show action
+    //MARK: - Change mode (Ano,Shake) Show action
     
     @IBAction func playAnoAct(_ sender: UIButton)
     {
-        MusicPlayer.instance.pause()
+        self.stopVoice()
         if sender.tag == 1
         {
             DataManager.comeFromTag=3
-            imgChangeCard.image = UIImage(named: "phoneRotate")
+            imgChangeCard.image = UIImage(named: "NewPhoneRotate")
             
             self.isAnoModeOn=true
             self.AllUserDataArray.removeAll()
@@ -873,7 +1250,7 @@ class HomeVC: BaseVC {
                 self.fromLikeDisLike=false
                 self.AllUserDataArray.removeAll()
                 self.getShakeSentUser(page: 0)
-                self.imgChangeCard.image = UIImage(named: "AnoBack")
+                self.imgChangeCard.image = UIImage(named: "NewAnoImg")//NewAnoImg //AnoBack
                 
                 self.tableAllUser.scrollToTop(animated: false)
             }
@@ -882,7 +1259,7 @@ class HomeVC: BaseVC {
                 self.AllUserDataArray.removeAll()
                 self.fromLikeDisLike=false
                 self.getAnonymousUser(page: 0)
-                imgChangeCard.image = UIImage(named: "phoneRotate")
+                imgChangeCard.image = UIImage(named: "NewPhoneRotate")
                 self.tableAllUser.scrollToTop(animated: false)
             }
         }
@@ -890,13 +1267,14 @@ class HomeVC: BaseVC {
         
         
     }
-    //MARK:- Close ads action
+    //MARK: - Close ads action
     
     @IBAction func closeAdsAct(_ sender: UIButton)
     {
-        MusicPlayer.instance.pause()
+        self.stopVoice()
         self.cardView.isHidden=true
         self.shakeView.isHidden=false
+    
         
         self.addsView.isHidden=true
     }
@@ -905,21 +1283,84 @@ class HomeVC: BaseVC {
     
     @IBAction func PremiumBtnAct(_ sender: UIButton)
     {
-        let storyBoard = UIStoryboard.init(name: "Account", bundle: nil)
+//        let storyBoard = UIStoryboard.init(name: "Account", bundle: nil)
+//
+//        let vc = storyBoard.instantiateViewController(withIdentifier: "PremiumVC") as! PremiumVC //RegretPopUpVC
+//        vc.type = .kExtraShakes
+//        vc.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+//        vc.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+//        self.present(vc, animated: true, completion: nil)
+//
         
-        let vc = storyBoard.instantiateViewController(withIdentifier: "PremiumVC") as! PremiumVC //RegretPopUpVC
-        vc.type = .kExtraShakes
-        vc.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
-        vc.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
-        self.present(vc, animated: true, completion: nil)
+        self.runOutPremiumPopup()
         
     }
     
+    
+    func showLoader()
+    {
+        self.viewLoader.isHidden=false
+        self.viewLoaderTop.cornerRadius = 10
+        self.view1Loader.cornerRadius = self.view1Loader.frame.height/2
+        self.view2Loader.cornerRadius = self.view2Loader.frame.height/2
+        self.view3Loader.cornerRadius = self.view3Loader.frame.height/2
+        self.view4Loader.cornerRadius = self.view4Loader.frame.height/2
+    
+        self.viewLoaderTop.clipsToBounds=true
+        self.view1Loader.clipsToBounds=true
+        self.view2Loader.clipsToBounds=true
+        self.view3Loader.clipsToBounds=true
+
+        self.view4Loader.clipsToBounds=true
+
+        
+        
+        self.viewLoader.isSkeletonable=true
+        self.viewLoaderBack.isSkeletonable=true
+        self.viewLoaderTop.isSkeletonable=true
+        self.viewLoaderButtom.isSkeletonable=true
+        
+        self.view1Loader.isSkeletonable=true
+        self.view2Loader.isSkeletonable=true
+        self.view3Loader.isSkeletonable=true
+        self.view4Loader.isSkeletonable=true
+        
+        self.viewLoaderBack.showAnimatedGradientSkeleton()
+   
+        self.viewLoaderTop.showAnimatedGradientSkeleton()
+        self.view1Loader.showAnimatedGradientSkeleton()
+        
+       self.view2Loader.showAnimatedGradientSkeleton()
+        self.view3Loader.showAnimatedGradientSkeleton()
+        self.view4Loader.showAnimatedGradientSkeleton()
+
+       
+    }
+    func hideLoader()
+    {
+        self.viewLoader.isHidden=true
+
+        self.viewLoaderTop.hideSkeleton()
+        self.view1Loader.hideSkeleton()
+        
+       self.view2Loader.hideSkeleton()
+        self.view3Loader.hideSkeleton()
+        self.view4Loader.hideSkeleton()
+//
+    }
+
+    
+     func stopVoice()
+    {
+        MusicPlayer.instance.pause()
+        self.btnHearVoice.isSelected=false
+        self.imgNewVoice.image = UIImage(named: "NewVoicePlay")
+    }
 }
 
 
 
-//MARK:- Table view setup and show data
+//MARK: - Table view setup and show data
 
 extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
 {
@@ -975,12 +1416,21 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
         //}
     }
     
+//    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
+//        return "HomeUserTCell"
+//    }
+//
+//    func collectionSkeletonView(_ skeletonView: UITableView, skeletonCellForRowAt indexPath: IndexPath) -> UITableViewCell? {
+//        let cell = skeletonView.dequeueReusableCell(withIdentifier: "HomeUserTCell", for: indexPath) as! HomeUserTCell
+//        return cell
+//    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell
     {
         let cell = tableView.dequeueReusableCell(withIdentifier: "HomeUserTCell") as! HomeUserTCell
         
         
-        var currentUserDetails:UserListModel?
+        var currentUserDetails:HomeUserListModel?
       
         
         if self.isRegetEnable{
@@ -1018,30 +1468,58 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
             let currentUserDetail=self.AllUserDataArray[0]
             let mode = currentUserDetail.second_table_like_dislike?.by_like_mode ?? ""
             let isMatch = currentUserDetail.like_dislikeData?.is_match ?? 0
-            
+            let other_user_inactive_state = currentUserDetail.other_user_inactive_state ?? 0
             
             if (kHangout.equalsIgnoreCase(string: mode)) //kStory.equalsIgnoreCase(string: mode) ||
             {
                 self.btnLike.isHidden=true
+                self.imgCardLike.isHidden=true
                 self.btnMessage.isHidden=false
+//                if other_user_inactive_state == 1
+//                {
+//                    self.btnMessage.isHidden=true
+//                    self.likeView.isHidden=true
+//                }
+//                else
+//                {
+                    self.btnMessage.isHidden=false
+                    self.likeView.isHidden=false
+              //  }
             }
             else if isMatch == 1
             {
                 self.btnLike.isHidden=true
-                self.btnMessage.isHidden=false
+                self.imgCardLike.isHidden=true
+                //self.btnMessage.isHidden=false
+                
+                if other_user_inactive_state == 1
+                {
+                    self.btnMessage.isHidden=true
+                    self.likeView.isHidden=true
+                }
+                else
+                {
+                    self.btnMessage.isHidden=false
+                    self.likeView.isHidden=false
+                }
             }
             else
             {
+                self.imgCardLike.isHidden=false
                 self.btnLike.isHidden=false
+                self.likeView.isHidden=false
                 self.btnMessage.isHidden=true
             }
             
         }
         else
         {
+            self.imgCardLike.isHidden=false
             self.btnLike.isHidden=false
             self.btnMessage.isHidden=true
+            self.likeView.isHidden=false
         }
+        
         return cell
     }
   
@@ -1072,8 +1550,8 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
     
     func scrollViewDidScroll(_ scrollView: UIScrollView)
     {
-       // print(#function)
-        MusicPlayer.instance.pause()
+       // debugPrint(#function)
+        self.stopVoice()
         
         var index = 0
         
@@ -1108,21 +1586,21 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
     }
     
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        print(#function)
+        debugPrint(#function)
         if scrollView == self.tableAllUser
         {
             
             if self.AllUserDataArray.count>1
             {
                 if targetContentOffset.pointee.y <= scrollView.contentOffset.y {
-                    print(" it's going up")
+                    debugPrint(" it's going up")
                     
                     self.scrollDown=false
                 }
                 else
                 {
                    
-                    print(" it's going down")
+                    debugPrint(" it's going down")
                     self.scrollDown=true
                    
                 }
@@ -1130,13 +1608,13 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
             else if self.AllUserDataArray.count==1
             {
                 if targetContentOffset.pointee.y < scrollView.contentOffset.y {
-                    print(" it's going up")
+                    debugPrint(" it's going up")
                     self.scrollDown=false
                 }
                 else
                 {
             
-                    print(" it's going down")
+                    debugPrint(" it's going down")
                     self.scrollDown=true
                  
                 }
@@ -1153,7 +1631,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         
-        print(#function)
+        debugPrint(#function)
         if scrollView == self.tableAllUser
         {
         
@@ -1174,7 +1652,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
             
             if self.AllUserDataArray.count>(index-1)
             {
-                var user:UserListModel?
+                var user:HomeUserListModel?
                 
                 if index == 0
                 {
@@ -1191,7 +1669,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
                 if  self.scrollDown
                 {
                     
-                    print("self.scrollDown \(self.scrollDown)")
+                    debugPrint("self.scrollDown \(self.scrollDown)")
                
                     if self.isAnoModeOn
                     {
@@ -1267,7 +1745,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
                             
                             
                         } ?? 0
-                        self.imgChangeCard.image = UIImage(named: "AnoBack")
+                        self.imgChangeCard.image = UIImage(named: "NewAnoImg")
                         
                         if (self.AllUserDataArray.count>index)
                         {
@@ -1309,7 +1787,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
                         {
                             self.likeUnlikeAPI(other_user_id: user?.user_id ?? "", action: "2", like_mode: kShake, type: kShake,showIndicator: false)
                         }
-                        print("Shake Array count  = \(AllUserDataArray.count)")
+                        debugPrint("Shake Array count  = \(AllUserDataArray.count)")
                       
                         if self.AllUserDataArray.count == 0 ||  self.AllUserDataArray.count == 1
                         {
@@ -1321,7 +1799,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
                         
         
                     }
-                    print("AllUserDataArray count 1 = \(AllUserDataArray.count)")
+                    debugPrint("AllUserDataArray count 1 = \(AllUserDataArray.count)")
                     
                     
                     
@@ -1368,13 +1846,13 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
             }
             else
             {
-                print("else")
+                debugPrint("else")
             }
             
             */
             
-//            print((self.tableAllUser.contentOffset.y + self.tableAllUser.frame.size.height))
-//                print(self.tableAllUser.contentSize.height-50)
+//            debugPrint((self.tableAllUser.contentOffset.y + self.tableAllUser.frame.size.height))
+//                debugPrint(self.tableAllUser.contentSize.height-50)
             
             if ((self.tableAllUser.contentOffset.y + self.tableAllUser.frame.size.height) >= self.tableAllUser.contentSize.height-50)
             {
@@ -1466,7 +1944,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
 //
 //
 //        for indexPath in indexPaths {
-//            print("prefetching row of \(indexPath.row)")
+//            debugPrint("prefetching row of \(indexPath.row)")
 //
 //            let cell = tableView.dequeueReusableCell(withIdentifier: "HomeUserTCell") as! HomeUserTCell
 //
@@ -1507,7 +1985,7 @@ extension HomeVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
         
 //    func tableView(_ tableView: UITableView, cancelPrefetchingForRowsAt indexPaths: [IndexPath]) {
 //
-//      print("cancel prefetch row of \(indexPaths)")
+//      debugPrint("cancel prefetch row of \(indexPaths)")
 //    }
 }
 
@@ -1520,7 +1998,7 @@ extension HomeVC:ButtonTapDelegate
     
 }
 
-//MARK:- Ads setup
+//MARK: - Ads setup
 
 extension HomeVC:GADBannerViewDelegate
 {
@@ -1535,49 +2013,14 @@ extension HomeVC:GADBannerViewDelegate
         
         bannerView.rootViewController = self
         bannerView.load(GADRequest())
-        bannerView.adUnitID = "ca-app-pub-3940256099942544/2934735716"
-        /*
-        if self.getDeviceModel() == "iPhone 6"
-        {
-            let adSize = GADAdSizeFromCGSize(CGSize(width: 300, height: 250))
-            bannerView.adSize = adSize//kGADAdSizeSmartBannerPortrait
-            bannerView.delegate = self
-            
-            //            bannerView.center = CGPoint(x: self.addsSubView.bounds.midX,
-            //                                        y: self.addsSubView.bounds.minY+150)
-            self.addsSubView.addSubview(bannerView)
-        }
-        else if self.getDeviceModel() == "iPhone 8+"
-        {
-           // let adSize = GADAdSizeFromCGSize(CGSize(width: 300, height: 500))
-            let adSize = GADAdSizeFromCGSize(CGSize(width: SCREENWIDTH, height: SCREENHEIGHT-106))
-            bannerView.adSize = adSize//kGADAdSizeSmartBannerPortrait
-            bannerView.delegate = self
-            bannerView.center = CGPoint(x: self.addsSubView.bounds.midX,
-                                        y: self.addsSubView.bounds.midY)
-            
-            self.addsSubView.addSubview(bannerView)
-        }
-        else
-        {
-            
-           // let adSize = GADAdSizeFromCGSize(CGSize(width: SCREENWIDTH, height: SCREENHEIGHT-356))//(CGSize(width: 300, height: 500))
-            
-            let adSize = GADAdSizeFromCGSize(CGSize(width: SCREENWIDTH, height: SCREENHEIGHT-106))
-            bannerView.adSize = adSize//kGADAdSizeSmartBannerPortrait
-            bannerView.delegate = self
-            
-            self.addsSubView.addSubview(bannerView)
-        }
-        */
-        
+        bannerView.adUnitID = APP_ADS_ID
+    
         let adSize = GADAdSizeFromCGSize(CGSize(width: SCREENWIDTH, height: SCREENHEIGHT))
         bannerView.adSize = adSize//kGADAdSizeSmartBannerPortrait
         bannerView.delegate = self
         
         self.addsSubView.addSubview(bannerView)
-        
-        
+    
     }
     
     
@@ -1641,7 +2084,7 @@ extension HomeVC:GADBannerViewDelegate
     
     /// Tells the delegate an ad request loaded an ad.
     func adViewDidReceiveAd(_ bannerView: GADBannerView) {
-        print("adViewDidReceiveAd")
+        debugPrint("adViewDidReceiveAd")
         Indicator.sharedInstance.showIndicator()
         
        
@@ -1657,40 +2100,89 @@ extension HomeVC:GADBannerViewDelegate
     }
     
     
-    //    /// Tells the delegate an ad request failed.
-    //    func adView(_ bannerView: GADBannerView,
-    //                didFailToReceiveAdWithError error: GADRequestError) {
-    //        print("adView:didFailToReceiveAdWithError: \(error.localizedDescription)")
-    //        Indicator.sharedInstance.hideIndicator()
-    //    }
-    //
-    //    /// Tells the delegate that a full-screen view will be presented in response
-    //    /// to the user clicking on an ad.
-    //    func adViewWillPresentScreen(_ bannerView: GADBannerView) {
-    //        print("adViewWillPresentScreen")
-    //    }
-    //
-    //    /// Tells the delegate that the full-screen view will be dismissed.
-    //    func adViewWillDismissScreen(_ bannerView: GADBannerView) {
-    //        print("adViewWillDismissScreen")
-    //    }
-    //
-    //    /// Tells the delegate that the full-screen view has been dismissed.
-    //    func adViewDidDismissScreen(_ bannerView: GADBannerView) {
-    //        print("adViewDidDismissScreen")
-    //    }
+        /// Tells the delegate an ad request failed.
+
+    
+        /// Tells the delegate that a full-screen view will be presented in response
+        /// to the user clicking on an ad.
+        func adViewWillPresentScreen(_ bannerView: GADBannerView) {
+            debugPrint("adViewWillPresentScreen")
+        }
+    
+        /// Tells the delegate that the full-screen view will be dismissed.
+        func adViewWillDismissScreen(_ bannerView: GADBannerView) {
+            debugPrint("adViewWillDismissScreen")
+        }
+    
+        /// Tells the delegate that the full-screen view has been dismissed.
+        func adViewDidDismissScreen(_ bannerView: GADBannerView) {
+            debugPrint("adViewDidDismissScreen")
+        }
     
     /// Tells the delegate that a user click will open another app (such as
     /// the App Store), backgrounding the current app.
     func adViewWillLeaveApplication(_ bannerView: GADBannerView) {
-        print("adViewWillLeaveApplication")
+        debugPrint("adViewWillLeaveApplication")
     }
 }
-//MARK:- Fav buttom Action Like /dislike Action
+//MARK: - Fav buttom Action Like /dislike Action
 
-extension HomeVC:FaveButtonDelegate
+extension HomeVC//:FaveButtonDelegate
 {
+    @objc func profileAudioStopedReceivedNotification(notification: Notification)
+    {
+        debugPrint("Home vc")
+        self.btnHearVoice.isSelected=false
+        self.stopVoice()
+       
+        self.imgNewVoice.image = UIImage(named: "NewVoicePlay")
+    }
+    //MARK: - Show like animation
+    func lightUp(imageName: UIImageView)
+    {
+        UIView.transition(with: imageName, duration: 1.30, options: .transitionCrossDissolve, animations: {
+            
+            if imageName == self.imgCardLike
+            {
+                self.imgCardLike.image = UIImage(named: "NewLikeImg")
+            }
+            else if imageName == self.imgNewDislike
+            {
+                self.imgNewDislike.image = UIImage(named: "NewImgDislikeFill")
+            }
+            else if imageName == self.imgNewVoice
+            {
+                self.imgNewVoice.image = UIImage(named: "NewImgVoiceFill")
+            }
+         
+            //button.setImage(UIImage(named: "NewLikeImg"), for: .normal)
+        }, completion: {_ in
+            UIView.transition(with: imageName, duration: 1.30, options: .transitionCrossDissolve, animations: {
+                
+            }, completion: { _ in
+                
+                debugPrint("lightUp done")
+                
+                 if imageName == self.imgCardLike
+                {
+                    self.imgCardLike.image = UIImage(named: "NewLikeImgNotFill")
+                }
+                else if imageName == self.imgNewDislike
+                {
+                    self.imgNewDislike.image = UIImage(named: "NewDislikeImg")
+                }
+            }
+            )})
+        
+        
+    }
+    
+    /*
     func faveButton(_ faveButton: FaveButton, didSelected selected: Bool) {
+        
+        if Connectivity.isConnectedToInternet {
+              
+        
         if faveButton == self.btnLike
         {
             self.regretView.isHidden=false
@@ -1702,11 +2194,11 @@ extension HomeVC:FaveButtonDelegate
             MusicPlayer.instance.pause()
             self.other_user_id = self.currentUserDetails?.user_id ?? ""
        
-            print("user name Like: = \(self.currentUserDetails?.profile_data?.username)")
+            debugPrint("user name Like: = \(String(describing: self.currentUserDetails?.profile_data?.username))")
             
             
              
-             var index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+            let index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
              
              if list.user_id == self.other_user_id
              {
@@ -1721,7 +2213,7 @@ extension HomeVC:FaveButtonDelegate
              } ?? 0
              
              
-             print("Index at id = \(index)")
+             debugPrint("Index at id = \(index)")
              
              if (self.AllUserDataArray.count>index)
              {
@@ -1858,7 +2350,7 @@ extension HomeVC:FaveButtonDelegate
         else
         {
             self.regretView.isHidden=false
-            //MARK:- tage 0- card, 2- user details, 3- ads
+            //MARK: - tage 0- card, 2- user details, 3- ads
                     if self.AllUserDataArray.count==1
                     {
                         self.currentUserDetails = self.AllUserDataArray[0]
@@ -1867,11 +2359,11 @@ extension HomeVC:FaveButtonDelegate
                     MusicPlayer.instance.pause()
                     self.other_user_id = self.currentUserDetails?.user_id ?? ""
                
-                    print("user name Like: = \(self.currentUserDetails?.profile_data?.username)")
+            debugPrint("user name Like: = \(String(describing: self.currentUserDetails?.profile_data?.username))")
                     
                     
                      
-                     var index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
+            let index:Int = self.AllUserDataArray.firstIndex { (list) -> Bool in
                      
                      if list.user_id == self.other_user_id
                      {
@@ -1886,7 +2378,7 @@ extension HomeVC:FaveButtonDelegate
                      } ?? 0
                      
                      
-                     print("Index at id = \(index)")
+                     debugPrint("Index at id = \(index)")
                      
                      if (self.AllUserDataArray.count>index)
                      {
@@ -1973,18 +2465,25 @@ extension HomeVC:FaveButtonDelegate
                    
         }
     }
+        else {
+            self.btnLike.setImage(UIImage(named: "NewLikeImg"), for: .selected)
+            self.btnLike.setSelected(selected: false, animated: true)
+                    self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+                }
+    }
     
     
+    */
 }
 
-// MARK:- Extension Api Calls
+// MARK: - Extension Api Calls
 
 
 extension HomeVC
 {
     
     
-    //MARK:- Get shake user list
+    //MARK: - Get shake user list
     
     func getShakeSentUser(page:Int,ShowIndicator:Bool=true)
     {
@@ -2007,13 +2506,18 @@ extension HomeVC
     
     func callApiForGetShakeSentUser(data:JSONDictionary)
     {
+       // Indicator.sharedInstance.showIndicator2()
+        self.showLoader()
         HomeVM.shared.callApiGetShakeUser(data: data, response: { (message, error) in
             
             if error != nil
             {
+                self.hideLoader()
                 self.showErrorMessage(error: error)
+                //Indicator.sharedInstance.hideIndicator2()
             }
             else{
+              
                 
                 
               //  self.btnLikeCard.isEnabled=true
@@ -2032,8 +2536,8 @@ extension HomeVC
                     self.addsView.isHidden=true
                     self.shakeView.isHidden=true
                     
-                    self.imgCardLike.image = UIImage(named: "BlackLike")
-                    self.imgChangeCard.image = UIImage(named: "AnoBack")
+                    self.imgCardLike.image = UIImage(named: "NewLikeImgNotFill")//BlackLike/NewLikeImgNotFill
+                    self.imgChangeCard.image = UIImage(named: "NewAnoImg")
                     
                    // self.btnLikeCard.setImage(nil, for: .normal)
                     self.viewButtomCard.isHidden=false
@@ -2056,7 +2560,7 @@ extension HomeVC
                     //                    {
                     //                        self.tableAllUser.reloadData()
                     //                    }
-                    //MARK:- Home page  changes
+                    //MARK: - Home page  changes
                     self.currentUserDetails?.user_id = nil
                     
                     self.tableAllUser.reloadData()
@@ -2105,17 +2609,20 @@ extension HomeVC
                         self.addsView.isHidden=true
                         self.viewButtomCard.isHidden=true
                         self.shakeView.isHidden=false
+                       
                         DataManager.comeFromTag=3
                     }
                 }
+               // Indicator.sharedInstance.hideIndicator2()
                 
+                self.hideLoader()
             }
             
             
         })
     }
     
-    //MARK:-  user like dislike api
+    //MARK: -  user like dislike api
     
     func likeUnlikeAPI(other_user_id:String,action:String,like_mode:String,type:String,showIndicator:Bool=true,story_id:String=kEmptyString)
     {
@@ -2131,7 +2638,8 @@ extension HomeVC
             
             self.callApiForLikeUnlike(data: data,type: type, action: action,showIndicator:showIndicator)
         } else {
-            
+            self.imgNewDislike.image = UIImage(named: "NewDislikeImg")
+            self.imgCardLike.image = UIImage(named: "NewLikeImgNotFill")
             self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
         }
         
@@ -2145,19 +2653,24 @@ extension HomeVC
             
             if error != nil
             {
+                self.imgCardLike.image = UIImage(named: "NewLikeImgNotFill")
+                self.imgNewDislike.image = UIImage(named: "NewDislikeImg")
                 self.showErrorMessage(error: error)
             }
             else{
-                
-                let isMatch = HomeVM.shared.like_Data_Model?.is_match ?? 0
+                self.imgCardLike.image = UIImage(named: "NewLikeImgNotFill")
+                self.imgNewDislike.image = UIImage(named: "NewDislikeImg")
+                let isMatch = HomeVM.shared.like_Dislike_Data?.is_match ?? 0
                 self.isRegetEnable=true
                 self.regretView.isHidden=false
-                self.imgCardLike.image = UIImage(named: "BlackLike")
-                self.btnLike.setSelected(selected: false, animated: false)
+                self.imgCardLike.image = UIImage(named: "NewLikeImgNotFill") // //BlackLike //NewLikeImgNotFill
+               // self.btnLike.setSelected(selected: false, animated: false)
+                
+                //
                 if isMatch == 1
                 {
-                    let storyBoard = UIStoryboard.init(name: "Home", bundle: nil)
-                    let vc = storyBoard.instantiateViewController(withIdentifier: "MatchVC") as!  MatchVC
+                   
+                    let vc = MatchVC.instantiate(fromAppStoryboard: .Home)
                     vc.comefrom = kHomePage
                   
                     vc.view_user_id=self.other_user_id
@@ -2217,7 +2730,7 @@ extension HomeVC
                             } ?? 0
                             
                             
-                            print("Index at id = \(index)")
+                            debugPrint("Index at id = \(index)")
                             if (self.AllUserDataArray.count>index)
                             {
                                 self.AllUserDataArray.remove(at: index)
@@ -2263,7 +2776,7 @@ extension HomeVC
                         } ?? 0
                         
                         
-                        print("Index at id = \(index)")
+                        debugPrint("Index at id = \(index)")
                         if (self.AllUserDataArray.count>index)
                         {
                             self.AllUserDataArray.remove(at: index)
@@ -2361,7 +2874,7 @@ extension HomeVC
                             } ?? 0
                             
                             
-                            print("Index at id = \(index)")
+                            debugPrint("Index at id = \(index)")
                             if (self.AllUserDataArray.count>index)
                             {
                                 self.AllUserDataArray.remove(at: index)
@@ -2406,7 +2919,7 @@ extension HomeVC
                         } ?? 0
                         
                         
-                        print("Index at id = \(index)")
+                        debugPrint("Index at id = \(index)")
                         if (self.AllUserDataArray.count>index)
                         {
                             self.AllUserDataArray.remove(at: index)
@@ -2470,7 +2983,7 @@ extension HomeVC
     }
 
     
-    //MARK:- Get ano user list
+    //MARK: - Get ano user list
     
     func getAnonymousUser(showIndiacter:Bool=true, page:Int)
     {
@@ -2493,13 +3006,17 @@ extension HomeVC
     
     func callApiForGetAnonymousUser(showIndiacter:Bool, data:JSONDictionary)
     {
+        self.showLoader()
         HomeVM.shared.callApiGetAnonymousUser(showIndiacter:showIndiacter, data: data, response: { (message, error) in
             
             if error != nil
             {
+                //Indicator.sharedInstance.hideIndicator2()
+                self.hideLoader()
                 self.showErrorMessage(error: error)
             }
             else{
+                
                 self.isAnoModeOn=true
                // self.btnLikeCard.isEnabled=true
                 self.btnLike.isEnabled=true
@@ -2527,7 +3044,7 @@ extension HomeVC
                 
                 self.hearView.isHidden=false
                 self.changeModeView.isHidden=false
-                //MARK:- Home page changes
+                //MARK: - Home page changes
                 
                 if self.AllUserDataArray.count>0//HomeVM.shared.AnonymousUserDataArray.count>0
                 {
@@ -2538,12 +3055,12 @@ extension HomeVC
                     self.shakeView.isHidden=true
                     
                     self.isAnoModeOn=true
-                    self.imgCardLike.image = UIImage(named: "BlackLike")
-                    self.imgChangeCard.image = UIImage(named: "phoneRotate")
+                    self.imgCardLike.image = UIImage(named: "NewLikeImgNotFill")
+                    self.imgChangeCard.image = UIImage(named: "NewPhoneRotate")
                     
                     
                    // self.btnLikeCard.setImage(nil, for: .normal)
-                    self.btnLike.setSelected(selected: false, animated: false)
+                   // self.btnLike.setSelected(selected: false, animated: false)
                     self.viewButtomCard.isHidden=false
                     
                     self.cardView.isHidden=false
@@ -2568,8 +3085,8 @@ extension HomeVC
                     
                     
                 }
-                
-                
+                self.hideLoader()
+               // Indicator.sharedInstance.hideIndicator2()
             }
             
             
@@ -2686,41 +3203,26 @@ extension HomeVC
         )
     }
     
-    func updateLocationAPI()
-    {
-        var data = JSONDictionary()
-        
-        data[ApiKey.kLatitude] = CURRENTLAT
-        data[ApiKey.kLongitude] = CURRENTLONG
-        
-        if Connectivity.isConnectedToInternet {
-            
-            self.callApiForUpdateLatLong(data: data)
-        } else {
-            
-            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
-        }
-        
-    }
+  
     
-    func callApiForUpdateLatLong(data:JSONDictionary)
-    {
-        HomeVM.shared.callApiForUpdateUserLatLong(showIndiacter: false, data: data, response: { (message, error) in
-            
-            
-            if DataManager.comeFromTag==5
-            {
-                
-                //                self.AllUserDataArray.removeAll()
-                //                self.getShakeSentUser(page: 0)
-                
-                
-            }
-        })
-    }
+//    func callApiForUpdateLatLong(data:JSONDictionary)
+//    {
+//        HomeVM.shared.callApiForUpdateUserLatLong(showIndiacter: false, data: data, response: { (message, error) in
+//
+//
+//            if DataManager.comeFromTag==5
+//            {
+//
+//                //                self.AllUserDataArray.removeAll()
+//                //                self.getShakeSentUser(page: 0)
+//
+//
+//            }
+//        })
+//    }
     
     
-    func getMySubscriptionApi()
+    func getMySubscriptionApi(MySubscriptiontype:String=kShake)
     {
         AccountVM.shared.callApiGetMySubscription(response: { (message, error) in
             
@@ -2730,10 +3232,12 @@ extension HomeVC
             }
             else{
                 self.regretPaymentChecked=true
-                let active = AccountVM.shared.Swiping_Subsription_Data?.subscription_is_active ?? 0
+                let active = AccountVM.shared.Shake_Subsription_Data?.subscription_is_active ?? 0
                 
                 let active2 = AccountVM.shared.Prolong_Subsription_Data?.subscription_is_active ?? 0
-                print("prolong active =\(active)")
+                debugPrint("prolong active =\(active)")
+                
+            
                 if active2 == 1
                 {
              
@@ -2755,9 +3259,9 @@ extension HomeVC
                     {
                         type=kShake
                     }
-                   DataManager.purchasePlan=true
-         
-                
+           
+                    if MySubscriptiontype.equalsIgnoreCase(string: kShake)
+                    {
                     var data = JSONDictionary()
                     
                     data[ApiKey.kTimezone] = TIMEZONE
@@ -2771,19 +3275,20 @@ extension HomeVC
                         
                         self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
                     }
+                    }
                     
                    
                 }
                 else
                 {
                     DataManager.purchasePlan=false
-                    let storyboard: UIStoryboard = UIStoryboard(name: "Account", bundle: Bundle.main)
-                    let destVC = storyboard.instantiateViewController(withIdentifier: "RegretPopUpVC") as!  RegretPopUpVC
-                    destVC.type = .Regret
-                    destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
-                    destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+                    if MySubscriptiontype.equalsIgnoreCase(string: kShake)
+                    {
+                        self.runOutPremiumPopup()
+                    }
+                   
                     
-                    self.present(destVC, animated: true, completion: nil)
+                    
                 }
                 
             }
@@ -2792,22 +3297,9 @@ extension HomeVC
     
     
     
-    //MARK:- Show like animation
+
     
-    func lightUp(button: UIButton)
-    {
-        UIView.transition(with: button, duration: 0.30, options: .transitionCrossDissolve, animations: {
-            button.setImage(UIImage(named: "redLike"), for: .normal)
-        }, completion: {_ in
-            UIView.transition(with: button, duration: 0.30, options: .transitionCrossDissolve, animations: {
-                // button.setImage(UIImage(named: "BlackLike"), for: .normal)
-            }, completion: { _ in
-                
-                print("Like done")
-            }
-            )})
-    }
-    //MARK:- getRTMTokenApi
+    //MARK: - getRTMTokenApi
     func getRTMTokenApi()
     {
         ChatVM.shared.callApi_RTM_Token_Generate(showIndiacter: false, response: { (message, error) in
@@ -2819,14 +3311,14 @@ extension HomeVC
             {
                 let rtmToken = ChatVM.shared.Rtm_token
                 
-                print("RTM token = \(rtmToken)")
+                debugPrint("RTM token = \(rtmToken)")
                 let rtm = AgoraRtm.shared()
                 rtm.inviterDelegate = self
                 guard let kit = AgoraRtm.shared().kit else {
                     return
                 }
                 kit.login(account: DataManager.Id, token: rtmToken) { [unowned self] (error) in
-                    print("Rtm login on home page error \(error)")
+                    debugPrint("Rtm login on home page error \(error)")
                     
                 }
                 
@@ -2838,14 +3330,14 @@ extension HomeVC
     
 }
 
-//MARK:- Get current location
+//MARK: - Get current location
 
 extension HomeVC: CLLocationManagerDelegate
 {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first
         {
-            print("Found user's location: \(location)")
+            debugPrint("Found user's location: \(location)")
             CURRENTLAT=location.coordinate.latitude
             CURRENTLONG=location.coordinate.longitude
         }
@@ -2853,13 +3345,75 @@ extension HomeVC: CLLocationManagerDelegate
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
     {
-        print("Failed to find user's location: \(error.localizedDescription)")
+        debugPrint("Failed to find user's location: \(error.localizedDescription)")
     }
 }
-//MARK:- Shake  popup
+//MARK: - Shake  popup
 
-extension HomeVC:DiscardDelegate
+extension HomeVC:DiscardDelegate,deleteAccountDelegate
 {
+    
+    func runOutPremiumPopup()
+    {
+    
+        let vc = DeleteAccountPopUpVC.instantiate(fromAppStoryboard: .Account)
+        vc.comeFrom = kRegretRunningOut
+        vc.message=kRegretMessage
+        vc.messageTitle=kRegretAction
+        vc.delegate=self
+        vc.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+        vc.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+        if let tab = self.tabBarController
+        {
+            tab.present(vc, animated: true, completion: nil)
+        }
+        else
+        {
+            self.present(vc, animated: true, completion: nil)
+        }
+        
+    }
+    
+    
+    
+    func showPremiumPopup()
+    {
+    
+        let destVC = NewPremiumVC.instantiate(fromAppStoryboard: .Account)
+        destVC.type = .Shake
+        destVC.subscription_type=kShake
+        destVC.popupShowIndex=3
+        destVC.delegate=self
+        destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+        destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+        
+        if let tab = self.tabBarController
+        {
+            tab.present(destVC, animated: true, completion: nil)
+        }
+        else
+        {
+            self.present(destVC, animated: true, completion: nil)
+        }
+        
+    }
+    
+    
+    
+    
+    
+    func deleteAccountFunc(name: String) {
+        
+        
+        if name.equalsIgnoreCase(string: kRegretRunningOut)
+        {
+            self.showPremiumPopup()
+        }
+    }
+    
+    
+    
+    
     func ClickNameAction(name: String)
     {
         if name.equalsIgnoreCase(string: kCancel)
@@ -2886,7 +3440,7 @@ extension HomeVC:DiscardDelegate
             
             
             DataManager.comeFromTag=3
-            imgChangeCard.image = UIImage(named: "phoneRotate")
+            imgChangeCard.image = UIImage(named: "NewPhoneRotate")
             self.fromLikeDisLike=false
             self.AllUserDataArray.removeAll()
             self.getAnonymousUser(page: 0)
@@ -2907,27 +3461,29 @@ extension HomeVC:DiscardDelegate
     
 }
 
-//MARK:- Socket method
+//MARK: - Socket method
 
-extension HomeVC
-{
-    func selfJoinSocketEmit()
-    {
-        
-        let JoinDict = ["selfUserId":DataManager.Id]
-        SocketIOManager.shared.selfJoinSocket(MessageChatDict: JoinDict)
-        self.selfJoinSocketON()
-    }
-    func selfJoinSocketON()
-    {
-        SocketIOManager.shared.socket.on("online", callback: { (data, error) in
-            
-            print("online = \(data) \(error)")
-        })
-        
-    }
-    
-}
+//extension HomeVC
+//{
+//    func selfJoinSocketEmit()
+//    {
+//        
+//        let JoinDict = ["selfUserId":DataManager.Id]
+//        SocketIOManager.shared.selfJoinSocket(MessageChatDict: JoinDict)
+//        self.selfJoinSocketON()
+//    }
+//    func selfJoinSocketON()
+//    {
+//        SocketIOManager.shared.socket.on("online", callback: { (data, error) in
+//            
+//            debugPrint("online = \(data) \(error)")
+//        })
+//        
+//    }
+//    
+//    
+//
+//}
 
 extension HomeVC:UIGestureRecognizerDelegate
 {
@@ -2939,14 +3495,189 @@ extension HomeVC:UIGestureRecognizerDelegate
 
 extension HomeVC: AgoraRtmInvitertDelegate {
     func inviter(_ inviter: AgoraRtmCallKit, didReceivedIncoming invitation: AgoraRtmInvitation) {
-        print(#function)
-        print("didReceivedIncoming")
+        debugPrint(#function)
+        debugPrint("didReceivedIncoming")
 
     }
 
     func inviter(_ inviter: AgoraRtmCallKit, remoteDidCancelIncoming invitation: AgoraRtmInvitation) {
-        print("remoteDidCancelIncoming")
+        debugPrint("remoteDidCancelIncoming")
         APPDEL.provider?.reportCall(with: APPDEL.uuid, endedAt: Date(), reason: .remoteEnded)
 
     }
+}
+
+extension HomeVC:paymentScreenOpenFrom
+{
+    func FromScreenName(name: String, ActiveDay: Int) {
+        if Connectivity.isConnectedToInternet {
+
+            self.getMySubscriptionApi(MySubscriptiontype: kDidAppear)
+        } else {
+
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
+    }
+    
+    func requestIDFA() {
+        if #available(iOS 14, *) {
+            ATTrackingManager.requestTrackingAuthorization(completionHandler: { status in
+                // Tracking authorization completed. Start loading ads here.
+                // loadAd()
+            })
+        } else {
+            // Fallback on earlier versions
+        }
+    }
+}
+
+
+extension HomeVC
+{
+    func BackgroundDataCall()
+    {
+        DispatchQueue.global(qos: .background).async {
+       
+            if HangoutVM.shared.hangoutOtherDataArray.count == 0
+            {
+                self.requestIDFA()
+                self.callGetAllHangoutApi()
+            }
+            
+            if StoriesVM.shared.StoriesPostData.count == 0
+            {
+            
+                self.callGetStoriesApi()
+            }
+        
+        }
+        
+        guard let tracker = GAI.sharedInstance().defaultTracker else { return }
+            tracker.set(kGAIScreenName, value: "HomeVC")
+
+            guard let builder = GAIDictionaryBuilder.createScreenView() else { return }
+            tracker.send(builder.build() as [NSObject : AnyObject])
+     
+        
+       
+    }
+}
+
+
+extension HomeVC
+{
+    func callGetAllHangoutApi(page: Int=0,fromType:String=kType)
+    {
+        
+        var data = JSONDictionary()
+        
+        data[ApiKey.kLatitude] = CURRENTLAT
+        data[ApiKey.kLongitude] = CURRENTLONG
+        data[ApiKey.kOffset] = "\(page)"
+        
+        
+        data[ApiKey.ksocial] = DataManager.social
+        data[ApiKey.ktravel] = DataManager.travel
+        data[ApiKey.kbusiness] = DataManager.business
+        data[ApiKey.ksport] = DataManager.sport
+        
+        let men = DataManager.men
+        let women = DataManager.women
+        
+        if ((men=="1") && (women=="1"))
+        {
+            data[ApiKey.kman] = "0"
+            data[ApiKey.kwomen] = "0"
+        }
+        else
+        {
+            data[ApiKey.kman] = DataManager.men
+            data[ApiKey.kwomen] = DataManager.women
+        }
+        
+        
+        
+        data[ApiKey.klatest_first] = DataManager.latest
+        data[ApiKey.kolder_first] = DataManager.oldest
+        data[ApiKey.kascending_age] = DataManager.ase
+        data[ApiKey.kdescending_age] = DataManager.desc
+        
+       
+        if Connectivity.isConnectedToInternet {
+            
+            self.callApiForGetHangout(data: data,fromType:fromType)
+        } else {
+            self.viewLoader.isHidden=true
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
+        
+    }
+    
+    
+    func callApiForGetHangout(data:JSONDictionary,fromType:String=kType)
+    {
+        HangoutVM.shared.callApiGetOtherHangout(showIndiacter: false, data: data, response: { (message, error) in
+            debugPrint("Hangout  = home")
+        })
+    }
+    
+    func callGetStoriesApi(page: Int=0,fromType:String=kType)
+    {
+        var data = JSONDictionary()
+
+        data[ApiKey.kLatitude] = CURRENTLAT
+        data[ApiKey.kLongitude] = CURRENTLONG
+        data[ApiKey.kOffset] = "\(page)"
+        
+      
+        
+        if DataManager.storyAllPostSelected == ""
+        {
+            data[ApiKey.kfilter_all_post] = "1"
+        }
+        else
+        {
+            data[ApiKey.kfilter_all_post] = DataManager.storyAllPostSelected
+        }
+       
+        
+        if DataManager.storyImageSelected == ""
+        {
+            data[ApiKey.kfilter_img] = "1"
+        }
+        else
+        {
+            data[ApiKey.kfilter_img] = DataManager.storyImageSelected
+        }
+        
+        if DataManager.storyVideoSelected == ""
+        {
+            data[ApiKey.kfilter_video] = "1"
+        }
+        else
+        {
+            data[ApiKey.kfilter_video] = DataManager.storyVideoSelected
+        }
+        data[ApiKey.kfilter_my_post] = DataManager.storyMyPostSelected
+        data[ApiKey.kfilter_matched_profile] = DataManager.storyMatchSelected
+       
+            
+            if Connectivity.isConnectedToInternet {
+                
+                self.callApiForGetStories(data: data,fromType:fromType)
+             } else {
+            
+                self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+            }
+        
+    }
+    
+    func callApiForGetStories(data:JSONDictionary,fromType:String=kType)
+    {
+        StoriesVM.shared.callApiGetStories(showIndiacter:false, data: data, response: { (message, error) in
+            debugPrint("Story  = home")
+        })
+    }
+    
+    
 }

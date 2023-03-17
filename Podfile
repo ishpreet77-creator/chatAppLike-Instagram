@@ -8,7 +8,6 @@ target 'Flazhed' do
   # Pods for Flazhed
 pod 'IQKeyboardManagerSwift'
 pod 'CountryPickerView'
-pod "SwiftyCam"
 pod 'SwiftRangeControl'
 pod 'Alamofire'
 pod 'FBSDKLoginKit','~> 9.3.0'
@@ -19,13 +18,16 @@ pod 'SDWebImage'
 pod 'Google-Mobile-Ads-SDK'
 pod 'GoogleMaps'#, '4.1.0'
 pod 'GooglePlaces'#, '4.1.0'
-pod 'SwiftyInsta', '~> 2.0'
+pod 'SwiftyInsta'
 pod 'Socket.IO-Client-Swift', '~> 15.2.0'
 pod 'Giphy'
 pod 'AgoraRtcEngine_iOS'
 pod 'AgoraRtm_iOS'
-pod 'FaveButton'
-pod 'InfiniteCarouselCollectionView'
-
+pod 'SkeletonView'
+pod 'Branch'
+pod 'GoogleAnalytics'
+pod 'Firebase/Core'
+pod 'KeychainSwift'
+pod 'ListPlaceholder'
 
 end

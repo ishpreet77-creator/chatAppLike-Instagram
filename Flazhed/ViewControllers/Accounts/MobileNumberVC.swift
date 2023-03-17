@@ -12,21 +12,31 @@ import CoreLocation
 
 class MobileNumberVC: BaseVC {
     
-    //MARK:- Variables
-    let countryPickerView = CountryPickerView()
+    //MARK: -  IBOutlets
     
-    //MARK:-  IBOutlets
+    @IBOutlet weak var lblTitle: UILabel!
+    @IBOutlet weak var lblContryCodeText: UILabel!
+    @IBOutlet weak var lblMobileNumberText: UILabel!
+    @IBOutlet weak var btnVerify: UIButton!
+    
+    @IBOutlet weak var viewButtom: UIView!
+    @IBOutlet weak var lblOtpsent: UILabel!
+    @IBOutlet weak var viewMobile: UIView!
+    @IBOutlet weak var viewCountry: UIView!
     @IBOutlet weak var verifyBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var txtFieldMobile: UITextField!
     @IBOutlet weak var textFieldCountry: UITextField!
     @IBOutlet weak var lblNumber: UILabel!
     @IBOutlet weak var topConst: NSLayoutConstraint!
+    //MARK: - Variables
+    let countryPickerView = CountryPickerView()
+    
     var countryCode = kCurrentCountryCode
     var countryName = "Denmark"
     var mobileNumber = ""
     var locationMenualy = false
     let manager = CLLocationManager()
-    //MARK:- Class Life Cycle
+    //MARK: - Class Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -39,11 +49,13 @@ class MobileNumberVC: BaseVC {
         
         // Do any additional setup after loading the view.
         lblNumber.text = txtFieldMobile.text
-        
+        setUpUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
+        self.tabBarController?.tabBar.isHidden = true
+
         manager.requestAlwaysAuthorization()
         manager.delegate = self
         manager.requestLocation()
@@ -84,17 +96,35 @@ class MobileNumberVC: BaseVC {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillAppear(notification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillDisappear(notification:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         
-        
+     
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        
+        self.tabBarController?.tabBar.isHidden = false
+
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification , object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification , object: nil)
         
     }
     
+    func setUpUI()
+    {
+        self.lblTitle.text = kMOBILENUMBER.capitalized
+        self.lblContryCodeText.text = kCOUNTRYCODE
+        self.lblMobileNumberText.text = kMOBILENUMBER
+        self.lblOtpsent.text = kVerificationOTP
+        self.btnVerify.setTitle(kVerify, for: .normal)
+        self.btnVerify.setTitle(kVerify, for: .selected)
+        
+        self.btnVerify.backgroundColor = ENABLECOLOR
+        
+        // color change
+        self.lblContryCodeText.textColor = PURPLECOLOR
+        self.lblMobileNumberText.textColor = PURPLECOLOR
+        
+        self.txtFieldMobile.placeholder = kMOBILENUMBER
+    }
     
     
     @IBAction func backBtnAction(_ sender: UIButton) {
@@ -141,7 +171,7 @@ class MobileNumberVC: BaseVC {
         
     }
     
-    //MARK:- Functions
+    //MARK: - Functions
     @objc
      func keyboardWillAppear(notification: NSNotification?) {
      
@@ -187,17 +217,27 @@ class MobileNumberVC: BaseVC {
         return nil
      }
     
+    
+    func showLoader()
+    {
+        Indicator.sharedInstance.showIndicator3(views: [self.viewMobile,self.viewCountry,self.lblNumber,self.viewButtom,self.lblOtpsent])
+    }
+    func hideLoader()
+    {
+        Indicator.sharedInstance.hideIndicator3(views: [self.viewMobile,self.viewCountry,self.lblNumber,self.viewButtom,self.lblOtpsent])
+    }
+    
 }
-//MARK:- Extension
+//MARK: - Extension
 extension MobileNumberVC: CountryPickerViewDelegate, CountryPickerViewDataSource
 {
     func countryPickerView(_ countryPickerView: CountryPickerView, didSelectCountry country: Country)
     {
         
         self.locationMenualy=true
-        let code = (country.phoneCode ?? kCurrentCountryCode)
+        let code = country.phoneCode
         //  self.imgCountry.roundedImageWithBorder()
-        var name =  country.name
+        let name =  country.name
         self.countryCode=code
         //        self.textFieldCountry.text = "( "+ \(code) + ")" + " " + name
         self.textFieldCountry.text = "(\(code))  \(name.uppercased())"
@@ -209,7 +249,7 @@ extension MobileNumberVC: CountryPickerViewDelegate, CountryPickerViewDataSource
 }
 
 
-//MARK:- Extension  UITextFieldDelegate
+//MARK: - Extension  UITextFieldDelegate
 extension MobileNumberVC:UITextFieldDelegate {
 
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
@@ -254,13 +294,10 @@ extension MobileNumberVC
                 self.showErrorMessage(error: error)
             }
             else{
-             
-                let storyBoard = UIStoryboard(name: kAccount, bundle: nil)
-               
-                let vc = storyBoard.instantiateViewController(withIdentifier: "OtpVC") as! OtpVC
-                    
-                vc.mobileNumber=self.txtFieldMobile.text!//String(OnBoardingVM.shared.sendOTPData[ApiKey.kPhoneNumber]  as? Int ?? 0) //phonenumber
-                vc.countryCode=self.countryCode//(OnBoardingVM.shared.sendOTPData[ApiKey.kCountryCode] as? String ?? "")
+            
+                let vc = OtpVC.instantiate(fromAppStoryboard: .Account)
+                vc.mobileNumber=self.txtFieldMobile.text!
+                vc.countryCode=self.countryCode
                vc.forTesting="no"
                 vc.SentOTP=(OnBoardingVM.shared.sendOTPData[ApiKey.kOtp] as? String ?? "")
                 self.navigationController?.pushViewController(vc, animated: true)
@@ -278,7 +315,7 @@ extension MobileNumberVC: CLLocationManagerDelegate
         
            if let location = locations.first
            {
-               print("Found user's location: \(location)")
+               debugPrint("Found user's location: \(location)")
             CURRENTLAT=location.coordinate.latitude
             CURRENTLONG=location.coordinate.longitude
         
@@ -287,9 +324,9 @@ extension MobileNumberVC: CLLocationManagerDelegate
             
             self.fetchCityAndCountry(from: location) { (Country, PhoneCode, error) in
                 
-                print("code = \(PhoneCode)")
-                print("country = \(Country)")
-                print("error = \(error)")
+                debugPrint("code = \(String(describing: PhoneCode))")
+                debugPrint("country = \(String(describing: Country))")
+                debugPrint("error = \(String(describing: error))")
                 let countryName = Country ?? "Denmark"
                 let code = PhoneCode ?? ""
                 
@@ -306,7 +343,7 @@ extension MobileNumberVC: CLLocationManagerDelegate
                 }
                 
                 
-                print(self.countryCode)
+                debugPrint(self.countryCode)
                 
             }
 
@@ -315,6 +352,6 @@ extension MobileNumberVC: CLLocationManagerDelegate
 
        func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
        {
-           print("Failed to find user's location: \(error.localizedDescription)")
+           debugPrint("Failed to find user's location: \(error.localizedDescription)")
        }
 }

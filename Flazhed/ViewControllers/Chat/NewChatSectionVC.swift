@@ -7,77 +7,153 @@
 
 import UIKit
 import CoreLocation
+import CoreData
+
 
 class NewChatSectionVC: BaseVC {
-    //MARK:- All outlets
+    //MARK: - All outlets
     
-    //    @IBOutlet weak var topStoryHeightConst: NSLayoutConstraint!
-    //    @IBOutlet weak var chatsStoriesView: UIView!
-    //    @IBOutlet weak var chatStoriesCollectionView: UICollectionView!
+    @IBOutlet weak var mainView: UIView!
     @IBOutlet weak var chatTableView: UITableView!
-    //    @IBOutlet weak var activeButton: UIButton!
-    //    @IBOutlet weak var inactiveButton: UIButton!
     @IBOutlet weak var bottomLabel: UILabel!
     @IBOutlet weak var bottomIcon: UIImageView!
-    //    @IBOutlet weak var lblNoNewMatch: UILabel!
     @IBOutlet weak var lblDataFound: UILabel!
     
-    
-    //MARK:- All Variable
+    //MARK: - All Variable
     var page = 0
     var MatchPage = 0
-    //var storyImageArray: [UIImage] = [#imageLiteral(resourceName: "chatdp"), #imageLiteral(resourceName: "chatdp"),#imageLiteral(resourceName: "chatdp"),#imageLiteral(resourceName: "chatdp")]
-    var UserNameArray: [String] = ["Emily kumar","Chelsea","dasfdhgeyry ryeryrurtureuyt","dev"]
-    var chatUserNameArray:[String] = ["Stephanie","Sarah","Diana","Natasha"]
-    var chatUserLastMessageArray:[String] = ["Let's have a call soon😉✌","Send me some tunes🎵","You got a cute dog","Heyy"]
-    var dateTimeArray:[String] = ["10:30 PM","Yesterday","Yesterday","15/08/20"]
-    // var chatImageArray:[UIImage] = [#imageLiteral(resourceName: "user"),#imageLiteral(resourceName: "user"),#imageLiteral(resourceName: "user"),#imageLiteral(resourceName: "user")]
     var tableListBool=true
     let locationmanager = CLLocationManager()
-    
     var activeInactiveChatArray:[chat_room_details_Model] = []
-    
-    var MatchArray:[UserListModel] = []
-    
-    
+    var MatchArray:[MatchUserListModel] = []
     var refreshControl = UIRefreshControl()
-    var chatFilter = ""  //Filter should be unread,latest,closest
+    var chatFilter = ""
     var imageLongPressIndex=0
+    var reloadMatchCollection=true
+    var reloadActiveListCollection=true
     
-    //MARK:- View Lifecycle
-    
+    var selectedUserName = ""
+    var selectedUserId = ""
+   
+    //MARK: - View Lifecycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        if Connectivity.isConnectedToInternet {
-            self.getMySubscriptionApi()
-        }
-        // activeButton.isSelected = true
-        // self.lblNoNewMatch.isHidden=true
+       
+        DataManager.comeFrom=kEmptyString
         tableListBool = true
-        chatTableView.tableFooterView = UIView()
-        SocketIOManager.shared.initializeSocket()
-        
-        refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
-        chatTableView.addSubview(refreshControl)
-        // chatStoriesCollectionView.showsHorizontalScrollIndicator=false
-        
-        self.setUpTable()
+        self.setUI()
+       self.AllSocketMethod()
+        DataManager.isProfileCompelete = true
+        DataManager.isPrefrenceSet = true
+         DataManager.isEditProfile = true
     }
+    
+  
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
+        DataManager.isEditProfile = true
+        tabBarController?.removeDotAtTabBarItemIndex(index: 1)
+       // badgeCountIntervalCheckON()
+//        if appDelegate?.chatVisitCount == 0 {
+//            self.chatTableView.showAnimatedSkeleton()
+//        }
+
+     
+        self.reloadMatchCollection=true
+        self.reloadActiveListCollection=true
         
+        DataManager.isMessagePageOpen=false
+        DataManager.currentScreen = kChat
+        
+        if Connectivity.isConnectedToInternet
+        {
+            if DataManager.comeFrom == kMessage
+            {
+                if tableListBool
+                {
+                    DispatchQueue.main.async
+                    {
+                        self.bottomLabel.isHidden = false
+                        self.bottomIcon.isHidden = false
+                        self.tableListBool = true
+                        self.chatTableView.separatorStyle = .singleLine
+            
+                           self.activeInactiveChatArray.removeAll()
+                      
+                        self.callGetGetActiveChat(page: 0)
+                    }
+                }
+            }
+            
+           else if DataManager.comeFrom != kViewProfile
+            {
+              
+                if tableListBool
+                {
+                    DispatchQueue.main.async
+                    {
+                        self.bottomLabel.isHidden = false
+                        self.bottomIcon.isHidden = false
+                        self.tableListBool = true
+                        self.chatTableView.separatorStyle = .singleLine
+                       // if self.appDelegate?.chatVisitCount == 0
+                       // {
+                           self.activeInactiveChatArray.removeAll()
+                        //    self.appDelegate?.chatVisitCount += 1
+                         //}
+                       
+                        self.callGetGetActiveChat(page: 0)
+                        
+                        self.MatchArray.removeAll()
+                        
+                        self.callGetAllMatch(page: 0)
+                      
+                    }
+                    
+                }
+                else
+                {
+                    DispatchQueue.main.async {
+                        self.tableListBool = false
+                        self.bottomLabel.isHidden = true
+                        self.bottomIcon.isHidden = true
+                    self.chatTableView.separatorStyle = .none
+                    
+                    self.activeInactiveChatArray.removeAll()
+                    self.page=0
+                    self.callGetInActiveChat(page: 0)
+                        self.MatchArray.removeAll()
+                        self.callGetAllMatch(page: 0)
+                    }
+                }
+               
+                
+            }
+            else
+            {
+                DataManager.comeFrom = kEmptyString
+            }
+        }
+        else
+        {
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
+        
+        /*
+        if DataManager.comeFrom != kShare
+        {
+            DataManager.comeFrom=kEmptyString
+            self.reloadMatchCollection=true
+            self.reloadActiveListCollection=true
+        }
         
         DataManager.currentScreen = kChat
         
         
-        SocketIOManager.shared.initializeSocket()
-        DataManager.isMessagePageOpen=false
-        locationmanager.requestAlwaysAuthorization()
-        locationmanager.delegate = self
-        locationmanager.requestLocation()
+       
         
-        self.selfJoinSocketEmit()
         
         self.MatchPage=0
         
@@ -93,7 +169,7 @@ class NewChatSectionVC: BaseVC {
         //        }
         //
         
-        
+        self.reloadMatchCollection=true
         if DataManager.comeFrom != kViewProfile
         {
             
@@ -111,7 +187,7 @@ class NewChatSectionVC: BaseVC {
                     tableListBool = true
                     self.chatTableView.separatorStyle = .singleLine
                     self.activeInactiveChatArray.removeAll()
-                    self.MatchArray.removeAll()
+                   
                     self.callGetGetActiveChat(page: 0)
                 } else {
                     
@@ -138,15 +214,22 @@ class NewChatSectionVC: BaseVC {
                     self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
                 }
             }
-            DispatchQueue.main.async {
-                if Connectivity.isConnectedToInternet {
-                    
-                    self.callGetAllMatch(page: 0)
-                } else {
-                    
-                    self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
-                }
-            }
+            DispatchQueue.background(background: {
+                    if Connectivity.isConnectedToInternet {
+                        self.MatchArray.removeAll()
+                        self.reloadActiveListCollection=false
+                        self.reloadMatchCollection=true
+                        self.callGetAllMatch(page: 0)
+                    } else {
+                        
+                        self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+                    }
+                
+            }, completion: {
+             
+            })
+            
+           
         }
         else
         {
@@ -161,9 +244,24 @@ class NewChatSectionVC: BaseVC {
         
         //   self.onActiveInactiveChatScreenJoin()
         
+        */
+        self.tabBarController?.removeDotAtTabBarItemIndex(index: 1)
         
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.tabBarController?.removeDotAtTabBarItemIndex(index: 1)
+       
         
-        
+//                        DispatchQueue.global(qos: .background).async {
+//                            if Connectivity.isConnectedToInternet {
+//                                self.getMySubscriptionApi()
+//                            }
+//                        }
+        SocketIOManager.shared.initializeSocket()
+      //  self.selfJoinSocketEmit()
+
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -171,16 +269,49 @@ class NewChatSectionVC: BaseVC {
         // DataManager.currentScreen = kEmptyString
         
     }
-    //MARK:- Filter action
+    
+    
+    
+    func setUI()
+    {
+        chatTableView.tableFooterView = UIView()
+        refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
+        chatTableView.addSubview(refreshControl)
+        self.setUpTable()
+        
+     
+        locationmanager.requestAlwaysAuthorization()
+        locationmanager.delegate = self
+        locationmanager.requestLocation()
+        
+        bottomLabel.text = kTapandHold
+    }
+    func AllSocketMethod()
+    {
+        DispatchQueue.background(background: {
+            self.updateOnlineStatusAfter2MinutesEmit()
+            self.sendSMS_ON_Method()
+        }, completion: nil)
+      
+    }
+    
+    
+    //MARK: - Filter action
     
     @objc func sortButtonAction(_ sender: UIButton) {
-        let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-        let destVC = storyboard.instantiateViewController(withIdentifier: "SortingAlertVC") as! SortingAlertVC
+      
+        let destVC = SortingAlertVC.instantiate(fromAppStoryboard: .Chat)
         destVC.delegate=self
         destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
         destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
-        self.present(destVC, animated: true, completion: nil)
-        
+        if let tab = self.tabBarController
+        {
+            tab.present(destVC, animated: true, completion: nil)
+        }
+        else
+        {
+            self.present(destVC, animated: true, completion: nil)
+        }
         //self.showToast(message: kLogoutMessage)
     }
     
@@ -196,6 +327,9 @@ class NewChatSectionVC: BaseVC {
         
         //self.chatTableView.reloadData()
         
+        self.reloadActiveListCollection=true
+        self.reloadMatchCollection=false
+
         if Connectivity.isConnectedToInternet {
             self.page=0
             self.callGetGetActiveChat(page: 0)
@@ -217,7 +351,8 @@ class NewChatSectionVC: BaseVC {
         bottomIcon.isHidden = true
         self.chatTableView.separatorStyle = .none
         self.activeInactiveChatArray.removeAll()
-        
+        self.reloadActiveListCollection=true
+        self.reloadMatchCollection=false
         if Connectivity.isConnectedToInternet {
             
             self.callGetInActiveChat(page: 0)
@@ -232,13 +367,15 @@ class NewChatSectionVC: BaseVC {
     
     @objc func refresh(_ sender: AnyObject)
     {
-        
+     
+        self.reloadActiveListCollection=true
+        self.reloadMatchCollection=true
         DispatchQueue.main.async {
             if Connectivity.isConnectedToInternet {
                 self.MatchArray.removeAll()
                 self.callGetAllMatch(page: 0,showIndiacter: false)
             } else {
-                
+                self.chatTableView.contentOffset = CGPoint.zero
                 self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
             }
         }
@@ -254,6 +391,7 @@ class NewChatSectionVC: BaseVC {
                 self.chatTableView.separatorStyle = .singleLine
                 self.callGetGetActiveChat(page: 0,showIndiacter: false)
             } else {
+                self.chatTableView.contentOffset = CGPoint.zero
                 self.refreshControl.endRefreshing()
                 self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
             }
@@ -268,6 +406,7 @@ class NewChatSectionVC: BaseVC {
                 self.activeInactiveChatArray.removeAll()
                 self.callGetInActiveChat(showIndiacter: false, page: 0)
             } else {
+                self.chatTableView.contentOffset = CGPoint.zero
                 self.refreshControl.endRefreshing()
                 self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
             }
@@ -275,9 +414,18 @@ class NewChatSectionVC: BaseVC {
         self.refreshControl.endRefreshing()
     }
     
+    
+    func showLoader()
+    {
+        Indicator.sharedInstance.showIndicator3(views: [self.chatTableView])
+    }
+    func hideLoader()
+    {
+        Indicator.sharedInstance.hideIndicator3(views: [self.chatTableView])
+    }
 }
 
-extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
+extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate {
     
     func setUpTable()
     {
@@ -299,16 +447,22 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return self.activeInactiveChatArray.count+3
+        return self.activeInactiveChatArray.count+2
     }
+
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if indexPath.row == 0
         {
             
             let cell = chatTableView.dequeueReusableCell(withIdentifier: "ChatMatchTCell") as! ChatMatchTCell
-            cell.reloadCollection(userArray: self.MatchArray)
-            cell.viewController=self
+            if  self.reloadMatchCollection
+            {
+                cell.reloadCollection(userArray: self.MatchArray)
+                cell.viewController=self
+            }
+           
+           
             let bgColorView = UIView()
             bgColorView.backgroundColor = UIColor.clear
             cell.selectedBackgroundView = bgColorView
@@ -320,33 +474,35 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
             
             let cell = chatTableView.dequeueReusableCell(withIdentifier: "ChatSecMessageHeaderTCell") as! ChatSecMessageHeaderTCell
             cell.btnSort.addTarget(self, action: #selector(sortButtonAction), for: .touchUpInside)
+            cell.sortIcon.tintColor = PURPLECOLOR
             let bgColorView = UIView()
             bgColorView.backgroundColor = UIColor.clear
             cell.selectedBackgroundView = bgColorView
             return cell
         }
-        else if indexPath.row == 2
-        {
-            
-            let cell = chatTableView.dequeueReusableCell(withIdentifier: "ChatActiveTCell") as! ChatActiveTCell
-            if tableListBool
-            {
-                cell.btnActive.isSelected=true
-                cell.btnInactive.isSelected=false
-            }
-            else
-            {
-                cell.btnActive.isSelected=false
-                cell.btnInactive.isSelected=true
-            }
-            cell.btnActive.addTarget(self, action: #selector(activeChatButtonAction), for: .touchUpInside)
-            cell.btnInactive.addTarget(self, action: #selector(inactiveButtonAction), for: .touchUpInside)
-            let bgColorView = UIView()
-            bgColorView.backgroundColor = UIColor.clear
-            cell.selectedBackgroundView = bgColorView
-            
-            return cell
-        }
+//        else if indexPath.row == 2
+//        {
+//
+//            let cell = chatTableView.dequeueReusableCell(withIdentifier: "ChatActiveTCell") as! ChatActiveTCell
+//            if tableListBool
+//            {
+//                cell.btnActive.isSelected=true
+//                cell.btnInactive.isSelected=false
+//            }
+//            else
+//            {
+//                cell.btnActive.isSelected=false
+//                cell.btnInactive.isSelected=true
+//            }
+//
+//            cell.btnActive.addTarget(self, action: #selector(activeChatButtonAction), for: .touchUpInside)
+//            cell.btnInactive.addTarget(self, action: #selector(inactiveButtonAction), for: .touchUpInside)
+//            let bgColorView = UIView()
+//            bgColorView.backgroundColor = UIColor.clear
+//            cell.selectedBackgroundView = bgColorView
+//
+//            return cell
+//        }
         
         else
         {
@@ -354,16 +510,17 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
             
             // let cell = chatTableView.dequeueReusableCell(withIdentifier: "ChatListingTVC") as! ChatListingTVC
             cell.selectionStyle = .none
-            
+            //if self.reloadActiveListCollection
+            //{
             
             if tableListBool == true{
                 
                 
                 var cellData:chat_room_details_Model?
                 
-                if self.activeInactiveChatArray.count>indexPath.row-3
+                if self.activeInactiveChatArray.count>indexPath.row-2
                 {
-                    cellData = self.activeInactiveChatArray[indexPath.row-3]
+                    cellData = self.activeInactiveChatArray[indexPath.row-2]
                 }
                 
                 cell.pendingMessagesNumberLabel.layer.cornerRadius = 10.25
@@ -409,7 +566,7 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                         
                         cell.userLastMessageLabel.text = name
                         
-                        print("Name =\(name)")
+                        debugPrint("Name =\(name)")
                     }
                     
                     else
@@ -442,15 +599,13 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                 {
                     cell.userLastMessageLabel.text = cellData?.last_message ?? ""
                 }
-                if cellData?.other_user_details?.profile_data?.images?.count ?? 0>0
+                if let img = cellData?.other_user_details?.profile_data?.image
                 {
-                    if let img = cellData?.other_user_details?.profile_data?.images?[0].image
-                    {
                         DispatchQueue.main.async {
-                            let url = URL(string: img)!
-                            cell.userProfileIMage.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: .refreshCached, completed: nil)
+                            //let url = URL(string: img)!
+                            cell.userProfileIMage.setImage(imageName: img)//.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: .refreshCached, completed: nil)
                         }
-                    }
+                    
                 }
                 
                 
@@ -481,7 +636,7 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                 cell.rightUnreadConst.constant = 0
                 let is_read_by_second_user = cellData?.is_read_by_second_user ?? 0
                 let continue_chat_status_other_user =  cellData?.continue_chat_status_other_user ?? 0
-                let chat_start_time_active =  cellData?.like_dislike?.chat_start_time_active ?? ""
+               // let chat_start_time_active =  cellData?.like_dislike?.chat_start_time_active ?? ""
                 
                 
                 if is_read_by_second_user == 1
@@ -496,8 +651,8 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                     
                 }
                 
-                let celldata = cellData?.last_message_time ?? ""
-                let time = celldata.dateFromString(format: .NewISO, type: .utc)
+                let lastMsgTime = cellData?.last_message_time ?? ""
+                let time = lastMsgTime.dateFromString(format: .NewISO, type: .utc)
                 let calendar = Calendar(identifier: .gregorian)
                 if calendar.isDateInToday(time)
                 {
@@ -515,9 +670,24 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                 
                 cell.userProfileIMage.cornerRadius = cell.userProfileIMage.frame.height/2
                 cell.userProfileIMage.contentMode = .scaleAspectFill
-                cell.circularProgressView.isHidden = false
-                cell.circularProgressView.progressClr = #colorLiteral(red: 0, green: 0.5077332854, blue: 1, alpha: 1)
-                cell.circularProgressView.setProgressWithAnimation(duration: 1.0, value: 0.50)
+                var continue_chat_status2 = cellData?.continue_chat_status ?? 0
+                
+                if continue_chat_status2 == 0
+                {
+                    continue_chat_status2 = cellData?.is_come_from_story_hangout ?? 0
+                }
+                
+                
+                if  continue_chat_status2 == 1
+                {
+               // cell.circularProgressView.isHidden = true
+                }
+                else
+                {
+                  //  cell.circularProgressView.isHidden = false
+                }
+              //  cell.circularProgressView.progressClr = #colorLiteral(red: 0, green: 0.5077332854, blue: 1, alpha: 1)
+              //  cell.circularProgressView.setProgressWithAnimation(duration: 1.0, value: 0.50)
                 
                 
                 
@@ -525,11 +695,11 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                 cell.menuBtn2.isHidden=true
                 cell.menuButton.isHidden=true
                 
-                var dif  = "".checkHoursLeftForRing(startTime: cellData?.like_dislike?.chat_start_time_active ?? "2021-05-20T04:55:50.706Z")
+                let dif  = "".checkHoursLeftForRing(startTime: cellData?.like_dislike?.chat_start_time_active ?? "2021-05-20T04:55:50.706Z")
                 
                 
                 
-                print("time check = \(dif)")
+                debugPrint("time check = \(dif)")
                 let flo = Float(kTimeRing)
                 let ring = (1.0/flo)*Float(dif)
                 
@@ -537,20 +707,20 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                 {
                     if dif <= 1440*2 // 24 Hours+24+
                     {
-                        cell.circularProgressView.setProgressWithAnimation(duration: 1.0, value: ring)
-                        cell.circularProgressView.progressClr = UIColor.red
+                       // cell.circularProgressView.setProgressWithAnimation(duration: 1.0, value: ring)
+                       // cell.circularProgressView.progressClr = UIColor.red
                     }
                     else
                     {
-                        cell.circularProgressView.setProgressWithAnimation(duration: 1.0, value: ring)
-                        cell.circularProgressView.progressClr = LINECOLOR
+                       // cell.circularProgressView.setProgressWithAnimation(duration: 1.0, value: ring)
+                      //  cell.circularProgressView.progressClr = LINECOLOR
                     }
                 }
                 else
                 {
-                    cell.circularProgressView.setProgressWithAnimation(duration: 1.0, value: 1)
-                    cell.circularProgressView.progressClr = LINECOLOR
-                    cell.circularProgressView.isHidden=true
+                   // cell.circularProgressView.setProgressWithAnimation(duration: 1.0, value: 1)
+                  //  cell.circularProgressView.progressClr = LINECOLOR
+                   // cell.circularProgressView.isHidden=true
                 }
                 
                 
@@ -564,27 +734,27 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                 
                 if  continue_chat_status == 1
                 {
-                    cell.circularProgressView.isHidden=true
+                    //cell.circularProgressView.isHidden=true
                     
                     cell.userProfileIMage.isUserInteractionEnabled = false
                 }
                 else
                 {
-                    cell.circularProgressView.isHidden=false
+                  //  cell.circularProgressView.isHidden=false
                     
                     
                     //  if DataManager.purchaseProlong == false
                     //  {
-                    let tapGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(imageTapped(tapGestureRecognizer:)))
-                    cell.userProfileIMage.tag=indexPath.row
-                    cell.userProfileIMage.isUserInteractionEnabled = true
-                    cell.userProfileIMage.addGestureRecognizer(tapGestureRecognizer)
+//                    let tapGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(imageTapped(tapGestureRecognizer:)))
+//                    cell.userProfileIMage.tag=indexPath.row
+//                    cell.userProfileIMage.isUserInteractionEnabled = true
+//                    cell.userProfileIMage.addGestureRecognizer(tapGestureRecognizer)
                     //}
                 }
-                //MARK:- Gray out
+                //MARK: - Gray out
                 
-                var hourRemanning  = "".checkHoursRemaining(startTime: cellData?.like_dislike?.chat_start_time_active ?? "2021-05-20T04:55:50.706Z")
-                print("hourRemanning \(hourRemanning)")
+                var (hourRemanning, _, _)  = "".checkHoursRemaining(startTime: cellData?.like_dislike?.chat_start_time_active ?? "2021-05-20T04:55:50.706Z")
+                debugPrint("hourRemanning \(hourRemanning)")
                 
                 let response_other_user = cellData?.response_other_user ?? 0
                 let response_self_user = cellData?.self_send_message ?? 0
@@ -601,18 +771,21 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                 //1440 == 24 hr
                 difX = difX-2880
                 var is_come_from_story_hangout = cellData?.is_come_from_story_hangout ?? 0
+                let have_parlong = cellData?.have_parlong ?? 0
                 let activeTime = cellData?.like_dislike?.chat_start_time_active ?? ""
                 
-                let timeDiff  = "".checkHoursLeftForRing24Hr(startTime: cellData?.like_dislike?.chat_start_time_active ?? "2021-05-20T04:55:50.706Z")
-                
+               // let timeDiff  = "".checkHoursLeftForRing24Hr(startTime: cellData?.like_dislike?.chat_start_time_active ?? "2021-05-20T04:55:50.706Z")
+                //MARK: - Payment changes
+             
                 if is_come_from_story_hangout == 0
                 {
-                    if DataManager.purchaseProlong
+                    if have_parlong == 1
                     {
                         is_come_from_story_hangout = 1
                     }
                     
                 }
+               
                 hourRemanning = hourRemanning+1
                 
                 if is_come_from_story_hangout != 1
@@ -669,7 +842,7 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                             cell.userLastMessageLabel.text = "Chat is no long active"
                             cell.userLastMessageLabel.textColor = UIColor.lightGray
                             cell.userNameLabel.textColor = UIColor.lightGray
-                            cell.circularProgressView.isHidden=true
+                            //cell.circularProgressView.isHidden=true
                             cell.userProfileIMage.isUserInteractionEnabled = false
                         
                         cell.userProfileIMage.alpha = 1
@@ -706,22 +879,30 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                 {
                     cell.userProfileIMage.alpha = 1
                     cell.grayView.isHidden=true
-                    cell.userProfileIMage.isUserInteractionEnabled = true
+                    cell.userProfileIMage.isUserInteractionEnabled = false
                         //cell.userProfileIMage.isUserInteractionEnabled = false
                     cell.userNameLabel.textColor = UIColor.black
                     cell.userLastMessageLabel.textColor = UIColor.black
                     cell.dateAndTimeLabel.textColor = TEXTFILEDPLACEHOLDERCOLOR
                 }
                 
-                cell.circularProgressView.trackClr = .white
-                if DataManager.purchaseProlong
+               // cell.circularProgressView.trackClr = .white
+                //MARK: - Payment changes
+                if have_parlong == 1
                 {
-                    cell.circularProgressView.isHidden=true
+                  //  cell.circularProgressView.isHidden=true
                 }
                 
+                //MARK: - Update ui
                 
-                
-            }else{
+                cell.grayView.isHidden=true
+                cell.userProfileIMage.isUserInteractionEnabled = true
+                cell.userProfileIMage.alpha = 1
+                cell.userNameLabel.textColor = UIColor.black
+                cell.userLastMessageLabel.textColor = UIColor.black
+                cell.dateAndTimeLabel.textColor = TEXTFILEDPLACEHOLDERCOLOR
+            }
+            else{
                 
                 /*
                  
@@ -766,15 +947,13 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                 {
                     cell.userLastMessageLabel.text = cellData?.last_message ?? ""
                 }
-                if cellData?.other_user_details?.profile_data?.images?.count ?? 0>0
+                if let img = cellData?.other_user_details?.profile_data?.image
                 {
-                    if let img = cellData?.other_user_details?.profile_data?.images?[0].image
-                    {
-                        DispatchQueue.main.async {
-                            let url = URL(string: img)!
-                            cell.userProfileIMage.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: .refreshCached, completed: nil)
+                    DispatchQueue.main.async {
+                           // let url = URL(string: img)!
+                        cell.userProfileIMage.setImage(imageName: img)//.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: .refreshCached, completed: nil)
                         }
-                    }
+                    
                 }
                 
                 cell.pendingMessagesNumberLabel.isHidden = true
@@ -838,10 +1017,13 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                 
                 cell.userProfileIMage.cornerRadius = cell.userProfileIMage.frame.height/2
                 cell.userProfileIMage.contentMode = .scaleAspectFill
-                cell.circularProgressView.isHidden = true
+               // cell.circularProgressView.isHidden = true
                 // cell.circularProgressView.progressClr = #colorLiteral(red: 0, green: 0.5077332854, blue: 1, alpha: 1)
                 //  cell.circularProgressView.setProgressWithAnimation(duration: 1.0, value: 0.50)
                 
+                
+                //MARK: - Payment changes
+                /*
                 if DataManager.purchaseProlong
                 {
                     cell.circularProgressView.isHidden=true
@@ -854,11 +1036,18 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                     cell.menuButton.isHidden = false
                     cell.menuBtn2.isHidden = false
                 }
+                */
+                
+               // cell.circularProgressView.isHidden=false
+                cell.menuButton.isHidden = false
+                cell.menuBtn2.isHidden = false
+                
+                
                 cell.grayView.isHidden=true
                 cell.menuBtn2.addTarget(self, action: #selector(menuBtnAct), for: .touchUpInside)
                 
                 //cell.menuButton.addTarget(self, action: #selector(menuBtnAct), for: .touchUpInside)
-                cell.circularProgressView.isHidden=true
+                //cell.circularProgressView.isHidden=true
             }
             if  ((self.activeInactiveChatArray.count>1) && (indexPath.row != self.activeInactiveChatArray.count-1))
             {
@@ -868,7 +1057,8 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
             {
                 cell.viewLine.isHidden=true
             }
-            
+           // }
+            //
             
             let bgColorView = UIView()
             bgColorView.backgroundColor = UIColor.clear
@@ -877,6 +1067,7 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
             
             
         }
+        
     }
     
     
@@ -890,10 +1081,10 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
         {
             return 55
         }
-        else if indexPath.row == 2
-        {
-            return 35
-        }
+//        else if indexPath.row == 2
+//        {
+//            return 0
+//        }
         else
         {
             return UITableView.automaticDimension
@@ -904,16 +1095,63 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         
-        if indexPath.row != 0 &&  indexPath.row != 1 && indexPath.row != 2
+        if indexPath.row != 0 &&  indexPath.row != 1
         {
+
+           
+            var cellData:chat_room_details_Model?
             
-            if tableListBool == true{
+            if self.activeInactiveChatArray.count>indexPath.row-2
+            {
+                cellData = self.activeInactiveChatArray[indexPath.row-2]
+            }
+           // if tableListBool == true{
                 
+                let vc = MessageVC.instantiate(fromAppStoryboard: .Chat)
+
+                
+                DataManager.comeFrom = kEmptyString
+                vc.view_user_id=cellData?.other_user_details?._id ?? ""
+                vc.profileName=cellData?.other_user_details?.profile_data?.username ?? ""
+                vc.comfrom=kChat
+                vc.listType=kChat
+                vc.chat_room_id=cellData?._id ?? kEmptyString
+//                if  continue_chat_status == 1
+//                {
+//                    vc.isContinue=true
+//                }
+//                else
+//                {
+//                    vc.isContinue=false
+//                }
+                   if let img = cellData?.other_user_details?.profile_data?.image
+                    {
+                        vc.profileImage=img
+                    }
+                
+                let id  = cellData?.other_user_details?._id ?? kEmptyString
+                if id != kEmptyString
+                {
+                    self.navigationController?.pushViewController(vc, animated: true)
+                }
+     
+                /*
+                
+//                let storyboard: UIStoryboard = UIStoryboard(name: "Account", bundle: Bundle.main)
+//                let destVC = storyboard.instantiateViewController(withIdentifier: "RegretPopUpVC") as!  RegretPopUpVC
+//                destVC.type = .Prolong
+//                destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+//                destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+//
+//                self.present(destVC, animated: true, completion: nil)
+//
+//
+               
                 var cellData:chat_room_details_Model?
                 
-                if self.activeInactiveChatArray.count>indexPath.row-3
+                if self.activeInactiveChatArray.count>indexPath.row-2
                 {
-                    cellData = self.activeInactiveChatArray[indexPath.row-3]
+                    cellData = self.activeInactiveChatArray[indexPath.row-2]
                 }
                 
                 let username =  cellData?.other_user_details?.profile_data?.username ?? ""
@@ -922,7 +1160,7 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                 
                 var dif  = "".checkHoursLeftNoReply(startTime: cellData?.like_dislike?.chat_end_time_inactive ?? "2021-05-20T04:55:50.706Z")
                 
-                print("time check = \(dif)")
+                debugPrint("time check = \(dif)")
                 
                 var is_come_from_story_hangout = cellData?.is_come_from_story_hangout ?? 0
                 /*
@@ -948,54 +1186,63 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                  */
                 let response_other_user = cellData?.response_other_user ?? 0
                 let response_self_user = cellData?.self_send_message ?? 0
-                let is_read_by_second_user = cellData?.is_read_by_second_user ?? 0
+                //let is_read_by_second_user = cellData?.is_read_by_second_user ?? 0
                 let continue_chat_status_other_user =  cellData?.continue_chat_status_other_user ?? 0
-                let chat_start_time_active =  cellData?.like_dislike?.chat_start_time_active ?? ""
+               // let chat_start_time_active =  cellData?.like_dislike?.chat_start_time_active ?? ""
                 let is_continue_from_user =  cellData?.is_continue_from_user ?? 0
                 let is_continue_to_user =  cellData?.like_dislike?.is_continue_to_user ?? 0
                 // var dif2 = 2880
                 dif = dif-2880
                 
                 //
-                let timeDiff  = "".checkHoursLeftForRing24Hr(startTime: cellData?.like_dislike?.chat_start_time_active ?? "2021-05-20T04:55:50.706Z")
+               // let timeDiff  = "".checkHoursLeftForRing24Hr(startTime: cellData?.like_dislike?.chat_start_time_active ?? "2021-05-20T04:55:50.706Z")
                 
                 //                var hourRemanning  = "".checkHoursLeftNoReply(startTime: cellData?.like_dislike?.chat_end_time_inactive ?? "2021-05-20T04:55:50.706Z")
-                //                print("hourRemanning \(hourRemanning/60)")
+                //                debugPrint("hourRemanning \(hourRemanning/60)")
                 //
                 
                 
-                var hourRemanning  = "".checkHoursRemaining(startTime: cellData?.like_dislike?.chat_start_time_active ?? "2021-05-20T04:55:50.706Z")
-                print("hourRemanning \(hourRemanning)")
-                var isActiveTime = cellData?.like_dislike?.chat_start_time_active ?? ""
+                var (hourRemanning,_,_)  = "".checkHoursRemaining(startTime: cellData?.like_dislike?.chat_start_time_active ?? "2021-05-20T04:55:50.706Z")
+                debugPrint("hourRemanning \(hourRemanning)")
+                let isActiveTime = cellData?.like_dislike?.chat_start_time_active ?? ""
                 hourRemanning = hourRemanning+1
+                let have_parlong = cellData?.have_parlong ?? 0
+                //MARK: - Payment changes
+               
                 if is_come_from_story_hangout == 0
                 {
-                    if DataManager.purchaseProlong
+                    if have_parlong == 1
                     {
                         is_come_from_story_hangout = 1
                     }
                 }
                 
+                
                 if is_come_from_story_hangout == 1
                 {
-                    let vc = storyboard?.instantiateViewController(withIdentifier: "MessageVC") as! MessageVC
-                    
+                   
+                    let vc = MessageVC.instantiate(fromAppStoryboard: .Chat)
+
+                    DataManager.comeFrom = kEmptyString
                     vc.view_user_id=cellData?.other_user_details?._id ?? ""
                     vc.profileName=cellData?.other_user_details?.profile_data?.username ?? ""
                     
                     vc.isContinue=true
-                    
-                    
-                    if cellData?.other_user_details?.profile_data?.images?.count ?? 0>0
+                    vc.comfrom=kChat
+                    vc.listType=kChat
+                    vc.chat_room_id=cellData?._id ?? kEmptyString
+                    if let img = cellData?.other_user_details?.profile_data?.image
                     {
-                        if let img = cellData?.other_user_details?.profile_data?.images?[0].image
-                        {
-                            vc.profileImage=img
-                        }
+                        vc.profileImage=img
+            
                     }
-                    self.navigationController?.pushViewController(vc, animated: true)
+                    let id  = cellData?.other_user_details?._id ?? kEmptyString
+                    if id != kEmptyString
+                    {
+                        self.navigationController?.pushViewController(vc, animated: true)
+                    }
                 }
-                //MARK:- For active to Inactive chat popup
+                //MARK: - For active to Inactive chat popup
                 
                 else if  ((is_continue_from_user == 0 && is_continue_to_user == 0) && (hourRemanning <= 48 && hourRemanning >= 25) && (isActiveTime != ""))
                 {
@@ -1003,8 +1250,8 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                     
                     if (response_other_user == 0 && response_self_user == 0)
                     {
-                        let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-                        let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                        let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
+                        
                         destVC.type = .GrayOut
                         destVC.user_name=username.capitalized
                         destVC.view_user_id=cellData?.other_user_details?._id ?? ""
@@ -1012,14 +1259,24 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                         
                         destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                         destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
-                        self.present(destVC, animated: true, completion: nil)
-                    }
+                        if let tab = self.tabBarController
+                        {
+                            tab.present(destVC, animated: true, completion: nil)
+                        }
+                        else
+                        {
+                            self.present(destVC, animated: true, completion: nil)
+                        }                    }
                     else if (response_other_user == 1 && response_self_user == 1)
                     {
-                        let vc = storyboard?.instantiateViewController(withIdentifier: "MessageVC") as! MessageVC
-                        
+                        let vc = MessageVC.instantiate(fromAppStoryboard: .Chat)
+
+                        DataManager.comeFrom = kEmptyString
                         vc.view_user_id=cellData?.other_user_details?._id ?? ""
                         vc.profileName=cellData?.other_user_details?.profile_data?.username ?? ""
+                        vc.comfrom=kChat
+                        vc.listType=kChat
+                        vc.chat_room_id=cellData?._id ?? kEmptyString
                         if  continue_chat_status == 1
                         {
                             vc.isContinue=true
@@ -1029,19 +1286,21 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                             vc.isContinue=false
                         }
                         
-                        if cellData?.other_user_details?.profile_data?.images?.count ?? 0>0
+                        if let img = cellData?.other_user_details?.profile_data?.image
                         {
-                            if let img = cellData?.other_user_details?.profile_data?.images?[0].image
-                            {
-                                vc.profileImage=img
-                            }
+   
+                        vc.profileImage=img
+                            
                         }
-                        self.navigationController?.pushViewController(vc, animated: true)
+                        let id  = cellData?.other_user_details?._id ?? kEmptyString
+                        if id != kEmptyString
+                        {
+                            self.navigationController?.pushViewController(vc, animated: true)
+                        }
                     }
                     else
                     {
-                        let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-                        let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                        let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
                         destVC.type = .GrayOut48Hrs
                         destVC.user_name=username.capitalized
                         destVC.view_user_id=cellData?.other_user_details?._id ?? ""
@@ -1049,17 +1308,22 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                         destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                         destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
                         
-                        self.present(destVC, animated: true, completion: nil)
-                    }
+                        if let tab = self.tabBarController
+                        {
+                            tab.present(destVC, animated: true, completion: nil)
+                        }
+                        else
+                        {
+                            self.present(destVC, animated: true, completion: nil)
+                        }                    }
                 }
-                //MARK:- Continue and end chat popup
+                //MARK: - Continue and end chat popup
                 else if (response_other_user == 1 && response_self_user == 1) && (hourRemanning <= 24 && isActiveTime != "")
                 {
                     
                     if  continue_chat_status == 1 && continue_chat_status_other_user == 0
                     {
-                        let storyboard: UIStoryboard = UIStoryboard(name: "Chat", bundle: Bundle.main)
-                        let destVC = storyboard.instantiateViewController(withIdentifier: "FeedbackAlertVC") as!  FeedbackAlertVC
+                        let destVC = FeedbackAlertVC.instantiate(fromAppStoryboard: .Chat)
                         destVC.type = .onceContinue
                         destVC.user_name=username.capitalized
                         destVC.view_user_id=cellData?.other_user_details?._id ?? ""
@@ -1067,8 +1331,14 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                         destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                         destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
                         
-                        self.present(destVC, animated: true, completion: nil)
-                    }
+                        if let tab = self.tabBarController
+                        {
+                            tab.present(destVC, animated: true, completion: nil)
+                        }
+                        else
+                        {
+                            self.present(destVC, animated: true, completion: nil)
+                        }                    }
                     
                     else if  (continue_chat_status == 0 || continue_chat_status_other_user == 0)
                     {
@@ -1088,8 +1358,9 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                         //                    destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
                         //                    self.present(destVC, animated: true, completion: nil)
                         
-                        let storyboard: UIStoryboard = UIStoryboard(name: "Stories", bundle: Bundle.main)
-                        let destVC = storyboard.instantiateViewController(withIdentifier: "StoryDiscardVC") as!  StoryDiscardVC
+                      
+                        let destVC = StoryDiscardVC.instantiate(fromAppStoryboard: .Stories)
+
                         destVC.delegate=self
                         destVC.type = .continueChat
                         destVC.User_Name=cellData?.other_user_details?.profile_data?.username ?? ""
@@ -1101,14 +1372,26 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                         destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                         destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
                         
-                        self.present(destVC, animated: true, completion: nil)
+                        if let tab = self.tabBarController
+                        {
+                            tab.present(destVC, animated: true, completion: nil)
+                        }
+                        else
+                        {
+                            self.present(destVC, animated: true, completion: nil)
+                        }
+                        
                     }
                     else
                     {
-                        let vc = storyboard?.instantiateViewController(withIdentifier: "MessageVC") as! MessageVC
-                        
+                        let vc = MessageVC.instantiate(fromAppStoryboard: .Chat)
+
+                        DataManager.comeFrom = kEmptyString
                         vc.view_user_id=cellData?.other_user_details?._id ?? ""
                         vc.profileName=cellData?.other_user_details?.profile_data?.username ?? ""
+                        vc.comfrom=kChat
+                        vc.listType=kChat
+                        vc.chat_room_id=cellData?._id ?? kEmptyString
                         if  continue_chat_status == 1
                         {
                             vc.isContinue=true
@@ -1118,14 +1401,17 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                             vc.isContinue=false
                         }
                         
-                        if cellData?.other_user_details?.profile_data?.images?.count ?? 0>0
+                        if let img = cellData?.other_user_details?.profile_data?.image
                         {
-                            if let img = cellData?.other_user_details?.profile_data?.images?[0].image
-                            {
-                                vc.profileImage=img
-                            }
+                        
+                        vc.profileImage=img
+                        
                         }
-                        self.navigationController?.pushViewController(vc, animated: true)
+                        let id  = cellData?.other_user_details?._id ?? kEmptyString
+                        if id != kEmptyString
+                        {
+                            self.navigationController?.pushViewController(vc, animated: true)
+                        }
                     }
                     
                 }
@@ -1148,10 +1434,15 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                     //                    }
                     //                    else
                     //                    {
-                    let vc = storyboard?.instantiateViewController(withIdentifier: "MessageVC") as! MessageVC
+                    let vc = MessageVC.instantiate(fromAppStoryboard: .Chat)
+
                     
+                    DataManager.comeFrom = kEmptyString
                     vc.view_user_id=cellData?.other_user_details?._id ?? ""
                     vc.profileName=cellData?.other_user_details?.profile_data?.username ?? ""
+                    vc.comfrom=kChat
+                    vc.listType=kChat
+                    vc.chat_room_id=cellData?._id ?? kEmptyString
                     if  continue_chat_status == 1
                     {
                         vc.isContinue=true
@@ -1160,15 +1451,16 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                     {
                         vc.isContinue=false
                     }
-                    
-                    if cellData?.other_user_details?.profile_data?.images?.count ?? 0>0
-                    {
-                        if let img = cellData?.other_user_details?.profile_data?.images?[0].image
+                       if let img = cellData?.other_user_details?.profile_data?.image
                         {
                             vc.profileImage=img
                         }
+                    
+                    let id  = cellData?.other_user_details?._id ?? kEmptyString
+                    if id != kEmptyString
+                    {
+                        self.navigationController?.pushViewController(vc, animated: true)
                     }
-                    self.navigationController?.pushViewController(vc, animated: true)
                     
                     //}
                     
@@ -1235,11 +1527,49 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                  }
                  
                  */
-            }
+    
+                
+                */
+         
+           /* }
             else
             {
-                if DataManager.purchaseProlong
+                
+                var cellData:chat_room_details_Model?
+                
+                if self.activeInactiveChatArray.count>indexPath.row-3
                 {
+                    cellData = self.activeInactiveChatArray[indexPath.row-3]
+                }
+
+                let id = cellData?._id ?? ""
+                self.selectedUserName=id
+                self.selectedUserId=cellData?.other_user_details?._id  ?? ""
+                self.selectedUserName=cellData?.other_user_details?.profile_data?.username  ?? ""
+
+                
+                let vc = DeleteAccountPopUpVC.instantiate(fromAppStoryboard: .Account)
+                vc.comeFrom = kProlong
+                vc.message=kReactivateProlong + "\(self.selectedUserName)" + kagainProlong
+                vc.messageTitle=kHeadlineProlong
+                vc.delegate=self
+                vc.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+                vc.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+                if let tab = self.tabBarController
+                {
+                    tab.present(vc, animated: true, completion: nil)
+                }
+                else
+                {
+                    self.present(vc, animated: true, completion: nil)
+                }
+                
+                
+                /*
+                //MARK: - Payment changes
+                
+                //if DataManager.purchaseProlong
+                //{
                     
                     var cellData:chat_room_details_Model?
                     
@@ -1248,6 +1578,12 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                         cellData = self.activeInactiveChatArray[indexPath.row-3]
                     }
                     let vc = storyboard?.instantiateViewController(withIdentifier: "MessageVC") as! MessageVC
+                    DataManager.comeFrom = kEmptyString
+                    
+                    
+                    vc.comfrom=kChat
+                    vc.listType=kChat
+                    vc.chat_room_id=cellData?._id ?? kEmptyString
                     let continue_chat_status = cellData?.continue_chat_status ?? 0
                     vc.view_user_id=cellData?.other_user_details?._id ?? ""
                     vc.profileName=cellData?.other_user_details?.profile_data?.username ?? ""
@@ -1260,15 +1596,17 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                         vc.isContinue=false
                     }
                     
-                    if cellData?.other_user_details?.profile_data?.images?.count ?? 0>0
-                    {
-                        if let img = cellData?.other_user_details?.profile_data?.images?[0].image
+                       if let img = cellData?.other_user_details?.profile_data?.image
                         {
                             vc.profileImage=img
                         }
+                    let id  = cellData?.other_user_details?._id ?? kEmptyString
+                    if id != kEmptyString
+                    {
+                        self.navigationController?.pushViewController(vc, animated: true)
                     }
-                    self.navigationController?.pushViewController(vc, animated: true)
-                }
+                   
+               // }
                 
                 
                 //            if ChatVM.shared.chat_room_details_Array.count>indexPath.row-3
@@ -1283,7 +1621,12 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                 //            destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
                 //            self.present(destVC, animated: true, completion: nil)
                 //            }
+                
+                
+                */
+                
             }
+            */
         }
     }
     
@@ -1293,16 +1636,50 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
         
         if ChatVM.shared.chat_room_details_Array.count>sender.tag-3
         {
-            let storyboard: UIStoryboard = UIStoryboard(name: "Stories", bundle: Bundle.main)
-            let destVC = storyboard.instantiateViewController(withIdentifier: "StoryMenuPopUpVC") as!  StoryMenuPopUpVC
-            destVC.type = .chatScreen
+//            let storyboard: UIStoryboard = UIStoryboard(name: "Stories", bundle: Bundle.main)
+//            let destVC = storyboard.instantiateViewController(withIdentifier: "StoryMenuPopUpVC") as!  StoryMenuPopUpVC
+//            destVC.type = .chatScreen
             let cellData = ChatVM.shared.chat_room_details_Array[sender.tag-3]
             let id = cellData._id ?? ""
-            destVC.chat_room_id=id
-            destVC.view_user_id=cellData.other_user_details?._id  ?? ""
-            destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
-            destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
-            self.present(destVC, animated: true, completion: nil)
+            self.selectedUserName=id
+            self.selectedUserId=cellData.other_user_details?._id  ?? ""
+            self.selectedUserName=cellData.other_user_details?.profile_data?.username  ?? ""
+            
+//            destVC.chat_room_id=id
+//            destVC.view_user_id=cellData.other_user_details?._id  ?? ""
+//            destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+//            destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+//            self.present(destVC, animated: true, completion: nil)
+//
+            
+//            let storyboard: UIStoryboard = UIStoryboard(name: "Account", bundle: Bundle.main)
+//            let destVC = storyboard.instantiateViewController(withIdentifier: "NewPremiumVC") as!  NewPremiumVC //RegretPopUpVC
+//            destVC.type = .Prolong
+//            destVC.subscription_type=kProlong
+//            destVC.delegate=self
+//            destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+//            destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+//
+//            self.present(destVC, animated: true, completion: nil)
+//
+            
+            
+            let vc = DeleteAccountPopUpVC.instantiate(fromAppStoryboard: .Account)
+            vc.comeFrom = kProlong
+            vc.message=kReactivateProlong + "\(self.selectedUserName)" + kagainProlong
+            vc.messageTitle=kHeadlineProlong
+            vc.delegate=self
+            vc.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
+            vc.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
+            if let tab = self.tabBarController
+            {
+                tab.present(vc, animated: true, completion: nil)
+            }
+            else
+            {
+                self.present(vc, animated: true, completion: nil)
+            }
+            
         }
         
     }
@@ -1322,8 +1699,9 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                     cellData = self.activeInactiveChatArray[tappedImage.tag-3]
                 }
                 
-                let storyboard: UIStoryboard = UIStoryboard(name: "Stories", bundle: Bundle.main)
-                let destVC = storyboard.instantiateViewController(withIdentifier: "StoryDiscardVC") as!  StoryDiscardVC
+            
+                let destVC = StoryDiscardVC.instantiate(fromAppStoryboard: .Stories)
+
                 destVC.delegate=self
                 destVC.type = .continueChat
                 destVC.User_Name=cellData?.other_user_details?.profile_data?.username ?? ""
@@ -1334,10 +1712,18 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
                 destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
                 destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
                 
-                self.present(destVC, animated: true, completion: nil)
+                if let tab = self.tabBarController
+                {
+                    tab.present(destVC, animated: true, completion: nil)
+                }
+                else
+                {
+                    self.present(destVC, animated: true, completion: nil)
+                }
+                
             }
             
-            print(tappedImage.tag)
+            debugPrint(tappedImage.tag)
         }
         
         
@@ -1370,7 +1756,7 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
         //
         //        if ((self.chatStoriesCollectionView.contentOffset.x + self.chatStoriesCollectionView.frame.size.width) >= self.chatStoriesCollectionView.contentSize.width-50)
         //        {
-        //            print("Greater")
+        //            debugPrint("Greater")
         //
         //            if self.MatchArray.count<ChatVM.shared.Match_Pagination_Details?.totalCount ?? 0
         //            {
@@ -1379,7 +1765,7 @@ extension NewChatSectionVC: UITableViewDataSource, UITableViewDelegate{
         //        }
         //        else
         //        {
-        //            print("less")
+        //            debugPrint("less")
         //        }
         //
         //
@@ -1394,7 +1780,7 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
 {
     
     
-    //MARK:- Sort method
+    //MARK: - Sort method
     
     func SortOptionName(name: String)
     {
@@ -1441,8 +1827,10 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
         }
     }
     
-    func callGetAllMatch(page: Int=0,showIndiacter:Bool=true)
+    func callGetAllMatch(page: Int=0,showIndiacter:Bool=false)
     {
+       
+        
         var data = JSONDictionary()
         
         data[ApiKey.kOffset] = "\(page)"
@@ -1455,8 +1843,9 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
             self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
         }
     }
-    func getMatchesApi(data:JSONDictionary,showIndiacter:Bool=true,page:Int)
+    func getMatchesApi(data:JSONDictionary,showIndiacter:Bool=false,page:Int)
     {
+  
         ChatVM.shared.callApiMatchesProfile(showIndiacter: showIndiacter, data: data, response: { (message, error) in
             if error != nil
             {
@@ -1464,7 +1853,7 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
             }
             else
             {
-                
+//                self.chatTableView.hideSkeleton()
                 if page == 0
                 {
                     self.MatchArray.removeAll()
@@ -1476,6 +1865,8 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
                 }
                 
                 self.MatchPage=self.MatchArray.count
+                self.reloadActiveListCollection=false
+                self.reloadMatchCollection=true
                 self.chatTableView.reloadData()
             }
             
@@ -1483,7 +1874,7 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
     }
     
     
-    func callGetGetActiveChat(page: Int,showIndiacter:Bool=true,ChatFilter:String=DataManager.chatFilter)
+    func callGetGetActiveChat(page: Int,showIndiacter:Bool=false,ChatFilter:String=DataManager.chatFilter)
     {
         
         var data = JSONDictionary()
@@ -1495,10 +1886,10 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
         
         data[ApiKey.kOffset] = "\(page)"
         
-        print("Data active = \(data)")
+        debugPrint("Data active = \(data)")
         
         if Connectivity.isConnectedToInternet {
-            
+//            self.chatTableView.showAnimatedSkeleton()
             self.getActiveChatApi(data: data,page: page,showIndiacter:showIndiacter)
         } else {
             
@@ -1511,23 +1902,33 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
     
     func getActiveChatApi(data:JSONDictionary,page:Int,showIndiacter:Bool)
     {
+        if showIndiacter
+        {
+           // Indicator.sharedInstance.showIndicator2()
+            
+            self.showLoader()
+        }
+        
+        
         ChatVM.shared.callApiGetActiveChat(showIndiacter:showIndiacter, data: data, response: { (message, error) in
             if error != nil
             {
+           
+                self.hideLoader()
                 self.showErrorMessage(error: error)
             }
             else
             {
-                self.tableListBool=true
-                
-                self.bottomLabel.isHidden = false
-                self.bottomIcon.isHidden = false
-                
+                //self.chatTableView.hideSkeleton()
                 if page == 0
                 {
                     self.activeInactiveChatArray.removeAll()
                 }
+                self.tableListBool=true
                 
+                self.bottomLabel.isHidden = false
+                self.bottomIcon.isHidden = false
+    
                 for dict in ChatVM.shared.chat_room_details_Array
                 {
                     self.activeInactiveChatArray.append(dict)
@@ -1535,9 +1936,6 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
                 if self.activeInactiveChatArray.count>0
                 {
                     self.lblDataFound.isHidden=true
-                    
-                    //let kEmptyInActive = "No inactive chat found."
-                    
                 }
                 else
                 {
@@ -1545,8 +1943,13 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
                     self.lblDataFound.text = kEmptyActive
                     
                 }
+                self.reloadActiveListCollection=true
+                self.reloadMatchCollection=false
                 self.refreshControl.endRefreshing()
                 self.chatTableView.reloadData()
+                
+                self.hideLoader()
+                
             }
             
             
@@ -1554,7 +1957,7 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
     }
     
     
-    func callGetInActiveChat(showIndiacter:Bool=true,page: Int)
+    func callGetInActiveChat(showIndiacter:Bool=false,page: Int)
     {
         
         var data = JSONDictionary()
@@ -1579,7 +1982,7 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
     
     func getInActiveChatApi(showIndiacter:Bool,data:JSONDictionary,page:Int)
     {
-        ChatVM.shared.callApiGetInActiveChat(showIndiacter: showIndiacter,data: data, response: { (message, error) in
+        ChatVM.shared.callApiGetInActiveChat(showIndiacter: showIndiacter,data: data, page: page, response: { (message, error) in
             if error != nil
             {
                 self.showErrorMessage(error: error)
@@ -1599,6 +2002,7 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
                 }
                 if self.activeInactiveChatArray.count>0
                 {
+//                    self.chatTableView.hideSkeleton()
                     self.lblDataFound.isHidden=true
                     
                 }
@@ -1608,6 +2012,7 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
                     self.lblDataFound.text = kEmptyInActive
                     
                 }
+                self.reloadActiveListCollection=true
                 self.refreshControl.endRefreshing()
                 self.chatTableView.reloadData()
                 
@@ -1617,14 +2022,14 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
         })
     }
     
-    
+    /*
     func updateLocationAPI()
     {
         var data = JSONDictionary()
         
         data[ApiKey.kLatitude] = CURRENTLAT
         data[ApiKey.kLongitude] = CURRENTLONG
-        
+        data[ApiKey.KDeviceToken] = AppDelegate.DeviceToken
         if Connectivity.isConnectedToInternet {
             
             self.callApiForUpdateLatLong(data: data)
@@ -1638,10 +2043,11 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
     func callApiForUpdateLatLong(data:JSONDictionary)
     {
         HomeVM.shared.callApiForUpdateUserLatLong(showIndiacter: false, data: data, response: { (message, error) in
-            print("Location update api = \(message)")
+          //  debugPrint("Location update api = \(message)")
             
         })
     }
+    */
     
     func continueChatPI()
     {
@@ -1679,12 +2085,12 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
             else
             {
                 
-//                if #available(iOS 13.0, *) {
-//                    SCENEDEL?.navigateToChat()
-//                } else {
-//                    // Fallback on earlier versions
-//                    APPDEL.navigateToChat()
-//                }
+                if #available(iOS 13.0, *) {
+                    SCENEDEL?.navigateToChat()
+                } else {
+                    // Fallback on earlier versions
+                    APPDEL.navigateToChat()
+                }
             
                 /*
                 let vc = self.storyboard?.instantiateViewController(withIdentifier: "MessageVC") as! MessageVC
@@ -1726,25 +2132,29 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
             else{
                 
                 let active = AccountVM.shared.Prolong_Subsription_Data?.subscription_is_active ?? 0
-                print("prolong active =\(active)")
-                if active == 1
-                {
-                    
-                    DataManager.purchaseProlong=true
-                }
-                else
-                {
-                    DataManager.purchaseProlong=false
-                }
+                debugPrint("prolong active =\(active)")
+                //MARK: - Payment changes
+//                if active == 1
+//                {
+//
+//                    DataManager.purchaseProlong=true
+//                }
+//                else
+//                {
+//                    DataManager.purchaseProlong=false
+//                }
                 
             }
         })
     }
     
+  
+    
     
     
     func onActiveInactiveChatScreenJoin()
     {
+       
         //        socket.on('sendSmsAlert',({toUserId}) => {
         //           io.to(toUserId.toString()).emit('receivedSMS', {status : "true"});
         //         });
@@ -1754,7 +2164,7 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
         SocketIOManager.shared.onActiveInactiveChatScreenJoin(MessageChatDict: dict2)
     }
     
-    //MARK:- Time out continue
+    //MARK: - Time out continue
     
     func ClickNameAction(name: String) {
         
@@ -1769,13 +2179,44 @@ extension NewChatSectionVC:chatSortDelegate,DiscardDelegate
     }
     
     
+    func saveActiveChatData(userData: MyProfileDataModel?) {
+
+
+       let context = CoreDataManager.getContext()
+//        let context = getbgContext()
+       let entity = NSEntityDescription.entity(forEntityName: ApiKey.kOwnProfile, in: context)
+       let newdata = NSManagedObject(entity: entity!, insertInto: context)
+       do {
+          let age = userData?.age ?? 0
+           let phone = userData?.phone_number ?? 0
+           newdata.setValue(userData?.bio ?? kEmptyString, forKey: ApiKey.kBio)
+           newdata.setValue("\(age)", forKey: ApiKey.kAge)
+           newdata.setValue("\(phone)", forKey: ApiKey.kPhoneNumber)
+           newdata.setValue(userData?.unit, forKey: ApiKey.kUnit)
+           newdata.setValue(userData?.city ?? kEmptyString, forKey: ApiKey.kCity)
+           newdata.setValue(userData?.company_name ?? kEmptyString, forKey: ApiKey.kCompany_name)
+           newdata.setValue(userData?.job_title ?? kEmptyString, forKey: ApiKey.kJob_title)
+           newdata.setValue(userData?.username ?? kEmptyString, forKey: ApiKey.kUsername)
+    
+           do {
+               try context.save()
+               debugPrint("Saved profile data")
+           } catch {
+               debugPrint("***************** error while Saving *********")
+           }
+       } catch {
+           debugPrint("***************** error while Saving *********")
+       }
+   }
+    
+    
 }
 extension NewChatSectionVC: CLLocationManagerDelegate
 {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first
         {
-            print("Found user's location: \(location)")
+            debugPrint("Found user's location: \(location)")
             CURRENTLAT=location.coordinate.latitude
             CURRENTLONG=location.coordinate.longitude
             
@@ -1784,24 +2225,24 @@ extension NewChatSectionVC: CLLocationManagerDelegate
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
     {
-        print("Failed to find user's location: \(error.localizedDescription)")
+        debugPrint("Failed to find user's location: \(error.localizedDescription)")
     }
 }
 
 
-//MARK:- Socket method
+//MARK: - Socket method
 
 extension NewChatSectionVC
 {
     
-    func selfJoinSocketEmit()
-    {
-        
-        let JoinDict = ["selfUserId":DataManager.Id]
-        SocketIOManager.shared.selfJoinSocket(MessageChatDict: JoinDict)
-        
-    }
-    
+//    func selfJoinSocketEmit()
+//    {
+//        
+//        let JoinDict = ["selfUserId":DataManager.Id]
+//        SocketIOManager.shared.selfJoinSocket(MessageChatDict: JoinDict)
+//        
+//    }
+//    
     
     
     
@@ -1830,7 +2271,7 @@ extension NewChatSectionVC
      
      SocketIOManager.shared.socket.on("statusJoin", callback: { (data, error) in
      
-     print("statusJoin = \(data)")
+     debugPrint("statusJoin = \(data)")
      if let data = data as? JSONArray
      {
      for dict in data
@@ -1868,7 +2309,7 @@ extension NewChatSectionVC
         SocketIOManager.shared.socket.on("receivedSMS", callback: { (data, error) in
             
             
-            print("receivedSMS = \(data)")
+            debugPrint("receivedSMS = \(data)")
             
             if let data = data as? JSONArray
             {
@@ -1876,12 +2317,15 @@ extension NewChatSectionVC
                 {
                     
                     let status =  dict["status"] as? String ?? ""
-                  print("receivedSMS status = \(status)")
+                  debugPrint("receivedSMS status = \(status)")
                     
                     if status == kTrue
                     {
                         if  DataManager.currentScreen.equalsIgnoreCase(string: kChat)
                         {
+                            if self.MatchArray.count>0
+                            {
+                                self.reloadMatchCollection=true
                             DispatchQueue.main.async {
                                 if Connectivity.isConnectedToInternet {
                                     self.MatchArray.removeAll()
@@ -1891,9 +2335,11 @@ extension NewChatSectionVC
                                     self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
                                 }
                             }
+                            }
                             
                             if self.tableListBool
                             {
+                                self.reloadActiveListCollection=true
                                 self.activeInactiveChatArray.removeAll()
                                 //                            self.activeButton.isSelected = true
                                 //                            self.inactiveButton.isSelected = false
@@ -1938,5 +2384,141 @@ extension NewChatSectionVC
         })
         
     }
+}
+
+extension NewChatSectionVC:paymentScreenOpenFrom,deleteAccountDelegate,NavigateToPaymentPopup
+{
+ 
+    func FromScreenName(name: String, ActiveDay: Int)
+    {
+        debugPrint("name \(name)")
+        
+    }
     
+    func deleteAccountFunc(name: String) {
+        
+        debugPrint(name)
+        if name.equalsIgnoreCase(string: kProlong)
+        {
+
+            self.showLoader()
+            
+            IAPHandler.shared.purchase(product: .kChat)
+                IAPHandler.shared.delegate=self
+            
+        }
+    }
+    
+    func NavigateToPayment(name: String,transactionId: String?)
+    {
+        
+        debugPrint("payment call \(name)")
+        if name.equalsIgnoreCase(string: kSucess)
+        {
+           
+     
+            
+            var data = JSONDictionary()
+            data[ApiKey.kTransaction_id] = transactionId ?? kEmptyString
+            data[ApiKey.kAmount] = "100"
+            data[ApiKey.kSubscription_type] = kProlong
+            data[ApiKey.kSubName] = kProlong
+ 
+            data["other_user_id"] = self.selectedUserId
+
+            
+            debugPrint("Payment para = \(data)")
+            
+            if Connectivity.isConnectedToInternet {
+
+                self.updatePaymentApi(data: data)
+            } else {
+                self.hideLoader()
+                self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+            }
+        }
+        else
+        {
+            self.hideLoader()
+        }
+    }
+    
+    
+    func updatePaymentApi(data:JSONDictionary)
+    {
+        AccountVM.shared.callApiUpdatePayment(data: data, response: { (message, error) in
+            
+            if error != nil
+            {
+                self.hideLoader()
+                self.showErrorMessage(error: error)
+            }
+            else{
+                self.hideLoader()
+     
+                    self.tableListBool=true
+                    DispatchQueue.main.async
+                    {
+                        self.bottomLabel.isHidden = false
+                        self.bottomIcon.isHidden = false
+                        self.tableListBool = true
+                        self.chatTableView.separatorStyle = .singleLine
+            
+                           self.activeInactiveChatArray.removeAll()
+                      
+                        self.callGetGetActiveChat(page: 0)
+                    }
+                
+                
+            }
+            
+            
+        })
+    }
+    
+//    func badgeCountIntervalCheckEmit()
+//    {
+//
+//        let JoinDict = ["userId":DataManager.Id]
+//
+//        debugPrint("badgeCountIntervalCheckEmit \(JoinDict)")
+//        SocketIOManager.shared.badgeCountIntervalCheckEmit(MessageChatDict: JoinDict)
+//        DispatchQueue.main.async {
+//            self.badgeCountIntervalCheckON()
+//        }
+//
+//    }
+//    func badgeCountIntervalCheckON()
+//    {
+//        SocketIOManager.shared.socket.on("receivedBadgeCount", callback: { (data, error) in
+//
+//            //self.RoundRedView.isHidden=true
+//            //  debugPrint("badgeCountIntervalCheckON \(data) \(error)")
+//
+//            if let data = data as? JSONArray
+//            {
+//                for dict in data
+//                {
+//
+//                    let badgeCount =  dict["badgeCount"] as? Int ?? 0
+//                    if badgeCount > 0
+//                    {
+//
+//                        self.tabBarController?.tabBar.items![1].badgeValue = ""
+//                    }
+//                    else
+//                    {
+//
+//                    }
+//                }
+//            }
+//            else
+//            {
+//               // self.RoundRedView.isHidden=true
+//            }
+//
+//            //  debugPrint("receivedBadgeCount = \(data) \(error)")
+//        })
+//
+//    }
 }

@@ -25,6 +25,7 @@ class FeedbackAlertVC: BaseVC {
     @IBOutlet weak var buttonView: UIView!
     var type : ScreenType = .feedbackScreen
     var Alerttype : ScreenType = .storiesScreen
+    var comeFromScreen : ScreenType = .storiesScreen
     var user_name = ""
     var chat_room_id = ""
     var view_user_id = ""
@@ -35,13 +36,20 @@ class FeedbackAlertVC: BaseVC {
     @IBOutlet weak var blurView: UIVisualEffectView!
     
     override func viewDidLoad() {
+        
+        
+        
+        debugPrint("Come from data type Alerttype comeFromScreen \(type) \(Alerttype) \(comeFromScreen)")
+        
         super.viewDidLoad()
-        if type == .feedbackScreen {
+       
+        if type == .feedbackScreen
+        {
             alertHeightContraint.constant = 249//375
             titleBottomContarint.constant = 32
-            doneButton.setTitle("OKAY", for: .normal)
-            titleLabel.text = "Uh Oh!"
-            descrptionLbel.text = "\(user_name) hasn't accepted your chat request yet."
+            doneButton.setTitle(kOKAY, for: .normal)
+            titleLabel.text = kUhHh
+            descrptionLbel.text = "\(user_name) \(kHasnAcceptedYou)"
             buttonView.isHidden = false
             labelBottomConstraints.constant = 32
             
@@ -51,15 +59,15 @@ class FeedbackAlertVC: BaseVC {
             {
           
             titleBottomContarint.constant = 32
-            doneButton.setTitle("OKAY", for: .normal)
-            titleLabel.text = "Uh Oh!"
+            doneButton.setTitle(kOKAY, for: .normal)
+            titleLabel.text = kUhHh
             if user_name.count>60
             {
                 alertHeightContraint.constant = 300
             }
             else
             {
-                alertHeightContraint.constant = 249//375
+                alertHeightContraint.constant = 270//375
             }
             
             descrptionLbel.text = user_name
@@ -75,9 +83,9 @@ class FeedbackAlertVC: BaseVC {
           {
             alertHeightContraint.constant = 249//375
             titleBottomContarint.constant = 32
-            doneButton.setTitle("OKAY", for: .normal)
-            titleLabel.text = "Uh Oh!"
-            descrptionLbel.text = "\(user_name) has left the chat."
+            doneButton.setTitle(kOKAY, for: .normal)
+            titleLabel.text = kUhHh
+            descrptionLbel.text = "\(user_name) \(kHasLeft)"
             buttonView.isHidden = false
             labelBottomConstraints.constant = 32
             
@@ -88,9 +96,9 @@ class FeedbackAlertVC: BaseVC {
           {
             alertHeightContraint.constant = 249//375
             titleBottomContarint.constant = 32
-            doneButton.setTitle("OKAY", for: .normal)
-            titleLabel.text = "Uh Oh!"
-            descrptionLbel.text = "\(user_name) has left the chat."
+            doneButton.setTitle(kOKAY, for: .normal)
+            titleLabel.text = kUhHh
+            descrptionLbel.text = "\(user_name) \(kHasLeft)"
             buttonView.isHidden = false
             labelBottomConstraints.constant = 32
             
@@ -101,9 +109,9 @@ class FeedbackAlertVC: BaseVC {
           {
             alertHeightContraint.constant = 249//375
             titleBottomContarint.constant = 32
-            doneButton.setTitle("OKAY", for: .normal)
-            titleLabel.text = "Uh Oh!"
-            descrptionLbel.text = "You are still waiting on \(user_name) to accept the chat 😊."//"\(user_name) hasn't accepted your chat request yet."
+            doneButton.setTitle(kOKAY, for: .normal)
+            titleLabel.text = kUhHh
+            descrptionLbel.text = "\(kYouAreStill) \(user_name) \(kToAccept)"//"\(user_name) hasn't accepted your chat request yet."
             buttonView.isHidden = false
             labelBottomConstraints.constant = 32
             
@@ -119,32 +127,69 @@ class FeedbackAlertVC: BaseVC {
            // }
             alertHeightContraint.constant = 290
             titleBottomContarint.constant = 75
-            titleLabel.text = "Feedback Received"
-            if self.Alerttype == .messageScreen
+            titleLabel.text = kFeedbackReceived
+            if self.Alerttype == .messageScreen || self.Alerttype == .ViewProfile
             {
-                descrptionLbel.text = "Thank you for your time. \(user_name) has been \(fromBlock)."
+                descrptionLbel.text = "\(kThankyouFor) \(user_name) \(kHasBeen) \(fromBlock)."
             }
             else
-            
             {
-                descrptionLbel.text = "Thank you for your time. \(user_name) 's post has been \(fromBlock)."
+                if self.comeFromScreen == .ListHangout ||  self.type == .ViewPostHangout
+                {
+                descrptionLbel.text = "\(kThankyouFor) \(user_name) \(kHasBeenHangout) \(fromBlock)."
+                }
+                else
+                    
+                {
+            descrptionLbel.text = "\(kThankyouFor) \(user_name) \(kHasBeenPost) \(fromBlock)."
+                }
             }
            
             buttonView.isHidden = true
             labelBottomConstraints.constant = -16
         }
+        
+        self.doneButton.backgroundColor = ENABLECOLOR
   
     }
     
     @IBAction func backbtnAct(_ sender: Any) {
-        if self.Alerttype == .messageScreen
+        if (self.comeFromScreen == .ListHangout && !self.fromBlock.equalsIgnoreCase(string: "reported")) ||  (self.comeFromScreen == .ViewPostHangout && !self.fromBlock.equalsIgnoreCase(string: "reported"))
         {
-            if #available(iOS 13.0, *) {
-                SCENEDEL?.navigateToChat()
+            if #available(iOS 13.0, *)
+            {
+                SCENEDEL?.navigateToHangout()
             } else {
                 // Fallback on earlier versions
-                APPDEL.navigateToChat()
+                APPDEL.navigateToHangout()
             }
+        }
+       else if (self.Alerttype == .ViewProfile  && !self.fromBlock.equalsIgnoreCase(string: "reported"))
+        {
+            DataManager.HomeRefresh=true
+            if #available(iOS 13.0, *) {
+                SCENEDEL?.navigateToHome()
+            } else {
+                // Fallback on earlier versions
+                APPDEL.navigateToHome()
+            }
+        }
+        
+      else  if self.Alerttype == .messageScreen
+        {
+//            if #available(iOS 13.0, *) {
+//                SCENEDEL?.navigateToChat()
+//            } else {
+//                // Fallback on earlier versions
+//                APPDEL.navigateToChat()
+//            }
+          
+          if #available(iOS 13.0, *) {
+              SCENEDEL?.navigateToHome()
+          } else {
+              // Fallback on earlier versions
+              APPDEL.navigateToHome()
+          }
         }
        else if self.Alerttype == .GrayOut
         {
@@ -168,7 +213,7 @@ class FeedbackAlertVC: BaseVC {
             
             self.dismiss(animated: true) {
                 DataManager.ShakeId = ""
-                   print("okay click")
+                   debugPrint("okay click")
                 if #available(iOS 13.0, *) {
                     DataManager.comeFrom = ""
                     DataManager.isProfileCompelete = false
@@ -250,14 +295,39 @@ class FeedbackAlertVC: BaseVC {
     @IBAction func hidePopupAct(_ sender: UIButton)
     {
         //self.dismiss(animated: true)
-        
-        if self.Alerttype == .messageScreen
+        if (self.comeFromScreen == .ListHangout && !self.fromBlock.equalsIgnoreCase(string: "reported")) ||  (self.comeFromScreen == .ViewPostHangout && !self.fromBlock.equalsIgnoreCase(string: "reported"))
         {
-            if #available(iOS 13.0, *) {
-                SCENEDEL?.navigateToChat()
+            if #available(iOS 13.0, *)
+            {
+                SCENEDEL?.navigateToHangout()
             } else {
                 // Fallback on earlier versions
-                APPDEL.navigateToChat()
+                APPDEL.navigateToHangout()
+            }
+        }
+       else if (self.Alerttype == .ViewProfile  && !self.fromBlock.equalsIgnoreCase(string: "reported"))
+        {
+            DataManager.HomeRefresh=true
+            if #available(iOS 13.0, *) {
+                SCENEDEL?.navigateToHome()
+            } else {
+                // Fallback on earlier versions
+                APPDEL.navigateToHome()
+            }
+        }
+        else if self.Alerttype == .messageScreen
+        {
+//            if #available(iOS 13.0, *) {
+//                SCENEDEL?.navigateToChat()
+//            } else {
+//                // Fallback on earlier versions
+//                APPDEL.navigateToChat()
+//            }
+            if #available(iOS 13.0, *) {
+                SCENEDEL?.navigateToHome()
+            } else {
+                // Fallback on earlier versions
+                APPDEL.navigateToHome()
             }
         }
         else if self.Alerttype == .GrayOut
@@ -282,7 +352,7 @@ class FeedbackAlertVC: BaseVC {
                 
                 self.dismiss(animated: true) {
                     DataManager.ShakeId = ""
-                       print("okay click")
+                       debugPrint("okay click")
                     if #available(iOS 13.0, *) {
                         DataManager.comeFrom = ""
                         DataManager.isProfileCompelete = false
@@ -350,13 +420,40 @@ class FeedbackAlertVC: BaseVC {
     @IBAction func doneButtonAction(_ sender: Any)
     {
        // self.dismiss(animated: true, completion: nil)
-        if self.Alerttype == .messageScreen
+        if (self.comeFromScreen == .ListHangout && !self.fromBlock.equalsIgnoreCase(string: "reported")) ||  (self.comeFromScreen == .ViewPostHangout && !self.fromBlock.equalsIgnoreCase(string: "reported"))
         {
-            if #available(iOS 13.0, *) {
-                SCENEDEL?.navigateToChat()
+            if #available(iOS 13.0, *)
+            {
+                SCENEDEL?.navigateToHangout()
             } else {
                 // Fallback on earlier versions
-                APPDEL.navigateToChat()
+                APPDEL.navigateToHangout()
+            }
+        }
+       else if (self.Alerttype == .ViewProfile  && !self.fromBlock.equalsIgnoreCase(string: "reported"))
+        {
+            DataManager.HomeRefresh=true
+            if #available(iOS 13.0, *) {
+                SCENEDEL?.navigateToHome()
+            } else {
+                // Fallback on earlier versions
+                APPDEL.navigateToHome()
+            }
+        }
+        else if self.Alerttype == .messageScreen
+        {
+//            if #available(iOS 13.0, *) {
+//                SCENEDEL?.navigateToChat()
+//            } else {
+//                // Fallback on earlier versions
+//                APPDEL.navigateToChat()
+//            }
+            
+            if #available(iOS 13.0, *) {
+                SCENEDEL?.navigateToHome()
+            } else {
+                // Fallback on earlier versions
+                APPDEL.navigateToHome()
             }
         }
         else if self.Alerttype == .GrayOut
@@ -381,7 +478,7 @@ class FeedbackAlertVC: BaseVC {
                 
                 self.dismiss(animated: true) {
                     DataManager.ShakeId = ""
-                       print("okay click")
+                       debugPrint("okay click")
                     if #available(iOS 13.0, *) {
                         DataManager.comeFrom = ""
                         DataManager.isProfileCompelete = false
@@ -443,10 +540,11 @@ class FeedbackAlertVC: BaseVC {
     
     func storyBackAct()
     {
-        let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
-        vc.selectedIndex=1
-        self.navigationController?.pushViewController(vc, animated: true)
+        //let vc = OldTapControllerVC.instantiate(fromAppStoryboard: .Main)
+        //vc.selectedIndex=1
+        //self.navigationController?.pushViewController(vc, animated: true)
+        DataManager.comeFrom=kShare
+        self.goToShake()
     }
     
     
@@ -497,7 +595,7 @@ class FeedbackAlertVC: BaseVC {
     
     func sendMatchBlockNoti_Method()
     {
-        print("sendSMS ")
+        debugPrint("sendSMS ")
     
         let dict2 = ["from_user_id":DataManager.Id,"to_user_id":self.view_user_id,"alert_type":"removematch"]
         SocketIOManager.shared.sendMatchBlockNoti(MessageChatDict: dict2)

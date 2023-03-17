@@ -169,7 +169,7 @@ class CallKitManager: NSObject, CXProviderDelegate {
         
         callKitProvider?.reportOutgoingCall(with: action.callUUID, startedConnectingAt: nil)
         
-        print("UUID: report \(action.callUUID)")
+        debugPrint("UUID: report \(action.callUUID)")
         
         roomAnswearConnect(action: action, callerName: action.handle.value)
         
@@ -236,16 +236,16 @@ class CallKitManager: NSObject, CXProviderDelegate {
     func remoteUserDidDecline() {
         if let del = delegate {
             let uuid = del.getCurrentUUID()
-            print("UUID: Decline \(uuid)")
+            debugPrint("UUID: Decline \(uuid)")
             
             let endCallAction = CXEndCallAction.init(call: uuid)
             let transaction = CXTransaction(action: endCallAction)
             callKitCallController?.request(transaction) { error in
                 if let error = error {
-                    print("EndCallAction transaction request failed: \(error.localizedDescription).")
+                    debugPrint("EndCallAction transaction request failed: \(error.localizedDescription).")
                     self.callKitProvider?.reportCall(with: uuid, endedAt: Date(), reason: .remoteEnded)
                     
-                    print("EndCallAction transaction request successful")
+                    debugPrint("EndCallAction transaction request successful")
                     if let del = self.delegate {
                         del.userDidBlockAudioDevice()
                         
@@ -267,10 +267,10 @@ class CallKitManager: NSObject, CXProviderDelegate {
             let transaction = CXTransaction(action: endCallAction)
             callKitCallController?.request(transaction) { error in
                 if let error = error {
-                    print("EndCallAction transaction request failed: \(error.localizedDescription).")
+                    debugPrint("EndCallAction transaction request failed: \(error.localizedDescription).")
                     self.callKitProvider?.reportCall(with: uuid, endedAt: Date(), reason: .remoteEnded)
                     
-                    print("EndCallAction transaction request successful")
+                    debugPrint("EndCallAction transaction request successful")
                     if let del = self.delegate {
                         del.userDidBlockAudioDevice()
                         
@@ -429,10 +429,10 @@ class CallKitManager: NSObject, CXProviderDelegate {
         let transaction = CXTransaction(action: endCallAction)
         callKitCallController?.request(transaction) { error in
             if let error = error {
-                print("EndCallAction transaction request failed: \(error.localizedDescription).")
+                debugPrint("EndCallAction transaction request failed: \(error.localizedDescription).")
                 self.callKitProvider?.reportCall(with: uuid, endedAt: Date(), reason: .remoteEnded)
                 
-                print("EndCallAction transaction request successful")
+                debugPrint("EndCallAction transaction request successful")
                 if let del = self.delegate {
                     del.userDidBlockAudioDevice()
                     

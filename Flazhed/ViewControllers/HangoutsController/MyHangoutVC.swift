@@ -9,9 +9,10 @@ import UIKit
 import CoreLocation
 import MapKit
 import SDWebImage
+import SkeletonView
 
 class MyHangoutVC: BaseVC {
-    //MARK:- All outlets  
+    //MARK: - All outlets  
     
     @IBOutlet weak var topIconConst: NSLayoutConstraint!
     @IBOutlet weak var viewHeader: UIView!
@@ -28,7 +29,7 @@ class MyHangoutVC: BaseVC {
     @IBOutlet weak var imgBusiness: UIImageView!
     @IBOutlet weak var btnCreateHangout: UIButton!
 
-    //MARK:- All Variable  
+    //MARK: - All Variable  
     
     var refreshControl = UIRefreshControl()
     var fromCreateHangout=false
@@ -40,11 +41,11 @@ class MyHangoutVC: BaseVC {
     
     var fromDelete=false
     
-    //MARK:- View Lifecycle   
+    //MARK: - View Lifecycle   
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.viewHeader.isHidden=true
+//        self.viewHeader.isHidden=true
         self.viewEmptyList.isHidden=true
         self.setUpTable()
         refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
@@ -57,7 +58,7 @@ class MyHangoutVC: BaseVC {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
-   
+        
         if DataManager.fromHangout==kCreate
         {
             
@@ -245,17 +246,26 @@ class MyHangoutVC: BaseVC {
     }
     @objc func refresh(_ sender: AnyObject) {
      
-        HangoutVM.shared.page=0
-        self.MyHangoutData.removeAll()
- 
-        self.callGetHangoutApi(page: 0)
+        if Connectivity.isConnectedToInternet {
+            HangoutVM.shared.page=0
+            self.MyHangoutData.removeAll()
+     
+            self.callGetHangoutApi(page: 0)
+         } else {
+             
+             self.refreshControl.endRefreshing()
+             self.tableHangout.contentOffset = CGPoint.zero
+            self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
+        }
+        
+       
     }
-    //MARK:- back button action  
+    //MARK: - back button action  
     
     @IBAction func BackAct(_ sender: UIButton)
     {
 //        let storyBoard = UIStoryboard.init(name: "Main", bundle: nil)
-//        let vc = storyBoard.instantiateViewController(withIdentifier: "TapControllerVC") as! TapControllerVC
+//        let vc = storyBoard.instantiateViewController(withIdentifier: "OldTapControllerVC") as! OldTapControllerVC
 //        vc.selectedIndex=4
 //        DataManager.comeFrom = kViewProfile
 //        self.navigationController?.pushViewController(vc, animated: false)
@@ -267,8 +277,8 @@ class MyHangoutVC: BaseVC {
     
     @objc func editAct(_ sender: UIButton)
     {
-        let storyBoard = UIStoryboard.init(name: "Hangouts", bundle: nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "PostHangoutVC") as! PostHangoutVC
+        let vc = PostHangoutVC.instantiate(fromAppStoryboard: .Hangouts)
+
         let cellData = self.MyHangoutData[sender.tag]
         
         vc.HangoutDetail=cellData
@@ -281,8 +291,7 @@ class MyHangoutVC: BaseVC {
     @objc func deleteAct(_ sender: UIButton)
     {
         
-        let storyboard: UIStoryboard = UIStoryboard(name: "Stories", bundle: Bundle.main)
-        let destVC = storyboard.instantiateViewController(withIdentifier: "StoryDiscardVC") as!  StoryDiscardVC
+        let destVC = StoryDiscardVC.instantiate(fromAppStoryboard: .Stories)
         destVC.delegate=self
         let cellData = self.MyHangoutData[sender.tag]
         self.hangout_id=cellData._id ?? ""
@@ -290,16 +299,23 @@ class MyHangoutVC: BaseVC {
         destVC.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
         destVC.modalTransitionStyle = UIModalTransitionStyle.crossDissolve
 
-        self.present(destVC, animated: true, completion: nil)
+        if let tab = self.tabBarController
+        {
+            tab.present(destVC, animated: true, completion: nil)
+        }
+        else
+        {
+            self.present(destVC, animated: true, completion: nil)
+        }
+        
     }
     
     @IBAction func createHangoutAct(_ sender: UIButton)
     {
-        let storyBoard = UIStoryboard.init(name: "Hangouts", bundle: nil)
-        let vc = storyBoard.instantiateViewController(withIdentifier: "PostHangoutVC") as! PostHangoutVC
+        let vc = PostHangoutVC.instantiate(fromAppStoryboard: .Hangouts)
         self.navigationController?.pushViewController(vc, animated: true)
     }
-   //MARK:- Filter button action  
+   //MARK: - Filter button action  
     
     @IBAction func SocialAct(_ sender: UIButton)
     {
@@ -375,6 +391,35 @@ class MyHangoutVC: BaseVC {
         self.callGetHangoutApi(page: 0)
     }
     
+    func showLoader()
+    {
+        self.tableHangout.showAnimatedGradientSkeleton()
+        //self.viewSport.isSkeletonable=true
+       // self.viewSocial.isSkeletonable=true
+        
+        self.viewHeader.clipsToBounds=true
+        self.btnCreateHangout.clipsToBounds=true
+        self.viewHeader.isSkeletonable=true
+      
+       
+       // self.viewSport.showAnimatedGradientSkeleton()
+        self.viewHeader.showAnimatedGradientSkeleton()
+        self.btnCreateHangout.showAnimatedGradientSkeleton()
+       
+    
+
+    }
+    func hideLoader()
+    {
+        self.tableHangout.hideSkeleton()
+        self.viewHeader.hideSkeleton()
+        //self.viewSocial.hideSkeleton()
+        self.btnCreateHangout.hideSkeleton()
+     
+
+    }
+    
+    
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
 
             if ((tableHangout.contentOffset.y + tableHangout.frame.size.height) >= tableHangout.contentSize.height-50)
@@ -389,7 +434,7 @@ class MyHangoutVC: BaseVC {
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        print(#function)
+        debugPrint(#function)
         self.btnCreateHangout.isHidden=false
         
 
@@ -411,13 +456,13 @@ class MyHangoutVC: BaseVC {
     
 }
 
-//MARK:- delete hangout delegate  
+//MARK: - delete hangout delegate  
 
 extension MyHangoutVC:DiscardDelegate
 {
     func ClickNameAction(name: String)
     {
-        print(name)
+        debugPrint(name)
         if name.equalsIgnoreCase(string: kDelete)
         {
             self.callDeleteHangoutApi(hangout_id: self.hangout_id)
@@ -426,9 +471,9 @@ extension MyHangoutVC:DiscardDelegate
     
     
 }
-//MARK:- Tableview  setup and show my hangout data 
+//MARK: - Tableview  setup and show my hangout data 
 
-extension MyHangoutVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate
+extension MyHangoutVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDelegate,SkeletonTableViewDataSource
 {
    
     
@@ -442,6 +487,20 @@ extension MyHangoutVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDele
         self.tableHangout.delegate = self
         self.tableHangout.dataSource = self
     }
+    
+    func collectionSkeletonView(_ skeletonView: UITableView, cellIdentifierForRowAt indexPath: IndexPath) -> ReusableCellIdentifier {
+        
+        
+        return "MyHangoutTCell"
+    }
+    
+    func collectionSkeletonView(_ skeletonView: UITableView, skeletonCellForRowAt indexPath: IndexPath) -> UITableViewCell? {
+        
+        let cell = skeletonView.dequeueReusableCell(withIdentifier: "MyHangoutTCell") as! MyHangoutTCell
+        return cell
+    }
+    
+    
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.MyHangoutData.count
@@ -545,38 +604,14 @@ extension MyHangoutVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDele
 //            let source = CGImageSourceCreateWithURL(imageURL as CFURL,nil)
 //            let imageHeader = CGImageSourceCopyPropertiesAtIndex(source!, 0, nil)! as NSDictionary;
 //
-//            print("Sizec = \(imageHeader)")
+//            debugPrint("Sizec = \(imageHeader)")
             cell.imgHangout.sd_imageIndicator = SDWebImageActivityIndicator.gray
-            cell.imgHeightConst.constant =  390
+            cell.imgHeightConst.constant =  kListImageHeight
 
           DispatchQueue.main.async {
             cell.imgHangout.sd_setImage(with: url, placeholderImage: UIImage(named: "placeholderImage"), options: [], completed: nil)
           }
-            
-            var cellFrame = cell.frame.size
 
-//            cell.imgHangout.sd_setImage(with: url, placeholderImage: nil, options: [], completed: { (theImage, error, cache, url) in
-//
-//                if theImage != nil
-//                {
-//                    let height = self.getAspectRatioAccordingToiPhones(cellImageFrame: cellFrame,downloadedImage: theImage!)
-//
-//                    if height>500
-//                    {
-//                        cell.imgHeightConst.constant  = 500
-//                    }
-//                else
-//                    {
-//                        cell.imgHeightConst.constant  = height
-//                    }
-//
-//                    print("Height = \(height)")
-//                }
-//                else
-//                {
-//                    cell.imgHeightConst.constant  = 375
-//                }
-//    })
         }
         cell.lblLocation.underline()
         
@@ -635,14 +670,14 @@ extension MyHangoutVC:UITableViewDelegate,UITableViewDataSource,UIScrollViewDele
         
     }
 }
-//MARK:- Get current location 
+//MARK: - Get current location 
 
 extension MyHangoutVC: CLLocationManagerDelegate
 {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
            if let location = locations.first
            {
-               print("Found user's location: \(location)")
+               debugPrint("Found user's location: \(location)")
             CURRENTLAT=location.coordinate.latitude
             CURRENTLONG=location.coordinate.longitude
           
@@ -651,7 +686,7 @@ extension MyHangoutVC: CLLocationManagerDelegate
 
        func locationManager(_ manager: CLLocationManager, didFailWithError error: Error)
        {
-           print("Failed to find user's location: \(error.localizedDescription)")
+           debugPrint("Failed to find user's location: \(error.localizedDescription)")
        }
 }
 
@@ -668,10 +703,10 @@ extension MyHangoutVC
         data[ApiKey.kOffset] = "\(page)"
          
             if Connectivity.isConnectedToInternet {
-                
+                self.showLoader()
                 self.callApiForHangout(data: data)
              } else {
-                
+                 self.hideLoader()
                 self.openSimpleAlert(message: APIManager.INTERNET_ERROR)
             }
         
@@ -684,11 +719,11 @@ extension MyHangoutVC
             if error != nil
             {
                 self.btnCreateHangout.isHidden=false
-
+                self.hideLoader()
                 self.showErrorMessage(error: error)
             }
             else{
- 
+                self.hideLoader()
                 self.btnCreateHangout.isHidden=false
                 for dict in HangoutVM.shared.HangoutDataArray
                 {

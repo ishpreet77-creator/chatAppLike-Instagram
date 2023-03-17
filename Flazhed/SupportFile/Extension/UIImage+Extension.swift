@@ -9,6 +9,7 @@ import Foundation
 import UIKit
 import AVKit
 import AVFoundation
+import SDWebImage
 
 extension UIImageView {
     func roundedImageWithBorder() {
@@ -19,10 +20,51 @@ extension UIImageView {
         self.layer.cornerRadius = self.bounds.width / 2
     }
 }
+
+extension UIImageView {
+    func setImage(imageName:String = "",isStory:Bool=false,isHangout:Bool=false,placeHolderImage:String="placeholderImage")
+    {
+        DispatchQueue.main.async {
+        self.sd_imageIndicator = SDWebImageActivityIndicator.gray
+        var url:URL!
+        
+        if !imageName.contains(kHttps) &&  !imageName.contains(kHttp)
+        {
+            if isStory
+            {
+                url = URL(string: kstoryTale+imageName)
+            }
+            else if isHangout
+            {
+                url = URL(string: kHangoutTale+imageName)
+            }
+            else
+            {
+                url = URL(string: IMAGE_BASE_URL+imageName)
+            }
+          
+        }
+       else
+        {
+         url = URL(string: imageName)
+        }
+    
+        self.sd_setImage(with: url, placeholderImage: UIImage(named: placeHolderImage), options: [], completed: nil)
+        }
+    }
+    func loadingGif(gifName:String,placeholderImage:String = "placeholderImage") {
+        let path1 : String = Bundle.main.path(forResource: gifName, ofType: "gif")!
+        let url = URL(fileURLWithPath: path1)
+        self.sd_setImage(with: url, placeholderImage: UIImage(named: placeholderImage), options: [], completed: nil)
+   
+    }
+}
+
+
 extension UIImageView {
     static func fromGif(frame: CGRect, resourceName: String) -> UIImageView? {
         guard let path = Bundle.main.path(forResource: resourceName, ofType: "gif") else {
-            print("Gif does not exist at that path")
+            debugPrint("Gif does not exist at that path")
             return nil
         }
         let url = URL(fileURLWithPath: path)
@@ -224,7 +266,7 @@ extension UIImageView
                     completion(thumbImage) //9
                 }
             } catch {
-                print(error.localizedDescription) //10
+                debugPrint(error.localizedDescription) //10
                 DispatchQueue.main.async {
                     completion(nil) //11
                 }
@@ -248,4 +290,16 @@ extension UIImageView
             }
             return UIImage()
         }
+    
+    
+}
+extension UIImageView {
+
+    func roundCorners(_ corners: UIRectCorner, radius: CGFloat) {
+         let path = UIBezierPath(roundedRect: self.bounds, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
+         let mask = CAShapeLayer()
+         mask.path = path.cgPath
+         self.layer.mask = mask
+    }
+
 }

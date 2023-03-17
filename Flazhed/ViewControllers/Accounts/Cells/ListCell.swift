@@ -9,7 +9,7 @@ import UIKit
 
 class ListCell: UITableViewCell {
     
-    //MARK:- IBOutlets
+    //MARK: - IBOutlets
 
     @IBOutlet weak var selectImage: UIImageView!
     @IBOutlet weak var lbl: UILabel!

@@ -12,7 +12,7 @@ class SenderBubbleView: UIView {
     var isIncoming = false
 
     var incomingColor = UIColor(white: 0.9, alpha: 1)
-    var outgoingColor = LINECOLOR//UIColor(red: 0.09, green: 0.54, blue: 1, alpha: 1)
+    var outgoingColor = PURPLECOLOR//LINECOLOR//UIColor(red: 0.09, green: 0.54, blue: 1, alpha: 1)
 
     override func draw(_ rect: CGRect) {
         let width = rect.width
